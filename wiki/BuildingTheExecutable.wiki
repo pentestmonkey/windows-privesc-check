@@ -1,4 +1,4 @@
-The source code for windows-privesc-check is Python.  This page described how to create a Windows executable (.exe file) using pyinstaller.
+The source code for windows-privesc-check is Python.  This page describes how to create a Windows executable (.exe file) using pyinstaller.
 
 The process below was tested on Windows XP.
 
