@@ -23,6 +23,5 @@ windows-privesc-check\dist\window-privesc-check.exe
 = Useful Links =
 
 These resources are incredibly useful:
-pywin32 online docs: http://timgolden.me.uk/pywin32-docs/contents.html
-pyinstaller docs: http://www.pyinstaller.org/export/latest/tags/1.4/doc/Manual.html?format=raw
-
+  * pywin32 online docs: http://timgolden.me.uk/pywin32-docs/contents.html
+  * pyinstaller docs: http://www.pyinstaller.org/export/latest/tags/1.4/doc/Manual.html?format=raw
