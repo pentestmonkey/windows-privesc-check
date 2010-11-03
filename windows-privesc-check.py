@@ -741,7 +741,7 @@ issue_template = {
 
 This could allow certain users on the system to place malicious code into certain key directories, or to replace programs with malicious ones.  A malicious local user could use this technique to hijack the privileges of other local users, running commands with their privileges.
 ''',
-       'recommendation': '''Programs run by multiple users should only be changable only by administrative users.  The directories containing these programs should only be changable only by administators too.  Revoke write privileges for non-adminitrative users from the above programs and directories.''',
+       'recommendation': '''Programs run by multiple users should only be changable only by administrative users.  The directories containing these programs should only be changable only by administrators too.  Revoke write privileges for non-administrative users from the above programs and directories.''',
        'supporting_data': {
           'writable_progs': {
              'section': "description",
@@ -760,7 +760,7 @@ This could allow certain users on the system to place malicious code into certai
 
 This could allow certain users on the system to place malicious code into certain key directories, or to replace programs with malicious ones.  A malicious local user could use this technique to hijack the privileges of other local users, running commands with their privileges.
 ''',
-       'recommendation': '''Programs run by multiple users should only be changable only by administrative users.  The directories containing these programs should only be changable only by administators too.  Revoke write privileges for non-adminitrative users from the above programs and directories.''',
+       'recommendation': '''Programs run by multiple users should only be changable only by administrative users.  The directories containing these programs should only be changable only by administrators too.  Revoke write privileges for non-administrative users from the above programs and directories.''',
        'supporting_data': {
           'writable_progs': {
              'section': "description",
@@ -887,11 +887,11 @@ This could allow certain users on the system to place malicious code into certai
        'supporting_data': {
           'weak_perms_exe': {
              'section': "description",
-             'preamble': "The following programs/DLLs in the sysetm PATH can be manipulated by non-administrator users:",
+             'preamble': "The following programs/DLLs in the system PATH can be manipulated by non-administrator users:",
           },
           'weak_perms_dir': {
              'section': "description",
-             'preamble': "The following directories in the sysetm PATH can be manipulated by non-administrator users:",
+             'preamble': "The following directories in the system PATH can be manipulated by non-administrator users:",
           },
        }
     },
