@@ -2016,8 +2016,13 @@ def check_services():
 	
 	services = win32service.EnumServicesStatus(sch, win32service.SERVICE_WIN32, win32service.SERVICE_STATE_ALL )
 	for service in services:
-		sh = win32service.OpenService(sch, service[0] , win32service.SC_MANAGER_CONNECT )
-		service_info = win32service.QueryServiceConfig(sh)
+		try:
+			sh = win32service.OpenService(sch, service[0] , win32service.SC_MANAGER_CONNECT )
+			service_info = win32service.QueryServiceConfig(sh)
+		except:
+			print "WARNING: Can't open service " + service[0]
+			continue
+		
 		try:
 			sh = win32service.OpenService(sch, service[0] , win32con.GENERIC_READ )
 			sd = win32service.QueryServiceObjectSecurity(sh, win32security.OWNER_SECURITY_INFORMATION | win32security.DACL_SECURITY_INFORMATION)
