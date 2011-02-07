@@ -1217,7 +1217,7 @@ def format_issue(format, issue_no, issue_data, issue_template): # $format is xml
 		data = data.replace('REPLACE_ITEM', '')
 		issue = issue.replace('REPLACE_DESCRIPTION_DATA', data + "\nREPLACE_DESCRIPTION_DATA")
 		#elif section == "recommendation":
-		#	dummy=1
+		#	pass
 			#issue = issue.replace('REPLACE_RECOMMENDATION_DATA', "data\nREPLACE_DESCRIPTION_DATA', 
 
 	issue = issue.replace('REPLACE_RECOMMENDATION_DATA', '')
@@ -1291,7 +1291,7 @@ def principle_is_trusted(principle, domain):
 			if set(group_attrs).intersection(set(trusted_principles)):
 				return 1
 		except:
-			dummy=1
+			pass
 			
 	return 0
 
@@ -1594,7 +1594,7 @@ def check_event_logs():
 			try:
 				filename, type = win32api.RegQueryValueEx(subkeyh, "DisplayNameFile")
 			except:
-				dummy=1
+				pass
 			else:
 				weak_perms = check_weak_write_perms(os.path.expandvars(filename), 'file')
 				if weak_perms:
@@ -1607,7 +1607,7 @@ def check_event_logs():
 			try:
 				filename, type = win32api.RegQueryValueEx(subkeyh, "File")
 			except:
-				dummy=1
+				pass
 			else:
 				weak_perms = check_weak_write_perms(os.path.expandvars(filename), 'file')
 				if weak_perms:
@@ -1692,7 +1692,7 @@ def audit_processes():
 			exe = win32process.GetModuleFileNameEx(ph, mhs.pop(0))
 			gotexe = 1
 		except:
-			dummy = 1
+			pass
 		print "Filename: %s" % exe
 			
 		gottokenh = 0
@@ -1720,7 +1720,7 @@ def audit_processes():
 			print "TokenUser: Unknown"
 			print "TokenOwner: Unknown"
 			print "TokenPrimaryGroup: Unknown"
-			dummy=1
+			pass
 			
 		user = "unknown\\unknown"
 		
@@ -1783,7 +1783,7 @@ def audit_processes():
 			try:
 				print "TokenImpersonationLevel: %s" % win32security.GetTokenInformation(tokenh, TokenImpersonationLevel) # doesn't work on xp
 			except:
-				dummy = 1
+				pass
 			
 			try:
 				r = win32security.GetTokenInformation(tokenh, TokenHasRestrictions) # doesn't work on xp
@@ -1792,7 +1792,7 @@ def audit_processes():
 				else:
 					print "TokenHasRestrictions: %s (token has been filtered)" % r
 			except:
-				dummy = 1
+				pass
 			
 			try:
 				e = win32security.GetTokenInformation(tokenh, TokenElevationType) # vista
@@ -1805,23 +1805,23 @@ def audit_processes():
 				else:
 					print "TokenElevationType: Unknown (%s)" % e
 			except:
-				dummy = 1
+				pass
 				
 			try:
 				print "TokenUIAccess: %s" % win32security.GetTokenInformation(tokenh, TokenUIAccess) # doesn't work on xp
 			except:
-				dummy = 1
+				pass
 			
 			try:
 				print "TokenLinkedToken: %s" % win32security.GetTokenInformation(tokenh, TokenLinkedToken) # vista
 			except:
-				dummy = 1
+				pass
 			
 			try:
 				print "TokenLogonSid: %s" % win32security.GetTokenInformation(tokenh, TokenLogonSid) # doesn't work on xp
 				print "TokenElevation: %s" % win32security.GetTokenInformation(tokenh, TokenElevation) # vista
 			except:
-				dummy = 1
+				pass
 			
 			try:
 				sid, i =  win32security.GetTokenInformation(tokenh, TokenIntegrityLevel) # vista
@@ -1832,7 +1832,7 @@ def audit_processes():
 					user = win32security.ConvertSidToStringSid(sid)
 				print "TokenIntegrityLevel: %s %s" % (user, i)
 			except:
-				dummy = 1
+				pass
 			
 			try:
 				m = win32security.GetTokenInformation(tokenh, TokenMandatoryPolicy) # vista
@@ -1847,7 +1847,7 @@ def audit_processes():
 				else:
 					print "TokenMandatoryPolicy: %s" % m
 			except:
-				dummy = 1
+				pass
 			
 			print "Token Resitrcted Sids: " + str(win32security.GetTokenInformation(tokenh, TokenRestrictedSids))
 			print "IsTokenRestricted: " + str(win32security.IsTokenRestricted(tokenh))
@@ -1955,7 +1955,7 @@ def check_processes():
 			try:
 				tokenh = win32security.OpenProcessToken(ph, win32con.TOKEN_QUERY)
 			except:
-				dummy=1
+				pass
 			else:
 				sidObj, intVal = win32security.GetTokenInformation(tokenh, TokenUser)
 				#source = win32security.GetTokenInformation(tokenh, TokenSource)
@@ -1997,7 +1997,7 @@ def check_services():
 		sd = win32service.QueryServiceObjectSecurity(sch, win32security.OWNER_SECURITY_INFORMATION | win32security.DACL_SECURITY_INFORMATION)
 		print check_weak_write_perms_by_sd("Service Manager", 'service_manager', sd)
 	except: 
-		dummy=1
+		pass
 	
 	# Need to connect to service (OpenService) with minimum privs to read DACL.  Here are our options:
 	#
@@ -2070,7 +2070,7 @@ def audit_services():
 		print check_weak_write_perms_by_sd("Service Manager", 'service_manager', sd)
 	except: 
 		#print "ERROR: Can't get security descriptor for service manager"
-		dummy=1
+		pass
 	
 	# Need to connect to service (OpenService) with minimum privs to read DACL.  Here are our options:
 	#
@@ -2230,7 +2230,7 @@ def get_user_paths():
 		try:
 			subkeyh = win32api.RegOpenKeyEx(keyh, subkey[0] + "\\Environment" , 0, win32con.KEY_ENUMERATE_SUB_KEYS | win32con.KEY_QUERY_VALUE | win32con.KEY_READ)
 		except:
-			dummy=1
+			pass
 		else:
 			subkey_count, value_count, mod_time = win32api.RegQueryInfoKey(subkeyh)
 			
@@ -2238,7 +2238,7 @@ def get_user_paths():
 				path, type = win32api.RegQueryValueEx(subkeyh, "PATH")
 				paths.append((subkey[0], path))
 			except:
-				dummy=1
+				pass
 	return paths
 
 def get_system_path():
@@ -2453,7 +2453,7 @@ def audit_domain():
 		print "hds: " + hds
 		print "DsListDomainsInSite: "+ str(win32security.DsListDomainsInSite(hds))
 	except:
-		dummy=1
+		pass
 	
 	# domain can be null.  i think domainguid can be null.  sitename null.  flags = 0.
 	# print "Domain controller: " + str(win32security.DsGetDcName(dc, domain, domainguid, sitename, flags))
@@ -2700,7 +2700,7 @@ def audit_user_group():
 				privs = win32security.LsaEnumerateAccountRights(ph, gsid)
 				gprivs = list(list(gprivs) + list(privs))
 			except:
-				dummy = 1
+				pass
 			print "User %s is in this local group: %s" % (user, group)
 		group_list = win32net.NetUserGetGroups(remote_server, user)
 		groups = []
@@ -2712,7 +2712,7 @@ def audit_user_group():
 		try:
 			privs = win32security.LsaEnumerateAccountRights(ph, sid)
 		except:
-			dummy = 1
+			pass
 		for priv in list(set(list(gprivs) + list(privs))):
 			print "User %s has privilege %s" % (user, priv)
 
@@ -2727,7 +2727,7 @@ def audit_user_group():
 				try:
 					priv_desc = win32security.LookupPrivilegeDisplayName(remote_server, priv)
 				except:
-					dummy = 1
+					pass
 					
 				name, domain, type = win32security.LookupAccountSid(remote_server, s)
 				type_string = "unknown_type"
@@ -2739,7 +2739,7 @@ def audit_user_group():
 				# print "Privilege %s is held by %s\%s (%s)" % (priv, domain, name, type_string)
 		except:
 			#print "Skipping %s - doesn't exist for this platform" % priv
-			dummy = 1
+			pass
 
 print "windows-privesc-check v%s (http://pentestmonkey.net/windows-privesc-check)\n" % version
 
@@ -2881,7 +2881,7 @@ try:
 	)
 except:
 	# nothing
-	dummy = 1
+	pass
 
 # Disable WOW64 - we WANT to see 32-bit areas of the filesystem
 #
