@@ -2888,6 +2888,12 @@ except:
 	# nothing
 	pass
 
+# Load win32net
+#
+# NetLocalGroupEnum fails with like under Windows 7 64-bit, but not XP 32-bit:
+# pywintypes.error: (127, 'NetLocalGroupEnum', 'The specified procedure could not be found.')
+dummy = win32net.NetLocalGroupEnum(None, 0, 0, 1000)
+
 # Disable WOW64 - we WANT to see 32-bit areas of the filesystem
 #
 # Need to wrap in a try because the following call will error on 32-bit windows
