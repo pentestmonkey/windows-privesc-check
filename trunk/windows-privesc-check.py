@@ -2611,12 +2611,12 @@ def audit_user_group():
 	resume = 0
 	groups = []
 	while True:
-#		try:
+		try:
 			g, total, resume = win32net.NetLocalGroupEnum(remote_server, 0, resume, 999999)
 			groups = groups + g
 			if resume == 0:
 				break
-#		except:
+		except:
 			print "[E] NetLocalGroupEnum failed"
 			break
 	for group in groups:
@@ -2801,11 +2801,11 @@ for o, a in opts:
 		report_file_name = a
 	elif o in ("-s", "--server"):
 		remote_server = a
+		print "Remote server selected: " + a
 	elif o in ("-u", "--username"):
 		remote_username = a
 	elif o in ("-p", "--password"):
 		remote_password = a
-		print "Remote server selected: " + a
 	elif o in ("-d", "--domain"):
 		remote_domain = a
 	else:
