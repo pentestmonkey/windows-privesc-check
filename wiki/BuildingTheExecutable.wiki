@@ -5,9 +5,11 @@ The process below was tested on Windows XP.
 = Install Dependencies =
 
 In order to run windows-privesc-check.exe, you don't need any dependencies installed.  However, to build the .exe yourself, you'll need to following:
-   * python 2.6.x: http://www.python.org/download/releases/2.6/
+   * python: http://www.python.org/download/releases/2.7.1/
    * pyinstaller: http://www.pyinstaller.org/changeset/1352/tags/1.5-rc2?old_path=%2F&format=zip
-   * pywin32: http://sourceforge.net/projects/pywin32/
+   * pywin32: http://sourceforge.net/projects/pywin32/files/pywin32/Build%20214/
+
+Other versions will work too - these are just an example of known working versions.
 
 = Build Executable =
 
