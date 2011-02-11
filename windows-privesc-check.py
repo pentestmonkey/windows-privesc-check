@@ -241,7 +241,7 @@ remote_domain = None
 local_ips = socket.gethostbyname_ex(socket.gethostname())[2] # have to do this before Wow64DisableWow64FsRedirection
 
 version = "1.0"
-svnversion="$Revision: 0 $" # Don't change this line.  Auto-updated.
+svnversion="$Revision$" # Don't change this line.  Auto-updated.
 svnnum=re.sub('[^0-9]', '', svnversion)
 if svnnum:
 	version = version + "svn" + svnnum
