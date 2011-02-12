@@ -258,8 +258,10 @@ progfiles_checks = 0
 process_checks   = 0
 share_checks     = 0
 user_group_audit = 0
+logged_in_audit  = 0
 process_audit    = 0
 admin_users_audit= 0
+host_info_audit  = 0
 ignore_trusted   = 0
 owner_info       = 0
 weak_perms_only  = 0
@@ -2655,8 +2657,60 @@ def audit_admin_users():
 #			print sids
 #		except:
 #			print "[E] Lookup failed"
+
+def audit_logged_in():
+	resume = 0
+	print "\n[+] Logged in users:"
+	try:
+		while True:
+			users, total, resume = win32net.NetWkstaUserEnum(remote_server, 1 , resume , 999999 )
+			for user in users:
+				print user
+			if resume == 0:
+				break
+	except:
+		print "[E] Failed"
 		
+def audit_host_info():
+	print "\n"
+	ph = win32security.LsaOpenPolicy(remote_server, win32security.POLICY_VIEW_LOCAL_INFORMATION | win32security.POLICY_LOOKUP_NAMES)
+	print "PolicyDnsDomainInformation:"
+	print win32security.LsaQueryInformationPolicy(ph, win32security.PolicyDnsDomainInformation)
+	print "PolicyDnsDomainInformation:"
+	print win32security.LsaQueryInformationPolicy(ph, win32security.PolicyPrimaryDomainInformation)
+	print "PolicyPrimaryDomainInformation:"
+	print win32security.LsaQueryInformationPolicy(ph, win32security.PolicyAccountDomainInformation)
+	print "PolicyLsaServerRoleInformation:"
+	print win32security.LsaQueryInformationPolicy(ph, win32security.PolicyLsaServerRoleInformation)
 	
+	try:
+		#print "NetServerGetInfo 100" + str(win32net.NetServerGetInfo(remote_server, 100))
+		#print "NetServerGetInfo 101" + str(win32net.NetServerGetInfo(remote_server, 101))
+		serverinfo = win32net.NetServerGetInfo(remote_server, 102)
+		print "Name: %s" % serverinfo['name']
+		print "Comment: %s" % serverinfo['comment']
+		print "OS: %s.%s" % (serverinfo['version_major'], serverinfo['version_minor'])
+		print "Userpath: %s" % serverinfo['userpath']
+		print "Hidden: %s" % serverinfo['hidden']
+		
+		if serverinfo['platform_id'] & win32netcon.PLATFORM_ID_NT:
+			print "Platform: PLATFORM_ID_NT (means NT family, not NT4)"
+		if serverinfo['platform_id'] == win32netcon.PLATFORM_ID_OS2:
+			print "Platform: PLATFORM_ID_OS2"
+		if serverinfo['platform_id'] == win32netcon.PLATFORM_ID_DOS:
+			print "Platform: PLATFORM_ID_DOS"
+		if serverinfo['platform_id'] == win32netcon.PLATFORM_ID_OSF:
+			print "Platform: PLATFORM_ID_OSF"
+		if serverinfo['platform_id'] == win32netcon.PLATFORM_ID_VMS:
+			print "Platform: PLATFORM_ID_VMS"
+
+		for sv_type in sv_types:
+			if serverinfo['type'] & getattr(win32netcon, sv_type):
+				print "Type: " + sv_type
+	except:
+		print "[E] Couldn't get Server Info"
+
+		
 def audit_user_group():
 	ph = win32security.LsaOpenPolicy(remote_server, win32security.POLICY_VIEW_LOCAL_INFORMATION | win32security.POLICY_LOOKUP_NAMES)
 	print
@@ -2804,7 +2858,7 @@ print "windows-privesc-check v%s (http://pentestmonkey.net/windows-privesc-check
 
 # Process Command Line Options
 try:
-	opts, args = getopt.getopt(sys.argv[1:], "artSDEPRHUOMAehwiWvo:s:u:p:d:", ["help", "verbose", "all_checks", "registry_checks", "path_checks", "service_checks", "services", "drive_checks", "eventlog_checks", "progfiles_checks", "process_checks", "share_checks", "user_groups", "processes", "ignore_trusted", "owner_info", "write_perms_only", "domain", "patch_checks", "admin_users", "report_file=", "username=", "password=", "domain=", "server="])
+	opts, args = getopt.getopt(sys.argv[1:], "artSDEPRHUOMAILehwiWvo:s:u:p:d:", ["help", "verbose", "all_checks", "registry_checks", "path_checks", "service_checks", "services", "drive_checks", "eventlog_checks", "progfiles_checks", "process_checks", "share_checks", "user_groups", "processes", "ignore_trusted", "owner_info", "write_perms_only", "domain", "patch_checks", "admin_users", "host_info", "logged_in", "report_file=", "username=", "password=", "domain=", "server="])
 except getopt.GetoptError, err:
 	# print help information and exit:
 	print str(err) # will print something like "option -a not recognized"
@@ -2832,10 +2886,14 @@ for o, a in opts:
 		share_checks = 1
 #	elif o in ("-T", "--patch_checks"):
 #		patch_checks = 1
+	elif o in ("-L", "--logged_in_audit"):
+		logged_in_audit = 1
 	elif o in ("-U", "--user_group_audit"):
 		user_group_audit = 1
 	elif o in ("-A", "--admin_users_audit"):
 		admin_users_audit = 1
+	elif o in ("-I", "--host_info"):
+		host_info_audit = 1
 	elif o in ("-O", "--process_audit"):
 		process_audit = 1
 #	elif o in ("-m", "--domain_audit"):
@@ -2878,7 +2936,9 @@ if all_checks:
 	process_checks   = 1
 	share_checks     = 1
 	user_group_audit = 1
+	logged_in_audit  = 1
 	admin_users_audit= 1
+	host_info_audit  = 1
 	domain_audit     = 1
 	patch_checks     = 1
 	process_audit    = 1
@@ -2894,8 +2954,10 @@ if not (
 	progfiles_checks or
 	process_checks   or
     share_checks     or
+	logged_in_audit  or
 	user_group_audit or
 	admin_users_audit or
+	host_info_audit  or
 	process_audit    or
 	domain_audit     or
 	patch_checks
@@ -2919,7 +2981,9 @@ print "Process Checks: ........ " + str(progfiles_checks)
 print "Patch Checks: ..........." + str(patch_checks)
 print "Domain Audit: .......... " + str(domain_audit)
 print "User/Group Audit: ...... " + str(user_group_audit)
+print "Logged-in User Audit ... " + str(logged_in_audit)
 print "Admin Users Audit: ..... " + str(admin_users_audit)
+print "Host Info Audit: ....... " + str(host_info_audit)
 print "Process Audit: ......... " + str(process_audit)
 print "Service Audit .......... " + str(service_audit)
 print "Ignore Trusted ......... " + str(ignore_trusted)
@@ -3000,6 +3064,10 @@ if share_checks:
 	print_section("Share Checks")
 	check_shares()
 
+if logged_in_audit:
+	print_section("Logged-in User Audit")
+	audit_logged_in()
+	
 if user_group_audit:
 	print_section("User/Group Audit")
 	audit_user_group()
@@ -3007,6 +3075,10 @@ if user_group_audit:
 if admin_users_audit:
 	print_section("Admin Users Audit")
 	audit_admin_users()
+	
+if host_info_audit:
+	print_section("Host Info Audit")
+	audit_host_info()
 	
 if process_audit:
 	print_section("Process Audit")
