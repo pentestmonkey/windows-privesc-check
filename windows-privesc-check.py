@@ -230,7 +230,8 @@ import _winreg
 import win32netcon
 from subprocess import Popen, PIPE, STDOUT
 # from winapi import *
-from ntsecuritycon import TokenSessionId, TokenSandBoxInert, TokenType, TokenImpersonationLevel, TokenVirtualizationEnabled, TokenVirtualizationAllowed, TokenHasRestrictions, TokenElevationType, TokenUIAccess, TokenUser, TokenOwner, TokenGroups, TokenRestrictedSids, TokenPrivileges, TokenPrimaryGroup, TokenSource, TokenDefaultDacl, TokenStatistics, TokenOrigin, TokenLinkedToken, TokenLogonSid, TokenElevation, TokenIntegrityLevel, TokenMandatoryPolicy
+from ntsecuritycon import TokenSessionId, TokenSandBoxInert, TokenType, TokenImpersonationLevel, TokenVirtualizationEnabled, TokenVirtualizationAllowed, TokenHasRestrictions, TokenElevationType, TokenUIAccess, TokenUser, TokenOwner, TokenGroups, TokenRestrictedSids, TokenPrivileges, TokenPrimaryGroup, TokenSource, TokenDefaultDacl, TokenStatistics, TokenOrigin, TokenLinkedToken, TokenLogonSid, TokenElevation, TokenIntegrityLevel, TokenMandatoryPolicy, SE_ASSIGNPRIMARYTOKEN_NAME, SE_BACKUP_NAME, SE_CREATE_PAGEFILE_NAME, SE_CREATE_TOKEN_NAME, SE_DEBUG_NAME, SE_LOAD_DRIVER_NAME, SE_MACHINE_ACCOUNT_NAME, SE_RESTORE_NAME, SE_SHUTDOWN_NAME, SE_TAKE_OWNERSHIP_NAME, SE_TCB_NAME
+# Need: SE_ENABLE_DELEGATION_NAME, SE_MANAGE_VOLUME_NAME, SE_RELABEL_NAME, SE_SYNC_AGENT_NAME, SE_TRUSTED_CREDMAN_ACCESS_NAME
 k32 = ctypes.windll.kernel32
 wow64 = ctypes.c_long( 0 )
 on64bitwindows = 1
@@ -258,6 +259,7 @@ process_checks   = 0
 share_checks     = 0
 user_group_audit = 0
 process_audit    = 0
+admin_users_audit= 0
 ignore_trusted   = 0
 owner_info       = 0
 weak_perms_only  = 0
@@ -1104,6 +1106,7 @@ def usage():
 	print "  -H|--share_checks      Check shares for insecure permissions"
 	#print "  -T|--patch_checks      Check some important patches"
 	print "  -U|--user_groups       Dump users, groups and privileges (no HTML yet)"
+	print "  -A|--admin_users       Dump admin users / high priv users (no HTML yet)"
 	print "  -O|--processes         Dump process info (no HTML yet)"
 	print "  -m|--domain            Dump domain info (no HTML yet)"
 	print "  -e|--services          Dump service info (no HTML yet)"
@@ -2603,6 +2606,57 @@ def audit_domain():
 	# print win32net.NetServerEnum(remote_server, 100 or 101, win32netcon.SV_TYPE_ALL, "SOMEDOMAIN.COM", 0, 999999)
 	
 
+def audit_admin_users():
+	resume = 0
+	print 
+	for group in ("administrators", "domain admins", "enterprise admins"):
+		print "\n[+] Members of " + group + ":"
+		members = []
+		while True:
+			try:
+				m, total, resume = win32net.NetLocalGroupGetMembers(remote_server, group, 2, resume, 999999)
+			except:
+				break
+			for member in m:
+				if member['sidusage'] == 4:
+					type = "group"
+				elif member['sidusage'] == 1:
+					type = "user"
+				else: 
+					type = "type " + str(member['sidusage'])
+				print member['domainandname'] + " (" + str(type) + ")"
+			if resume == 0:
+				break
+
+# It might be interesting to look up who has powerful privs, but LsaEnumerateAccountsWithUserRight doesn't seem to work as a low priv user
+# SE_ASSIGNPRIMARYTOKEN_NAME TEXT("SeAssignPrimaryTokenPrivilege") Required to assign the primary token of a process. User Right: Replace a process-level token.
+# SE_BACKUP_NAME TEXT("SeBackupPrivilege") Required to perform backup operations. This privilege causes the system to grant all read access control to any file, regardless of the access control list (ACL) specified for the file. Any access request other than read is still evaluated with the ACL. This privilege is required by the RegSaveKey and RegSaveKeyExfunctions. The following access rights are granted if this privilege is held: READ_CONTROL ACCESS_SYSTEM_SECURITY FILE_GENERIC_READ FILE_TRAVERSE User Right: Back up files and directories.
+# SE_CREATE_PAGEFILE_NAME TEXT("SeCreatePagefilePrivilege") Required to create a paging file. User Right: Create a pagefile.
+# SE_CREATE_TOKEN_NAME TEXT("SeCreateTokenPrivilege") Required to create a primary token. User Right: Create a token object.
+# SE_DEBUG_NAME TEXT("SeDebugPrivilege") Required to debug and adjust the memory of a process owned by another account. User Right: Debug programs.
+# SE_ENABLE_DELEGATION_NAME TEXT("SeEnableDelegationPrivilege") Required to mark user and computer accounts as trusted for delegation. User Right: Enable computer and user accounts to be trusted for delegation.
+# SE_LOAD_DRIVER_NAME TEXT("SeLoadDriverPrivilege") Required to load or unload a device driver. User Right: Load and unload device drivers.
+# SE_MACHINE_ACCOUNT_NAME TEXT("SeMachineAccountPrivilege") Required to create a computer account. User Right: Add workstations to domain.
+# SE_MANAGE_VOLUME_NAME TEXT("SeManageVolumePrivilege") Required to enable volume management privileges. User Right: Manage the files on a volume.
+# SE_RELABEL_NAME TEXT("SeRelabelPrivilege") Required to modify the mandatory integrity level of an object. User Right: Modify an object label.
+# SE_RESTORE_NAME TEXT("SeRestorePrivilege") Required to perform restore operations. This privilege causes the system to grant all write access control to any file, regardless of the ACL specified for the file. Any access request other than write is still evaluated with the ACL. Additionally, this privilege enables you to set any valid user or group SID as the owner of a file. This privilege is required by the RegLoadKey function. The following access rights are granted if this privilege is held: WRITE_DAC WRITE_OWNER ACCESS_SYSTEM_SECURITY FILE_GENERIC_WRITE FILE_ADD_FILE FILE_ADD_SUBDIRECTORY DELETE User Right: Restore files and directories.
+# SE_SHUTDOWN_NAME TEXT("SeShutdownPrivilege") Required to shut down a local system. User Right: Shut down the system.
+# SE_SYNC_AGENT_NAME TEXT("SeSyncAgentPrivilege") Required for a domain controller to use the LDAP directory synchronization services. This privilege enables the holder to read all objects and properties in the directory, regardless of the protection on the objects and properties. By default, it is assigned to the Administrator and LocalSystem accounts on domain controllers. User Right: Synchronize directory service data.
+# SE_TAKE_OWNERSHIP_NAME TEXT("SeTakeOwnershipPrivilege") Required to take ownership of an object without being granted discretionary access. This privilege allows the owner value to be set only to those values that the holder may legitimately assign as the owner of an object. User Right: Take ownership of files or other objects.
+# SE_TCB_NAME TEXT("SeTcbPrivilege") This privilege identifies its holder as part of the trusted computer base. Some trusted protected subsystems are granted this privilege. User Right: Act as part of the operating system.
+# SE_TRUSTED_CREDMAN_ACCESS_NAME TEXT("SeTrustedCredManAccessPrivilege") Required to access Credential Manager as a trusted caller. User Right: Access Credential Manager as a trusted caller.
+
+# Need: SE_ENABLE_DELEGATION_NAME, SE_MANAGE_VOLUME_NAME, SE_RELABEL_NAME, SE_SYNC_AGENT_NAME, SE_TRUSTED_CREDMAN_ACCESS_NAME
+#	ph = win32security.LsaOpenPolicy(remote_server, win32security.POLICY_VIEW_LOCAL_INFORMATION | win32security.POLICY_LOOKUP_NAMES)
+#	for priv in (SE_ASSIGNPRIMARYTOKEN_NAME, SE_BACKUP_NAME, SE_CREATE_PAGEFILE_NAME, SE_CREATE_TOKEN_NAME, SE_DEBUG_NAME, SE_LOAD_DRIVER_NAME, SE_MACHINE_ACCOUNT_NAME, SE_RESTORE_NAME, SE_SHUTDOWN_NAME, SE_TAKE_OWNERSHIP_NAME, SE_TCB_NAME):
+#		print "Looking up who has " + priv + "priv"
+#		try:
+#			sids = win32security.LsaEnumerateAccountsWithUserRight(ph, priv)
+#			print sids
+#		except:
+#			print "[E] Lookup failed"
+		
+	
 def audit_user_group():
 	ph = win32security.LsaOpenPolicy(remote_server, win32security.POLICY_VIEW_LOCAL_INFORMATION | win32security.POLICY_LOOKUP_NAMES)
 	print
@@ -2637,7 +2691,7 @@ def audit_user_group():
 			for priv in privs:
 				print "Group %s has privilege: %s" % (group['name'], priv)
 		except:
-			print "Group %s has no privileges" % (group['name'])
+			print "Group %s: privilege lookup failed " % (group['name'])
 		
 	print
 	print "[+] Non-local Groups"
@@ -2750,7 +2804,7 @@ print "windows-privesc-check v%s (http://pentestmonkey.net/windows-privesc-check
 
 # Process Command Line Options
 try:
-	opts, args = getopt.getopt(sys.argv[1:], "artSDEPRHUOMehwiWvo:s:u:p:d:", ["help", "verbose", "all_checks", "registry_checks", "path_checks", "service_checks", "services", "drive_checks", "eventlog_checks", "progfiles_checks", "process_checks", "share_checks", "user_groups", "processes", "ignore_trusted", "owner_info", "write_perms_only", "domain", "patch_checks", "report_file=", "username=", "password=", "domain=", "server="])
+	opts, args = getopt.getopt(sys.argv[1:], "artSDEPRHUOMAehwiWvo:s:u:p:d:", ["help", "verbose", "all_checks", "registry_checks", "path_checks", "service_checks", "services", "drive_checks", "eventlog_checks", "progfiles_checks", "process_checks", "share_checks", "user_groups", "processes", "ignore_trusted", "owner_info", "write_perms_only", "domain", "patch_checks", "admin_users", "report_file=", "username=", "password=", "domain=", "server="])
 except getopt.GetoptError, err:
 	# print help information and exit:
 	print str(err) # will print something like "option -a not recognized"
@@ -2780,6 +2834,8 @@ for o, a in opts:
 #		patch_checks = 1
 	elif o in ("-U", "--user_group_audit"):
 		user_group_audit = 1
+	elif o in ("-A", "--admin_users_audit"):
+		admin_users_audit = 1
 	elif o in ("-O", "--process_audit"):
 		process_audit = 1
 #	elif o in ("-m", "--domain_audit"):
@@ -2822,6 +2878,7 @@ if all_checks:
 	process_checks   = 1
 	share_checks     = 1
 	user_group_audit = 1
+	admin_users_audit= 1
 	domain_audit     = 1
 	patch_checks     = 1
 	process_audit    = 1
@@ -2838,6 +2895,7 @@ if not (
 	process_checks   or
     share_checks     or
 	user_group_audit or
+	admin_users_audit or
 	process_audit    or
 	domain_audit     or
 	patch_checks
@@ -2861,6 +2919,7 @@ print "Process Checks: ........ " + str(progfiles_checks)
 print "Patch Checks: ..........." + str(patch_checks)
 print "Domain Audit: .......... " + str(domain_audit)
 print "User/Group Audit: ...... " + str(user_group_audit)
+print "Admin Users Audit: ..... " + str(admin_users_audit)
 print "Process Audit: ......... " + str(process_audit)
 print "Service Audit .......... " + str(service_audit)
 print "Ignore Trusted ......... " + str(ignore_trusted)
@@ -2944,6 +3003,10 @@ if share_checks:
 if user_group_audit:
 	print_section("User/Group Audit")
 	audit_user_group()
+	
+if admin_users_audit:
+	print_section("Admin Users Audit")
+	audit_admin_users()
 	
 if process_audit:
 	print_section("Process Audit")
