@@ -1110,7 +1110,7 @@ def usage():
 	print "  -U|--user_groups       Dump users, groups and privileges (no HTML yet)"
 	print "  -A|--admin_users       Dump admin users / high priv users (no HTML yet)"
 	print "  -O|--processes         Dump process info (no HTML yet)"
-	print "  -m|--domain            Dump domain info (no HTML yet)"
+	print "  -m|--domain            Dump domain info - inc. password policy (no HTML yet)"
 	print "  -e|--services          Dump service info (no HTML yet)"
 # TODO options to flag a user/group as trusted
 	print ""
@@ -2352,6 +2352,49 @@ def check_shares():
 	except:
 		print "[E] Can't check shares - not enough privs?"
 
+# TODO not option to call this yet
+def audit_shares():	
+	print 
+	print "[+] Shares"
+	print
+
+	resume = 0;
+	try:
+		(sharelist, total, resume) = win32net.NetShareEnum(remote_server, 502, resume, 999999)
+		#print win32net.NetShareGetInfo(remote_server, ?, 0) # do we need this?
+
+		for share in sharelist:
+			# Determine type of share
+			types = []
+			if share['type'] & getattr(win32netcon, "STYPE_SPECIAL"):
+				# print "Share type: "
+				types.append("STYPE_SPECIAL")
+			share['type'] = share['type'] & 3 # mask off "special"
+			#print share['type']
+			for stype in share_types:
+				if share['type'] == getattr(win32netcon, stype):
+					types.append(stype)
+					#print "Share type: " + stype
+					break
+			print "---------------"
+			print "Share:        " + share['netname']
+			print "Path:         " + share['path']
+			print "Remark:       " + share['remark']
+			print "Type(s):      " + "|".join(types)
+			print "Reserved:     %s" % share['reserved']
+			print "Passwd:       %s" % share['passwd']
+			print "Current Uses: %s" % share['current_uses']
+			print "Max Uses:     %s" % share['max_uses']
+			print "Permissions:  %s" % share['permissions']
+			print "Sec. Desc.:   " 
+			dump_sd(share['netname'], 'share', share['security_descriptor'])
+	except:
+		print "[E] Couldn't get share information"
+	
+	print
+	print "[+] Server Info (NetServerGetInfo 102)"
+	print 
+	
 def check_progfiles():
 	# %ProgramFiles%
 	# %ProgramFiles(x86)%
@@ -2480,47 +2523,6 @@ def audit_domain():
 	# win32security.DsCrackNames(hds, flags , formatOffered , formatDesired , names )
 	# ...For example, user objects can be identified by SAM account names (Domain\UserName), user principal name (UserName@Domain.com), or distinguished name.
 		
-	print 
-	print "[+] Shares"
-	print
-	
-	resume = 0;
-	try:
-		(sharelist, total, resume) = win32net.NetShareEnum(remote_server, 502, resume, 999999)
-		#print win32net.NetShareGetInfo(remote_server, ?, 0) # do we need this?
-
-		for share in sharelist:
-			# Determine type of share
-			types = []
-			if share['type'] & getattr(win32netcon, "STYPE_SPECIAL"):
-				# print "Share type: "
-				types.append("STYPE_SPECIAL")
-			share['type'] = share['type'] & 3 # mask off "special"
-			#print share['type']
-			for stype in share_types:
-				if share['type'] == getattr(win32netcon, stype):
-					types.append(stype)
-					#print "Share type: " + stype
-					break
-			print "---------------"
-			print "Share:        " + share['netname']
-			print "Path:         " + share['path']
-			print "Remark:       " + share['remark']
-			print "Type(s):      " + "|".join(types)
-			print "Reserved:     %s" % share['reserved']
-			print "Passwd:       %s" % share['passwd']
-			print "Current Uses: %s" % share['current_uses']
-			print "Max Uses:     %s" % share['max_uses']
-			print "Permissions:  %s" % share['permissions']
-			print "Sec. Desc.:   " 
-			dump_sd(share['netname'], 'share', share['security_descriptor'])
-	except:
-		print "[E] Couldn't get share information"
-	
-	print
-	print "[+] Server Info (NetServerGetInfo 102)"
-	print 
-	
 	try:
 		#print "NetServerGetInfo 100" + str(win32net.NetServerGetInfo(remote_server, 100))
 		#print "NetServerGetInfo 101" + str(win32net.NetServerGetInfo(remote_server, 101))
@@ -2606,29 +2608,41 @@ def audit_domain():
 	# This function sounds very much like what lservers.exe does, but the server name must be None
 	# according to http://msdn.microsoft.com/en-us/library/aa370623%28VS.85%29.aspx.  No use to us.
 	# print win32net.NetServerEnum(remote_server, 100 or 101, win32netcon.SV_TYPE_ALL, "SOMEDOMAIN.COM", 0, 999999)
-	
 
-def audit_admin_users():
-	resume = 0
-	print 
-	for group in ("administrators", "domain admins", "enterprise admins"):
-		print "\n[+] Members of " + group + ":"
+# Recursive function to find group members (and the member of any groups in those groups...)
+def get_group_members(server, group, depth):
+		resume = 0
+		indent = "\t" * depth
 		members = []
 		while True:
 			try:
-				m, total, resume = win32net.NetLocalGroupGetMembers(remote_server, group, 2, resume, 999999)
+				m, total, resume = win32net.NetLocalGroupGetMembers(server, group, 2, resume, 999999)
 			except:
 				break
 			for member in m:
 				if member['sidusage'] == 4:
-					type = "group"
+					type = "local group"
+					g = member['domainandname'].split("\\")
+					print indent + member['domainandname'] + " (" + str(type) + ")"
+					get_group_members(server, g[1], depth + 1)
+				elif member['sidusage'] == 2:
+					type = "domain group"
+					print indent + member['domainandname'] + " (" + str(type) + ")"
 				elif member['sidusage'] == 1:
 					type = "user"
+					print indent + member['domainandname'] + " (" + str(type) + ")"
 				else: 
 					type = "type " + str(member['sidusage'])
-				print member['domainandname'] + " (" + str(type) + ")"
+					print indent + member['domainandname'] + " (" + str(type) + ")"
 			if resume == 0:
 				break
+	
+def audit_admin_users():
+	print
+	for group in ("administrators", "domain admins", "enterprise admins"):
+		print "\n[+] Members of " + group + ":"
+		get_group_members(remote_server, group, 0)
+	print 
 
 # It might be interesting to look up who has powerful privs, but LsaEnumerateAccountsWithUserRight doesn't seem to work as a low priv user
 # SE_ASSIGNPRIMARYTOKEN_NAME TEXT("SeAssignPrimaryTokenPrivilege") Required to assign the primary token of a process. User Right: Replace a process-level token.
@@ -2665,7 +2679,7 @@ def audit_logged_in():
 		while True:
 			users, total, resume = win32net.NetWkstaUserEnum(remote_server, 1 , resume , 999999 )
 			for user in users:
-				print user
+				print "User logged in: Logon Server=\"%s\" Logon Domain=\"%s\" Username=\"%s\"" % (user['logon_server'], user['logon_domain'], user['username'])
 			if resume == 0:
 				break
 	except:
@@ -2712,7 +2726,11 @@ def audit_host_info():
 
 		
 def audit_user_group():
-	ph = win32security.LsaOpenPolicy(remote_server, win32security.POLICY_VIEW_LOCAL_INFORMATION | win32security.POLICY_LOOKUP_NAMES)
+	try:
+		ph = win32security.LsaOpenPolicy(remote_server, win32security.POLICY_VIEW_LOCAL_INFORMATION | win32security.POLICY_LOOKUP_NAMES)
+	except:
+		pass		
+		
 	print
 	print "[+] Local Groups"
 	print
@@ -2801,6 +2819,7 @@ def audit_user_group():
 		except:
 			print "[E] NetUserEnum failed"
 			break
+			
 	for user in users:
 		gprivs = []
 		sid, s, i = win32security.LookupAccountName(remote_server, user)
@@ -2858,7 +2877,7 @@ print "windows-privesc-check v%s (http://pentestmonkey.net/windows-privesc-check
 
 # Process Command Line Options
 try:
-	opts, args = getopt.getopt(sys.argv[1:], "artSDEPRHUOMAILehwiWvo:s:u:p:d:", ["help", "verbose", "all_checks", "registry_checks", "path_checks", "service_checks", "services", "drive_checks", "eventlog_checks", "progfiles_checks", "process_checks", "share_checks", "user_groups", "processes", "ignore_trusted", "owner_info", "write_perms_only", "domain", "patch_checks", "admin_users", "host_info", "logged_in", "report_file=", "username=", "password=", "domain=", "server="])
+	opts, args = getopt.getopt(sys.argv[1:], "artSDEPRHUOMAILmehwiWvo:s:u:p:d:", ["help", "verbose", "all_checks", "registry_checks", "path_checks", "service_checks", "services", "drive_checks", "eventlog_checks", "progfiles_checks", "process_checks", "share_checks", "user_groups", "processes", "ignore_trusted", "owner_info", "write_perms_only", "domain", "patch_checks", "admin_users", "host_info", "logged_in", "report_file=", "username=", "password=", "domain=", "server="])
 except getopt.GetoptError, err:
 	# print help information and exit:
 	print str(err) # will print something like "option -a not recognized"
@@ -2896,8 +2915,8 @@ for o, a in opts:
 		host_info_audit = 1
 	elif o in ("-O", "--process_audit"):
 		process_audit = 1
-#	elif o in ("-m", "--domain_audit"):
-#		domain_audit = 1
+	elif o in ("-m", "--domain_audit"):
+		domain_audit = 1
 	elif o in ("-e", "--services"):
 		service_audit = 1
 	elif o in ("-h", "--help"):
