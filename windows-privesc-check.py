@@ -1119,7 +1119,7 @@ def usage():
 	print "  -w|--write_perms_only  Only list write perms (dump opts only)"
 	print "  -i|--ignore_trusted    Ignore trusted users, empty groups (dump opts only)"
 	print "  -W|--owner_info        Owner, Group info (dump opts only)"
-	print "  -v|--verbose           Lots of output"
+	print "  -v|--verbose           More detail output (use with -U)"
 	print "  -o|--report_file file  Report filename.  Default privesc-report-[host].html"
 	print "  -s|--server host       Remote server name.  Only works with -u!"
 	print "  -u|--username arg      Remote username.  Only works with -u!"
@@ -2496,20 +2496,20 @@ def audit_domain():
 
 	# DsBindWithCred isn't available from python!
 	
-	# IADsComputer look useful, but also isn't implemented:
+	# IADsComputer looks useful, but also isn't implemented:
 	# http://msdn.microsoft.com/en-us/library/aa705980%28v=VS.85%29.aspx
 
+	# The following always seems to fail:
 	# need a dc hostname as remote_server
 	# and    domain
-	try:
-		hds = win32security.DsBind(remote_server, remote_domain)
-		print "hds: " + hds
-		print "DsListDomainsInSite: "+ str(win32security.DsListDomainsInSite(hds))
-	except:
-		pass
+	#try:
+	#	hds = win32security.DsBind(remote_server, remote_domain)
+	#	print "hds: " + hds
+	#	print "DsListDomainsInSite: "+ str(win32security.DsListDomainsInSite(hds))
+	#except:
+	#	pass
 	
 	# domain can be null.  i think domainguid can be null.  sitename null.  flags = 0.
-	# print "Domain controller: " + str(win32security.DsGetDcName(dc, domain, domainguid, sitename, flags))
 	
 	# lists roles recognised by the server (fsmo roles?)
 	# win32security.DsListRoles(hds)
@@ -2605,9 +2605,37 @@ def audit_domain():
 	except:
 		print "[E] Couldn't get Workstation Info"
 		
+	print
+	print "[+] Getting domain controller info"
+	print
+	
+	try:
+		domain = None # TODO: could call of each domain if we had a list
+		print "PDC: " + win32net.NetGetDCName(remote_server, domain)
+	except:
+		pass
 	# This function sounds very much like what lservers.exe does, but the server name must be None
 	# according to http://msdn.microsoft.com/en-us/library/aa370623%28VS.85%29.aspx.  No use to us.
 	# print win32net.NetServerEnum(remote_server, 100 or 101, win32netcon.SV_TYPE_ALL, "SOMEDOMAIN.COM", 0, 999999)
+	
+	# Try to list some domain controllers for the remote host
+	# There are better ways of doing this, but they don't seem to be available via python!
+	dc_seen = {}
+	for filter in (0, 0x00004000, 0x00000080, 0x00001000, 0x00000400, 0x00000040, 0x00000010):
+		dc_info = win32security.DsGetDcName(remote_server, None, None, None, filter)
+		if not dc_info['DomainControllerAddress'] in dc_seen:
+			print "\n[+] Found DC\n"
+			for k in dc_info:
+				print k + ": " + str(dc_info[k])
+		dc_seen[dc_info['DomainControllerAddress']] = 1
+	print "\nWARNING: Above is not necessarily a complete list of DCs\n"
+	#print "Domain controller: " + str(win32security.DsGetDcName(remote_server, None, None, None, 0)) # any dc
+	#print "Domain controller: " + str(win32security.DsGetDcName(remote_server, None, None, None, 0x00004000)) # not the system we connect to
+	#print "Domain controller: " + str(win32security.DsGetDcName(remote_server, None, None, None, 0x00000080)) # pdc
+	#print "Domain controller: " + str(win32security.DsGetDcName(remote_server, None, None, None, 0x00001000)) # writeable
+	#print "Domain controller: " + str(win32security.DsGetDcName(remote_server, None, None, None, 0x00000400)) # kerberos
+	#print "Domain controller: " + str(win32security.DsGetDcName(remote_server, None, None, None, 0x00000040)) # gc
+	#print "Domain controller: " + str(win32security.DsGetDcName(remote_server, None, None, None, 0x00000010)) # directory service
 
 # Recursive function to find group members (and the member of any groups in those groups...)
 def get_group_members(server, group, depth):
@@ -2758,12 +2786,13 @@ def audit_user_group():
 		print "Group %s has sid %s" % (group['name'], sid_string)
 		for m in members:
 			print "Group %s has member: %s" % (group['name'], m)
-		try:
-			privs = win32security.LsaEnumerateAccountRights(ph, sid)
-			for priv in privs:
-				print "Group %s has privilege: %s" % (group['name'], priv)
-		except:
-			print "Group %s: privilege lookup failed " % (group['name'])
+		if verbose:
+			try:
+				privs = win32security.LsaEnumerateAccountRights(ph, sid)
+				for priv in privs:
+					print "Group %s has privilege: %s" % (group['name'], priv)
+			except:
+				print "Group %s: privilege lookup failed " % (group['name'])
 		
 	print
 	print "[+] Non-local Groups"
@@ -2797,22 +2826,34 @@ def audit_user_group():
 		print "Group %s has sid %s" % (group['name'], sid_string)
 		for m in members:
 			print "Group %s has member: %s" % (group['name'], m)
-		try:
-			privs = win32security.LsaEnumerateAccountRights(ph, sid)
-			for priv in privs:
-				print "Group %s has privilege: %s" % (group['name'], priv)
-		except:
-			print "Group %s has no privileges" % (group['name'])
+		if verbose:
+			try:
+				privs = win32security.LsaEnumerateAccountRights(ph, sid)
+				for priv in privs:
+					print "Group %s has privilege: %s" % (group['name'], priv)
+			except:
+				print "Group %s has no privileges" % (group['name'])
 			
 	print
 	print "[+] Users"
 	print
 	resume = 0
 	users = []
+	if verbose:
+		level = 11
+	else:
+		level = 0
 	while True:
 		try:
-			u, total, resume = win32net.NetUserEnum(remote_server, 0, 0, resume, 999999)
+			# u, total, resume = win32net.NetUserEnum(remote_server, 11, 0, resume, 999999) # lots of user detail
+			# u, total, resume = win32net.NetUserEnum(remote_server, 0, 0, resume, 999999) # just the username
+			u, total, resume = win32net.NetUserEnum(remote_server, level, 0, resume, 999999)
 			for user in u:
+				if verbose:
+					for k in user:
+						if k != 'parms':
+							print k + "\t: " + str(user[k])
+					print 
 				users.append(user['name'])
 			if resume == 0:
 				break
@@ -2840,38 +2881,40 @@ def audit_user_group():
 			groups.append(g[0])
 		for group in groups:
 			print "User %s is in this non-local group: %s" % (user, group)
-		privs = []
-		try:
-			privs = win32security.LsaEnumerateAccountRights(ph, sid)
-		except:
-			pass
-		for priv in list(set(list(gprivs) + list(privs))):
-			print "User %s has privilege %s" % (user, priv)
+		if verbose:
+			privs = []
+			try:
+				privs = win32security.LsaEnumerateAccountRights(ph, sid)
+			except:
+				pass
+			for priv in list(set(list(gprivs) + list(privs))):
+				print "User %s has privilege %s" % (user, priv)
 
-	print
-	print "[+] Privileges"
-	print
-			
-	for priv in windows_privileges:
-		try:
-			for s in win32security.LsaEnumerateAccountsWithUserRight(ph, priv):
-				priv_desc = "NoDesc!"
-				try:
-					priv_desc = win32security.LookupPrivilegeDisplayName(remote_server, priv)
-				except:
-					pass
-					
-				name, domain, type = win32security.LookupAccountSid(remote_server, s)
-				type_string = "unknown_type"
-				if type == 4:
-					type_string = "group"
-				if type == 5:
-					type_string = "user"
-				print "Privilege %s (%s) is held by %s\%s (%s)" % (priv, priv_desc, domain, name, type_string)
-				# print "Privilege %s is held by %s\%s (%s)" % (priv, domain, name, type_string)
-		except:
-			#print "Skipping %s - doesn't exist for this platform" % priv
-			pass
+	if verbose:
+		print
+		print "[+] Privileges"
+		print
+				
+		for priv in windows_privileges:
+			try:
+				for s in win32security.LsaEnumerateAccountsWithUserRight(ph, priv):
+					priv_desc = "NoDesc!"
+					try:
+						priv_desc = win32security.LookupPrivilegeDisplayName(remote_server, priv)
+					except:
+						pass
+						
+					name, domain, type = win32security.LookupAccountSid(remote_server, s)
+					type_string = "unknown_type"
+					if type == 4:
+						type_string = "group"
+					if type == 5:
+						type_string = "user"
+					print "Privilege %s (%s) is held by %s\%s (%s)" % (priv, priv_desc, domain, name, type_string)
+					# print "Privilege %s is held by %s\%s (%s)" % (priv, domain, name, type_string)
+			except:
+				#print "Skipping %s - doesn't exist for this platform" % priv
+				pass
 
 print "windows-privesc-check v%s (http://pentestmonkey.net/windows-privesc-check)\n" % version
 
