@@ -257,6 +257,7 @@ eventlog_checks  = 0
 progfiles_checks = 0
 process_checks   = 0
 share_checks     = 0
+passpol_audit    = 0
 user_group_audit = 0
 logged_in_audit  = 0
 process_audit    = 0
@@ -265,7 +266,7 @@ host_info_audit  = 0
 ignore_trusted   = 0
 owner_info       = 0
 weak_perms_only  = 0
-domain_audit     = 0
+host_info_audit     = 0
 patch_checks     = 0
 verbose          = 0
 report_file_name = None
@@ -414,12 +415,14 @@ sv_types = (
         "SV_TYPE_DFS",
         "SV_TYPE_CLUSTER_NT",
         "SV_TYPE_TERMINALSERVER", # missing from win32netcon.py
-        "SV_TYPE_CLUSTER_VS_NT", # missing from win32netcon.py
+        #"SV_TYPE_CLUSTER_VS_NT", # missing from win32netcon.py
         "SV_TYPE_DCE",
         "SV_TYPE_ALTERNATE_XPORT",
         "SV_TYPE_LOCAL_LIST_ONLY",
         "SV_TYPE_DOMAIN_ENUM"
 )
+
+win32netcon.SV_TYPE_TERMINALSERVER = 0x2000000 
 
 dangerous_perms_write = {
 	# http://www.tek-tips.com/faqs.cfm?fid
@@ -1103,21 +1106,22 @@ def usage():
 	print "  -S|--service_checks    Check Windows services for insecure permissions"
 	print "  -d|--drive_checks      Check for FAT filesystems and weak perms in root dir"
 	print "  -E|--eventlog_checks   Check Event Logs for insecure permissions"
-	print "  -P|--progfiles_checks  Check Program Files directories for insecure perms"
+	print "  -F|--progfiles_checks  Check Program Files directories for insecure perms"
 	print "  -R|--process_checks    Check Running Processes for insecure permissions"
 	print "  -H|--share_checks      Check shares for insecure permissions"
 	#print "  -T|--patch_checks      Check some important patches"
 	print "  -U|--user_groups       Dump users, groups and privileges (no HTML yet)"
 	print "  -A|--admin_users       Dump admin users / high priv users (no HTML yet)"
 	print "  -O|--processes         Dump process info (no HTML yet)"
-	print "  -m|--domain            Dump domain info - inc. password policy (no HTML yet)"
+	print "  -P|--passpol           Dump password policy (no HTML yet)"
+	print "  -i|--host_info         Dump host info - OS, domain controller, ... (no HTML yet)"
 	print "  -e|--services          Dump service info (no HTML yet)"
 # TODO options to flag a user/group as trusted
 	print ""
 	print "options are:"
 	print "  -h|--help              This help message"
 	print "  -w|--write_perms_only  Only list write perms (dump opts only)"
-	print "  -i|--ignore_trusted    Ignore trusted users, empty groups (dump opts only)"
+	print "  -I|--ignore_trusted    Ignore trusted users, empty groups (dump opts only)"
 	print "  -W|--owner_info        Owner, Group info (dump opts only)"
 	print "  -v|--verbose           More detail output (use with -U)"
 	print "  -o|--report_file file  Report filename.  Default privesc-report-[host].html"
@@ -2490,66 +2494,7 @@ def impersonate(username, password, domain):
 		print "Running as current user.  No logon creds supplied (-u, -d, -p)."
 	print
 	
-def audit_domain():
-	if remote_server:
-		print "Querying server: " + remote_server
-
-	# DsBindWithCred isn't available from python!
-	
-	# IADsComputer looks useful, but also isn't implemented:
-	# http://msdn.microsoft.com/en-us/library/aa705980%28v=VS.85%29.aspx
-
-	# The following always seems to fail:
-	# need a dc hostname as remote_server
-	# and    domain
-	#try:
-	#	hds = win32security.DsBind(remote_server, remote_domain)
-	#	print "hds: " + hds
-	#	print "DsListDomainsInSite: "+ str(win32security.DsListDomainsInSite(hds))
-	#except:
-	#	pass
-	
-	# domain can be null.  i think domainguid can be null.  sitename null.  flags = 0.
-	
-	# lists roles recognised by the server (fsmo roles?)
-	# win32security.DsListRoles(hds)
-	
-	# list misc info for a server
-	# win32security.DsListInfoForServer(hds, server)
-	
-	# but how to get a list of sites?
-	# win32security.DsListServersInSite(hds, site )
-	
-	# win32security.DsCrackNames(hds, flags , formatOffered , formatDesired , names )
-	# ...For example, user objects can be identified by SAM account names (Domain\UserName), user principal name (UserName@Domain.com), or distinguished name.
-		
-	try:
-		#print "NetServerGetInfo 100" + str(win32net.NetServerGetInfo(remote_server, 100))
-		#print "NetServerGetInfo 101" + str(win32net.NetServerGetInfo(remote_server, 101))
-		serverinfo = win32net.NetServerGetInfo(remote_server, 102)
-		print "Name: %s" % serverinfo['name']
-		print "Comment: %s" % serverinfo['comment']
-		print "OS: %s.%s" % (serverinfo['version_major'], serverinfo['version_minor'])
-		print "Userpath: %s" % serverinfo['userpath']
-		print "Hidden: %s" % serverinfo['hidden']
-		
-		if serverinfo['platform_id'] & win32netcon.PLATFORM_ID_NT:
-			print "Platform: PLATFORM_ID_NT (means NT family, not NT4)"
-		if serverinfo['platform_id'] == win32netcon.PLATFORM_ID_OS2:
-			print "Platform: PLATFORM_ID_OS2"
-		if serverinfo['platform_id'] == win32netcon.PLATFORM_ID_DOS:
-			print "Platform: PLATFORM_ID_DOS"
-		if serverinfo['platform_id'] == win32netcon.PLATFORM_ID_OSF:
-			print "Platform: PLATFORM_ID_OSF"
-		if serverinfo['platform_id'] == win32netcon.PLATFORM_ID_VMS:
-			print "Platform: PLATFORM_ID_VMS"
-
-		for sv_type in sv_types:
-			if serverinfo['type'] & getattr(win32netcon, sv_type):
-				print "Type: " + sv_type
-	except:
-		print "[E] Couldn't get Server Info"
-	
+def audit_passpol():
 	print 
 	print "[+] NetUserModalsGet 0,1,2,3"
 	print
@@ -2577,65 +2522,6 @@ def audit_domain():
 				print "%s: %s" % (key, data[key])
 	except:
 		print "[E] Couldn't get NetUserModals data"
-		
-	print
-	print "[+] Workstation Info (NetWkstaGetInfo 102)"
-	print
-	
-	try:
-		#print win32net.NetWkstaGetInfo(remote_server, 100)
-		#print win32net.NetWkstaGetInfo(remote_server, 101)
-		serverinfo = win32net.NetWkstaGetInfo(remote_server, 102)
-		print "Computer Name: %s" % serverinfo['computername']
-		print "Langroup: %s" % serverinfo['langroup']
-		print "OS: %s.%s" % (serverinfo['ver_major'], serverinfo['ver_minor'])
-		print "Logged On Users: %s" % serverinfo['logged_on_users']
-		print "Lanroot: %s" % serverinfo['lanroot']
-		
-		if serverinfo['platform_id'] & win32netcon.PLATFORM_ID_NT:
-			print "Platform: PLATFORM_ID_NT (means NT family, not NT4)"
-		if serverinfo['platform_id'] == win32netcon.PLATFORM_ID_OS2:
-			print "Platform: PLATFORM_ID_OS2"
-		if serverinfo['platform_id'] == win32netcon.PLATFORM_ID_DOS:
-			print "Platform: PLATFORM_ID_DOS"
-		if serverinfo['platform_id'] == win32netcon.PLATFORM_ID_OSF:
-			print "Platform: PLATFORM_ID_OSF"
-		if serverinfo['platform_id'] == win32netcon.PLATFORM_ID_VMS:
-			print "Platform: PLATFORM_ID_VMS"
-	except:
-		print "[E] Couldn't get Workstation Info"
-		
-	print
-	print "[+] Getting domain controller info"
-	print
-	
-	try:
-		domain = None # TODO: could call of each domain if we had a list
-		print "PDC: " + win32net.NetGetDCName(remote_server, domain)
-	except:
-		pass
-	# This function sounds very much like what lservers.exe does, but the server name must be None
-	# according to http://msdn.microsoft.com/en-us/library/aa370623%28VS.85%29.aspx.  No use to us.
-	# print win32net.NetServerEnum(remote_server, 100 or 101, win32netcon.SV_TYPE_ALL, "SOMEDOMAIN.COM", 0, 999999)
-	
-	# Try to list some domain controllers for the remote host
-	# There are better ways of doing this, but they don't seem to be available via python!
-	dc_seen = {}
-	for filter in (0, 0x00004000, 0x00000080, 0x00001000, 0x00000400, 0x00000040, 0x00000010):
-		dc_info = win32security.DsGetDcName(remote_server, None, None, None, filter)
-		if not dc_info['DomainControllerAddress'] in dc_seen:
-			print "\n[+] Found DC\n"
-			for k in dc_info:
-				print k + ": " + str(dc_info[k])
-		dc_seen[dc_info['DomainControllerAddress']] = 1
-	print "\nWARNING: Above is not necessarily a complete list of DCs\n"
-	#print "Domain controller: " + str(win32security.DsGetDcName(remote_server, None, None, None, 0)) # any dc
-	#print "Domain controller: " + str(win32security.DsGetDcName(remote_server, None, None, None, 0x00004000)) # not the system we connect to
-	#print "Domain controller: " + str(win32security.DsGetDcName(remote_server, None, None, None, 0x00000080)) # pdc
-	#print "Domain controller: " + str(win32security.DsGetDcName(remote_server, None, None, None, 0x00001000)) # writeable
-	#print "Domain controller: " + str(win32security.DsGetDcName(remote_server, None, None, None, 0x00000400)) # kerberos
-	#print "Domain controller: " + str(win32security.DsGetDcName(remote_server, None, None, None, 0x00000040)) # gc
-	#print "Domain controller: " + str(win32security.DsGetDcName(remote_server, None, None, None, 0x00000010)) # directory service
 
 # Recursive function to find group members (and the member of any groups in those groups...)
 def get_group_members(server, group, depth):
@@ -2715,25 +2601,32 @@ def audit_logged_in():
 		
 def audit_host_info():
 	print "\n"
-	ph = win32security.LsaOpenPolicy(remote_server, win32security.POLICY_VIEW_LOCAL_INFORMATION | win32security.POLICY_LOOKUP_NAMES)
-	print "PolicyDnsDomainInformation:"
-	print win32security.LsaQueryInformationPolicy(ph, win32security.PolicyDnsDomainInformation)
-	print "PolicyDnsDomainInformation:"
-	print win32security.LsaQueryInformationPolicy(ph, win32security.PolicyPrimaryDomainInformation)
-	print "PolicyPrimaryDomainInformation:"
-	print win32security.LsaQueryInformationPolicy(ph, win32security.PolicyAccountDomainInformation)
-	print "PolicyLsaServerRoleInformation:"
-	print win32security.LsaQueryInformationPolicy(ph, win32security.PolicyLsaServerRoleInformation)
+	if remote_server:
+		print "Querying remote server: " + remote_server
+	
+	# This looks interesting, but doesn't seem to work.  Maybe unsupported legacy api.
+	#pywintypes.error: (50, 'NetUseEnum', 'The request is not supported.')
+	#print
+	#print "[+] Getting Net Use info"
+	#print
+
+	#resume = 0
+	#use, total, resume = win32net.NetUseEnum(remote_server, 2, resume , 999999 )	
+	#print use
+
+	print
+	print "[+] Workstation Info (NetWkstaGetInfo 102)"
+	print
 	
 	try:
-		#print "NetServerGetInfo 100" + str(win32net.NetServerGetInfo(remote_server, 100))
-		#print "NetServerGetInfo 101" + str(win32net.NetServerGetInfo(remote_server, 101))
-		serverinfo = win32net.NetServerGetInfo(remote_server, 102)
-		print "Name: %s" % serverinfo['name']
-		print "Comment: %s" % serverinfo['comment']
-		print "OS: %s.%s" % (serverinfo['version_major'], serverinfo['version_minor'])
-		print "Userpath: %s" % serverinfo['userpath']
-		print "Hidden: %s" % serverinfo['hidden']
+		#print win32net.NetWkstaGetInfo(remote_server, 100)
+		#print win32net.NetWkstaGetInfo(remote_server, 101)
+		serverinfo = win32net.NetWkstaGetInfo(remote_server, 102)
+		print "Computer Name: %s" % serverinfo['computername']
+		print "Langroup: %s" % serverinfo['langroup']
+		print "OS: %s.%s" % (serverinfo['ver_major'], serverinfo['ver_minor'])
+		print "Logged On Users: %s" % serverinfo['logged_on_users']
+		print "Lanroot: %s" % serverinfo['lanroot']
 		
 		if serverinfo['platform_id'] & win32netcon.PLATFORM_ID_NT:
 			print "Platform: PLATFORM_ID_NT (means NT family, not NT4)"
@@ -2745,14 +2638,119 @@ def audit_host_info():
 			print "Platform: PLATFORM_ID_OSF"
 		if serverinfo['platform_id'] == win32netcon.PLATFORM_ID_VMS:
 			print "Platform: PLATFORM_ID_VMS"
-
-		for sv_type in sv_types:
-			if serverinfo['type'] & getattr(win32netcon, sv_type):
-				print "Type: " + sv_type
 	except:
-		print "[E] Couldn't get Server Info"
+		print "[E] Couldn't get Workstation Info"
+		
+	print
+	print "[+] Server Info (NetServerGetInfo 102)"
+	print
+		
+	#try:
+	#print "NetServerGetInfo 100" + str(win32net.NetServerGetInfo(remote_server, 100))
+	#print "NetServerGetInfo 101" + str(win32net.NetServerGetInfo(remote_server, 101))
+	serverinfo = win32net.NetServerGetInfo(remote_server, 102)
+	print "Name: %s" % serverinfo['name']
+	print "Comment: %s" % serverinfo['comment']
+	print "OS: %s.%s" % (serverinfo['version_major'], serverinfo['version_minor'])
+	print "Userpath: %s" % serverinfo['userpath']
+	print "Hidden: %s" % serverinfo['hidden']
+	
+	if serverinfo['platform_id'] & win32netcon.PLATFORM_ID_NT:
+		print "Platform: PLATFORM_ID_NT (means NT family, not NT4)"
+	if serverinfo['platform_id'] == win32netcon.PLATFORM_ID_OS2:
+		print "Platform: PLATFORM_ID_OS2"
+	if serverinfo['platform_id'] == win32netcon.PLATFORM_ID_DOS:
+		print "Platform: PLATFORM_ID_DOS"
+	if serverinfo['platform_id'] == win32netcon.PLATFORM_ID_OSF:
+		print "Platform: PLATFORM_ID_OSF"
+	if serverinfo['platform_id'] == win32netcon.PLATFORM_ID_VMS:
+		print "Platform: PLATFORM_ID_VMS"
+	for sv_type in sv_types:
+		if serverinfo['type'] & getattr(win32netcon, sv_type):
+			print "Type: " + sv_type
+	#except:
+	#	print "[E] Couldn't get Server Info"
+
+	ph = win32security.LsaOpenPolicy(remote_server, win32security.POLICY_VIEW_LOCAL_INFORMATION | win32security.POLICY_LOOKUP_NAMES)
+	
+	print
+	print "[+] LsaQueryInformationPolicy"
+	print
+	
+	print "PolicyDnsDomainInformation:"
+	print win32security.LsaQueryInformationPolicy(ph, win32security.PolicyDnsDomainInformation)
+	print "PolicyDnsDomainInformation:"
+	print win32security.LsaQueryInformationPolicy(ph, win32security.PolicyPrimaryDomainInformation)
+	print "PolicyPrimaryDomainInformation:"
+	print win32security.LsaQueryInformationPolicy(ph, win32security.PolicyAccountDomainInformation)
+	print "PolicyLsaServerRoleInformation:"
+	print win32security.LsaQueryInformationPolicy(ph, win32security.PolicyLsaServerRoleInformation)
 
 		
+	# DsBindWithCred isn't available from python!
+	
+	# IADsComputer looks useful, but also isn't implemented:
+	# http://msdn.microsoft.com/en-us/library/aa705980%28v=VS.85%29.aspx
+
+	# The following always seems to fail:
+	# need a dc hostname as remote_server
+	# and    domain
+	#try:
+	#	hds = win32security.DsBind(remote_server, remote_domain)
+	#	print "hds: " + hds
+	#	print "DsListDomainsInSite: "+ str(win32security.DsListDomainsInSite(hds))
+	#except:
+	#	pass
+	
+	# domain can be null.  i think domainguid can be null.  sitename null.  flags = 0.
+	
+	# lists roles recognised by the server (fsmo roles?)
+	# win32security.DsListRoles(hds)
+	
+	# list misc info for a server
+	# win32security.DsListInfoForServer(hds, server)
+	
+	# but how to get a list of sites?
+	# win32security.DsListServersInSite(hds, site )
+	
+	# win32security.DsCrackNames(hds, flags , formatOffered , formatDesired , names )
+	# ...For example, user objects can be identified by SAM account names (Domain\UserName), user principal name (UserName@Domain.com), or distinguished name.
+
+	print
+	print "[+] Getting domain controller info"
+	print
+	
+	try:
+		domain = None # TODO: could call of each domain if we had a list
+		print "PDC: " + win32net.NetGetDCName(remote_server, domain)
+	except:
+		pass
+	# This function sounds very much like what lservers.exe does, but the server name must be None
+	# according to http://msdn.microsoft.com/en-us/library/aa370623%28VS.85%29.aspx.  No use to us.
+	# print win32net.NetServerEnum(remote_server, 100 or 101, win32netcon.SV_TYPE_ALL, "SOMEDOMAIN.COM", 0, 999999)
+	
+	# Try to list some domain controllers for the remote host
+	# There are better ways of doing this, but they don't seem to be available via python!
+	dc_seen = {}
+	for filter in (0, 0x00004000, 0x00000080, 0x00001000, 0x00000400, 0x00000040, 0x00000010):
+		dc_info = win32security.DsGetDcName(remote_server, None, None, None, filter)
+		if not dc_info['DomainControllerAddress'] in dc_seen:
+			print "\n[+] Found DC\n"
+			for k in dc_info:
+				print k + ": " + str(dc_info[k])
+		dc_seen[dc_info['DomainControllerAddress']] = 1
+	print "\nWARNING: Above is not necessarily a complete list of DCs\n"
+	#print "Domain controller: " + str(win32security.DsGetDcName(remote_server, None, None, None, 0)) # any dc
+	#print "Domain controller: " + str(win32security.DsGetDcName(remote_server, None, None, None, 0x00004000)) # not the system we connect to
+	#print "Domain controller: " + str(win32security.DsGetDcName(remote_server, None, None, None, 0x00000080)) # pdc
+	#print "Domain controller: " + str(win32security.DsGetDcName(remote_server, None, None, None, 0x00001000)) # writeable
+	#print "Domain controller: " + str(win32security.DsGetDcName(remote_server, None, None, None, 0x00000400)) # kerberos
+	#print "Domain controller: " + str(win32security.DsGetDcName(remote_server, None, None, None, 0x00000040)) # gc
+	#print "Domain controller: " + str(win32security.DsGetDcName(remote_server, None, None, None, 0x00000010)) # directory service
+
+	
+	
+	
 def audit_user_group():
 	try:
 		ph = win32security.LsaOpenPolicy(remote_server, win32security.POLICY_VIEW_LOCAL_INFORMATION | win32security.POLICY_LOOKUP_NAMES)
@@ -2920,7 +2918,7 @@ print "windows-privesc-check v%s (http://pentestmonkey.net/windows-privesc-check
 
 # Process Command Line Options
 try:
-	opts, args = getopt.getopt(sys.argv[1:], "artSDEPRHUOMAILmehwiWvo:s:u:p:d:", ["help", "verbose", "all_checks", "registry_checks", "path_checks", "service_checks", "services", "drive_checks", "eventlog_checks", "progfiles_checks", "process_checks", "share_checks", "user_groups", "processes", "ignore_trusted", "owner_info", "write_perms_only", "domain", "patch_checks", "admin_users", "host_info", "logged_in", "report_file=", "username=", "password=", "domain=", "server="])
+	opts, args = getopt.getopt(sys.argv[1:], "artSDEPRHUOMAFILIehwiWvo:s:u:p:d:", ["help", "verbose", "all_checks", "registry_checks", "path_checks", "service_checks", "services", "drive_checks", "eventlog_checks", "progfiles_checks", "passpol", "process_checks", "share_checks", "user_groups", "processes", "ignore_trusted", "owner_info", "write_perms_only", "domain", "patch_checks", "admin_users", "host_info", "logged_in", "report_file=", "username=", "password=", "domain=", "server="])
 except getopt.GetoptError, err:
 	# print help information and exit:
 	print str(err) # will print something like "option -a not recognized"
@@ -2940,7 +2938,7 @@ for o, a in opts:
 		drive_checks = 1
 	elif o in ("-E", "--eventlog_checks"):
 		eventlog_checks = 1
-	elif o in ("-P", "--progfiles_checks"):
+	elif o in ("-F", "--progfiles_checks"):
 		progfiles_checks = 1
 	elif o in ("-R", "--process_checks"):
 		process_checks = 1
@@ -2952,14 +2950,14 @@ for o, a in opts:
 		logged_in_audit = 1
 	elif o in ("-U", "--user_group_audit"):
 		user_group_audit = 1
+	elif o in ("-P", "--passpol"):
+		passpol_audit = 1
 	elif o in ("-A", "--admin_users_audit"):
 		admin_users_audit = 1
-	elif o in ("-I", "--host_info"):
-		host_info_audit = 1
 	elif o in ("-O", "--process_audit"):
 		process_audit = 1
-	elif o in ("-m", "--domain_audit"):
-		domain_audit = 1
+	elif o in ("-i", "--host_info"):
+		host_info_audit = 1
 	elif o in ("-e", "--services"):
 		service_audit = 1
 	elif o in ("-h", "--help"):
@@ -2967,7 +2965,7 @@ for o, a in opts:
 		sys.exit()
 	elif o in ("-w", "--write_perms_only"):
 		weak_perms_only = 1
-	elif o in ("-i", "--ignore_trusted"):
+	elif o in ("-I", "--ignore_trusted"):
 		ignore_trusted = 1
 	elif o in ("-W", "--owner_info"):
 		owner_info  = 1
@@ -2998,10 +2996,10 @@ if all_checks:
 	process_checks   = 1
 	share_checks     = 1
 	user_group_audit = 1
+	passpol_audit    = 1
 	logged_in_audit  = 1
 	admin_users_audit= 1
 	host_info_audit  = 1
-	domain_audit     = 1
 	patch_checks     = 1
 	process_audit    = 1
 
@@ -3018,10 +3016,10 @@ if not (
     share_checks     or
 	logged_in_audit  or
 	user_group_audit or
+	passpol_audit    or
 	admin_users_audit or
 	host_info_audit  or
 	process_audit    or
-	domain_audit     or
 	patch_checks
 ):
 	usage()
@@ -3041,8 +3039,8 @@ print "Eventlog Checks: ....... " + str(drive_checks)
 print "Program Files Checks: .. " + str(eventlog_checks)
 print "Process Checks: ........ " + str(progfiles_checks)
 print "Patch Checks: ..........." + str(patch_checks)
-print "Domain Audit: .......... " + str(domain_audit)
 print "User/Group Audit: ...... " + str(user_group_audit)
+print "Password Policy Audit .. " + str(passpol_audit)
 print "Logged-in User Audit ... " + str(logged_in_audit)
 print "Admin Users Audit: ..... " + str(admin_users_audit)
 print "Host Info Audit: ....... " + str(host_info_audit)
@@ -3134,6 +3132,10 @@ if user_group_audit:
 	print_section("User/Group Audit")
 	audit_user_group()
 	
+if passpol_audit:
+	print_section("Password Policy")
+	audit_passpol()
+
 if admin_users_audit:
 	print_section("Admin Users Audit")
 	audit_admin_users()
@@ -3145,10 +3147,6 @@ if host_info_audit:
 if process_audit:
 	print_section("Process Audit")
 	audit_processes()
-
-if domain_audit:
-	print_section("Process Domain")
-	audit_domain()
 
 if patch_checks:
 	print_section("Patch Checks")
