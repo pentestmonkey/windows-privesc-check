@@ -2604,6 +2604,9 @@ def audit_host_info():
 	if remote_server:
 		print "Querying remote server: " + remote_server
 	
+	# Only works on local host
+	#win32net.NetGetJoinInformation()
+	
 	# This looks interesting, but doesn't seem to work.  Maybe unsupported legacy api.
 	#pywintypes.error: (50, 'NetUseEnum', 'The request is not supported.')
 	#print
@@ -2645,47 +2648,49 @@ def audit_host_info():
 	print "[+] Server Info (NetServerGetInfo 102)"
 	print
 		
-	#try:
-	#print "NetServerGetInfo 100" + str(win32net.NetServerGetInfo(remote_server, 100))
-	#print "NetServerGetInfo 101" + str(win32net.NetServerGetInfo(remote_server, 101))
-	serverinfo = win32net.NetServerGetInfo(remote_server, 102)
-	print "Name: %s" % serverinfo['name']
-	print "Comment: %s" % serverinfo['comment']
-	print "OS: %s.%s" % (serverinfo['version_major'], serverinfo['version_minor'])
-	print "Userpath: %s" % serverinfo['userpath']
-	print "Hidden: %s" % serverinfo['hidden']
-	
-	if serverinfo['platform_id'] & win32netcon.PLATFORM_ID_NT:
-		print "Platform: PLATFORM_ID_NT (means NT family, not NT4)"
-	if serverinfo['platform_id'] == win32netcon.PLATFORM_ID_OS2:
-		print "Platform: PLATFORM_ID_OS2"
-	if serverinfo['platform_id'] == win32netcon.PLATFORM_ID_DOS:
-		print "Platform: PLATFORM_ID_DOS"
-	if serverinfo['platform_id'] == win32netcon.PLATFORM_ID_OSF:
-		print "Platform: PLATFORM_ID_OSF"
-	if serverinfo['platform_id'] == win32netcon.PLATFORM_ID_VMS:
-		print "Platform: PLATFORM_ID_VMS"
-	for sv_type in sv_types:
-		if serverinfo['type'] & getattr(win32netcon, sv_type):
-			print "Type: " + sv_type
-	#except:
-	#	print "[E] Couldn't get Server Info"
+	try:
+		#print "NetServerGetInfo 100" + str(win32net.NetServerGetInfo(remote_server, 100))
+		#print "NetServerGetInfo 101" + str(win32net.NetServerGetInfo(remote_server, 101))
+		serverinfo = win32net.NetServerGetInfo(remote_server, 102)
+		print "Name: %s" % serverinfo['name']
+		print "Comment: %s" % serverinfo['comment']
+		print "OS: %s.%s" % (serverinfo['version_major'], serverinfo['version_minor'])
+		print "Userpath: %s" % serverinfo['userpath']
+		print "Hidden: %s" % serverinfo['hidden']
+		
+		if serverinfo['platform_id'] & win32netcon.PLATFORM_ID_NT:
+			print "Platform: PLATFORM_ID_NT (means NT family, not NT4)"
+		if serverinfo['platform_id'] == win32netcon.PLATFORM_ID_OS2:
+			print "Platform: PLATFORM_ID_OS2"
+		if serverinfo['platform_id'] == win32netcon.PLATFORM_ID_DOS:
+			print "Platform: PLATFORM_ID_DOS"
+		if serverinfo['platform_id'] == win32netcon.PLATFORM_ID_OSF:
+			print "Platform: PLATFORM_ID_OSF"
+		if serverinfo['platform_id'] == win32netcon.PLATFORM_ID_VMS:
+			print "Platform: PLATFORM_ID_VMS"
+		for sv_type in sv_types:
+			if serverinfo['type'] & getattr(win32netcon, sv_type):
+				print "Type: " + sv_type
+	except:
+		print "[E] Couldn't get Server Info"
 
-	ph = win32security.LsaOpenPolicy(remote_server, win32security.POLICY_VIEW_LOCAL_INFORMATION | win32security.POLICY_LOOKUP_NAMES)
 	
 	print
 	print "[+] LsaQueryInformationPolicy"
 	print
 	
-	print "PolicyDnsDomainInformation:"
-	print win32security.LsaQueryInformationPolicy(ph, win32security.PolicyDnsDomainInformation)
-	print "PolicyDnsDomainInformation:"
-	print win32security.LsaQueryInformationPolicy(ph, win32security.PolicyPrimaryDomainInformation)
-	print "PolicyPrimaryDomainInformation:"
-	print win32security.LsaQueryInformationPolicy(ph, win32security.PolicyAccountDomainInformation)
-	print "PolicyLsaServerRoleInformation:"
-	print win32security.LsaQueryInformationPolicy(ph, win32security.PolicyLsaServerRoleInformation)
-
+	try:
+		ph = win32security.LsaOpenPolicy(remote_server, win32security.POLICY_VIEW_LOCAL_INFORMATION | win32security.POLICY_LOOKUP_NAMES)
+		print "PolicyDnsDomainInformation:"
+		print win32security.LsaQueryInformationPolicy(ph, win32security.PolicyDnsDomainInformation)
+		print "PolicyDnsDomainInformation:"
+		print win32security.LsaQueryInformationPolicy(ph, win32security.PolicyPrimaryDomainInformation)
+		print "PolicyPrimaryDomainInformation:"
+		print win32security.LsaQueryInformationPolicy(ph, win32security.PolicyAccountDomainInformation)
+		print "PolicyLsaServerRoleInformation:"
+		print win32security.LsaQueryInformationPolicy(ph, win32security.PolicyLsaServerRoleInformation)
+	except:
+		print "[E] Couldn't LsaOpenPolicy"
 		
 	# DsBindWithCred isn't available from python!
 	
@@ -2723,34 +2728,31 @@ def audit_host_info():
 	try:
 		domain = None # TODO: could call of each domain if we had a list
 		print "PDC: " + win32net.NetGetDCName(remote_server, domain)
+		# Try to list some domain controllers for the remote host
+		# There are better ways of doing this, but they don't seem to be available via python!
+		dc_seen = {}
+		for filter in (0, 0x00004000, 0x00000080, 0x00001000, 0x00000400, 0x00000040, 0x00000010):
+			dc_info = win32security.DsGetDcName(remote_server, None, None, None, filter)
+			if not dc_info['DomainControllerAddress'] in dc_seen:
+				print "\n[+] Found DC\n"
+				for k in dc_info:
+					print k + ": " + str(dc_info[k])
+			dc_seen[dc_info['DomainControllerAddress']] = 1
+		print "\nWARNING: Above is not necessarily a complete list of DCs\n"
+		#print "Domain controller: " + str(win32security.DsGetDcName(remote_server, None, None, None, 0)) # any dc
+		#print "Domain controller: " + str(win32security.DsGetDcName(remote_server, None, None, None, 0x00004000)) # not the system we connect to
+		#print "Domain controller: " + str(win32security.DsGetDcName(remote_server, None, None, None, 0x00000080)) # pdc
+		#print "Domain controller: " + str(win32security.DsGetDcName(remote_server, None, None, None, 0x00001000)) # writeable
+		#print "Domain controller: " + str(win32security.DsGetDcName(remote_server, None, None, None, 0x00000400)) # kerberos
+		#print "Domain controller: " + str(win32security.DsGetDcName(remote_server, None, None, None, 0x00000040)) # gc
+		#print "Domain controller: " + str(win32security.DsGetDcName(remote_server, None, None, None, 0x00000010)) # directory service
 	except:
-		pass
+		print "[E] Couldn't get DC info"
+		
 	# This function sounds very much like what lservers.exe does, but the server name must be None
 	# according to http://msdn.microsoft.com/en-us/library/aa370623%28VS.85%29.aspx.  No use to us.
 	# print win32net.NetServerEnum(remote_server, 100 or 101, win32netcon.SV_TYPE_ALL, "SOMEDOMAIN.COM", 0, 999999)
-	
-	# Try to list some domain controllers for the remote host
-	# There are better ways of doing this, but they don't seem to be available via python!
-	dc_seen = {}
-	for filter in (0, 0x00004000, 0x00000080, 0x00001000, 0x00000400, 0x00000040, 0x00000010):
-		dc_info = win32security.DsGetDcName(remote_server, None, None, None, filter)
-		if not dc_info['DomainControllerAddress'] in dc_seen:
-			print "\n[+] Found DC\n"
-			for k in dc_info:
-				print k + ": " + str(dc_info[k])
-		dc_seen[dc_info['DomainControllerAddress']] = 1
-	print "\nWARNING: Above is not necessarily a complete list of DCs\n"
-	#print "Domain controller: " + str(win32security.DsGetDcName(remote_server, None, None, None, 0)) # any dc
-	#print "Domain controller: " + str(win32security.DsGetDcName(remote_server, None, None, None, 0x00004000)) # not the system we connect to
-	#print "Domain controller: " + str(win32security.DsGetDcName(remote_server, None, None, None, 0x00000080)) # pdc
-	#print "Domain controller: " + str(win32security.DsGetDcName(remote_server, None, None, None, 0x00001000)) # writeable
-	#print "Domain controller: " + str(win32security.DsGetDcName(remote_server, None, None, None, 0x00000400)) # kerberos
-	#print "Domain controller: " + str(win32security.DsGetDcName(remote_server, None, None, None, 0x00000040)) # gc
-	#print "Domain controller: " + str(win32security.DsGetDcName(remote_server, None, None, None, 0x00000010)) # directory service
-
-	
-	
-	
+		
 def audit_user_group():
 	try:
 		ph = win32security.LsaOpenPolicy(remote_server, win32security.POLICY_VIEW_LOCAL_INFORMATION | win32security.POLICY_LOOKUP_NAMES)
