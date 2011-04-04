@@ -99,12 +99,14 @@ class principal:
 			#print "Cache result returned for trust of %s: %s" % (self.get_fq_name(), self.trusted)
 			return self.trusted
 
-			if self.is_group_type():
+		# TODO optimize this.  It's called a LOT!
+		if self.is_group_type() and self.get_type() == 4:
 			g = wpc.group.group(self.get_sid())
 			# Groups with zero members are trusted - i.e. not interesting
 			if len(g.get_members()) == 0:
 				self.trusted_set = 1
 				self.trusted = 1
+				#print "Ignoring empty group %s (type %s)" % (self.get_fq_name(), self.get_type())
 				return 1
 				
 		for p in wpc.conf.trusted_principals:
