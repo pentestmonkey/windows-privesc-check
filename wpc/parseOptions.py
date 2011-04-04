@@ -35,8 +35,8 @@ def parseOptions():
 		print "[E] Specify either --dump or --audit"
 		sys.exit()
 		
-	if not (options.do_services or options.do_registry or options.do_drivers):
-		print "[E] Specify something to look at.  At least one of: -s, -r, -d"
+	if not (options.do_services or options.do_drivers):
+		print "[E] Specify something to look at.  At least one of: -s, -d"
 		sys.exit()
 		
 	return options
