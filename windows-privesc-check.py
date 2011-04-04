@@ -168,7 +168,7 @@ def check_services(report):
 						report.get_by_id("WPC034").add_supporting_data('service_exe_file_parent_write_perms', [s, fa, fa_parent])
 			
 			# Check for file perms allowing overwrite
-			fa = s.get_exe_file().get_file_acl_for_perms(["FILE_WRITE", "WRITE_OWNER", "WRITE_DAC"])
+			fa = s.get_exe_file().get_file_acl_for_perms(["FILE_WRITE_DATA", "WRITE_OWNER", "WRITE_DAC"])
 			if fa:
 				report.get_by_id("WPC028").add_supporting_data('service_exe_write_perms', [s, fa])
 
