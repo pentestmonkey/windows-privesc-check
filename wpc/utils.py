@@ -41,7 +41,7 @@ def init(remote_server):
 	wpc.conf.cache = cache()
 	
 	wpc.conf.version = "2.0"
-	svnversion="$Revision: 24 $" # Don't change this line.  Auto-updated.
+	svnversion="$Revision$" # Don't change this line.  Auto-updated.
 	svnnum=re.sub('[^0-9]', '', svnversion)
 	if svnnum:
 		wpc.conf.version = wpc.conf.version + "svn" + svnnum
