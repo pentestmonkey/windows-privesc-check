@@ -8,6 +8,7 @@ import win32netcon
 from wpc.principal import principal
 from wpc.user import user
 import wpc.conf
+
 # These have members
 class group(principal):
 	def get_members(self):

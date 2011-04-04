@@ -4,6 +4,7 @@ import _winreg
 import win32service
 import win32con
 import wpc.conf
+#from wpc.group import group
 
 # These have sids, perhaps a domain
 class principal:
@@ -97,16 +98,14 @@ class principal:
 		if self.trusted_set:
 			#print "Cache result returned for trust of %s: %s" % (self.get_fq_name(), self.trusted)
 			return self.trusted
-# TODO			
-#		if self.is_group_type():
-#			g = group(self.get_sid())
-#			print "Group type"
-#			# Groups with zero members are trusted - i.e. not interesting
-#			if len(g.get_members()) == 0:
-#				self.trusted_set = 1
-#				self.trusted = 1
-#				print "%s is trusted.  Group with no members" % self.get_fq_name()
-#				return 1
+
+			if self.is_group_type():
+			g = wpc.group.group(self.get_sid())
+			# Groups with zero members are trusted - i.e. not interesting
+			if len(g.get_members()) == 0:
+				self.trusted_set = 1
+				self.trusted = 1
+				return 1
 				
 		for p in wpc.conf.trusted_principals:
 			# This also recurses through sub groups
