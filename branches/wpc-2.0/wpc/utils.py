@@ -40,9 +40,6 @@ def init(remote_server):
 	# This is (or should) be used by many wpc.* classes
 	wpc.conf.cache = cache()
 	
-	# Which permissions do we NOT care about? == who do we trust?
-	define_trusted_principals()
-	
 	wpc.conf.version = "2.0"
 	svnversion="$Revision: 24 $" # Don't change this line.  Auto-updated.
 	svnnum=re.sub('[^0-9]', '', svnversion)
@@ -51,6 +48,8 @@ def init(remote_server):
 
 	print "windows-privesc-check v%s (http://pentestmonkey.net/windows-privesc-check)\n" % wpc.conf.version
 
+	# Which permissions do we NOT care about? == who do we trust?
+	define_trusted_principals()
 
 # If we're admin then we assign ourselves some extra privs
 def get_extra_privs():
@@ -67,7 +66,7 @@ def get_extra_privs():
 	newprivs = []
 	for privtuple in privs:
 		if privtuple[0] == win32security.LookupPrivilegeValue(wpc.conf.remote_server, "SeBackupPrivilege") or privtuple[0] == win32security.LookupPrivilegeValue(wpc.conf.remote_server, "SeDebugPrivilege") or privtuple[0] == win32security.LookupPrivilegeValue(wpc.conf.remote_server, "SeSecurityPrivilege"):
-			print "Added privilege " + str(privtuple[0])
+			# print "Added privilege " + str(privtuple[0])
 			# privtuple[1] = 2 # tuples are immutable.  WHY?!
 			newprivs.append((privtuple[0], 2)) # SE_PRIVILEGE_ENABLED
 		else:
@@ -143,8 +142,10 @@ def define_trusted_principals():
 		except:
 			pass
 	
+	print "Considering these users to be trusted:"
 	for p in wpc.conf.trusted_principals:
-		print "Trusted: " + p.get_fq_name()
+		print "* " + p.get_fq_name()
+	print
 
 # Walk a directory tree, returning all matching files
 #
