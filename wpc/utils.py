@@ -42,6 +42,15 @@ def init(remote_server):
 	
 	# Which permissions do we NOT care about? == who do we trust?
 	define_trusted_principals()
+	
+	wpc.conf.version = "2.0"
+	svnversion="$Revision: 24 $" # Don't change this line.  Auto-updated.
+	svnnum=re.sub('[^0-9]', '', svnversion)
+	if svnnum:
+		wpc.conf.version = wpc.conf.version + "svn" + svnnum
+
+	print "windows-privesc-check v%s (http://pentestmonkey.net/windows-privesc-check)\n" % wpc.conf.version
+
 
 # If we're admin then we assign ourselves some extra privs
 def get_extra_privs():
