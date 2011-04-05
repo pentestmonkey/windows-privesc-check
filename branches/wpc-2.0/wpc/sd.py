@@ -127,7 +127,7 @@ class sd(acelist):
 		return self._as_text(1)
 		
 	def _as_text(self, flag):
-		s = "--- start sd ---\n"
+		s = "--- start %s security descriptor ---\n" % self.get_type()
 		s += "Owner:    " + self.get_owner().get_fq_name() + "\n"
 		s += "Group:    " + self.get_group().get_fq_name() + "\n"
 		for a in self.get_aces():
@@ -136,6 +136,6 @@ class sd(acelist):
 					s += a.as_text() + "\n"
 			else:
 				s += a.as_text() + "\n"			
-		s += "--- end sd ---\n"
+		s += "--- end security descriptor ---\n"
 		return s
 		
