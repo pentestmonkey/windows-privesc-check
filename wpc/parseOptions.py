@@ -17,6 +17,7 @@ def parseOptions():
 
 	examine.add_option("-s", "--services", dest="do_services", default=False, action="store_true", help="Windows Services")
 	examine.add_option("-d", "--drivers",  dest="do_drivers",  default=False, action="store_true", help="Kernel Drivers")
+	examine.add_option("-P", "--processes",dest="do_processes",default=False, action="store_true", help="Processes")
 	#examine.add_option("-r", "--registry", dest="do_registry", default=False, action="store_true", help="Registry Setting + Permissions")
 
 	host.add_option("-t", "--target", dest="remote_host", help="Remote host or IP")
@@ -35,8 +36,8 @@ def parseOptions():
 		print "[E] Specify either --dump or --audit"
 		sys.exit()
 		
-	if not (options.do_services or options.do_drivers):
-		print "[E] Specify something to look at.  At least one of: -s, -d"
+	if not (options.do_services or options.do_drivers or options.do_processes):
+		print "[E] Specify something to look at.  At least one of: -s, -d, -p"
 		sys.exit()
 		
 	return options

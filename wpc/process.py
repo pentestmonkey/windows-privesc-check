@@ -3,6 +3,7 @@ import win32con
 import win32api
 import win32security
 import ntsecuritycon
+import wpc.utils
 from wpc.token import token
 from wpc.file import file as File
 from wpc.principal import principal
@@ -14,6 +15,8 @@ class process:
 		self.ph = None
 		self.pth = None
 		self.exe = None
+		self.exe_path_dirty = None
+		self.exe_path_clean = None
 		self.wow64 = None
 		self.mhs = None
 		self.dlls = []
@@ -73,15 +76,23 @@ class process:
 					#dump_perms(dll, 'file', {'brief': 1})
 		return self.dlls
 		
+	def get_exe_path_clean(self):
+		if not self.exe_path_clean:
+			self.exe_path_clean = wpc.utils.get_exe_path_clean(self.get_exe_path_dirty())
+			if not self.exe_path_clean:
+				self.exe_path_clean = self.get_exe_path_dirty()
+		return self.exe_path_clean
+		
+	def get_exe_path_dirty(self):
+		if not self.exe_path_dirty:
+			if self.get_mhs():
+				self.exe_path_dirty = win32process.GetModuleFileNameEx(self.get_ph(), self.get_mhs().pop(0))
+		return self.exe_path_dirty
+
 	def get_exe(self):
 		if not self.exe:
-			# try:
-				#mhs = win32process.EnumProcessModules(self.get_ph())
-				#self.mhs = list(mhs)
-			if self.get_mhs():
-				self.exe = File(win32process.GetModuleFileNameEx(self.get_ph(), self.get_mhs().pop(0)))
-			# except:
-#				pass
+			if self.get_exe_path_dirty():
+				self.exe = File(self.get_exe_path_clean())
 		return self.exe
 		
 	def get_ph(self):
@@ -142,29 +153,32 @@ class process:
 	def as_text(self):
 		t = ''
 		t += "-------------------------------------------------\n"
-		t += "PID: " + str(self.get_pid()) + "\n"
-		t += "WTS Name: " + str(self.get_wts_name()) + "\n"
+		t += "PID:            " + str(self.get_pid()) + "\n"
+		t += "WTS Name:       " + str(self.get_wts_name()) + "\n"
 		t += "WTS Session ID: " + str(self.get_wts_session_id()) + "\n"
 		if self.get_wts_sid():
-			t += "WTS Sid: " + str(self.get_wts_sid().get_fq_name()) + "\n"
+			t += "WTS Sid:        " + str(self.get_wts_sid().get_fq_name()) + "\n"
 		else:
-			t += "WTS Sid: None\n"
-
-		t += "Process Security Descriptor:\n"
-		if self.get_sd():
-			t += self.get_sd().as_text()
+			t += "WTS Sid:        None\n"
 		if self.get_ph():
-			t += "Is WOW64: " + str(self.is_wow64()) + "\n"
+			t += "Is WOW64:       " + str(self.is_wow64()) + "\n"
 			if self.get_exe():
-				t += "Exe: " + str(self.get_exe().get_name()) + "\n"
+				t += "Exe:            " + str(self.get_exe().get_name()) + "\n"
 			else:
-				t += "Exe: [unknown]\n"
+				t += "Exe:        [unknown]\n"
 			t += "Modules:\n"
 			for dll in self.get_dlls():
-				t += "\t" + dll.get_name() + "\n"
+				t += "\t\t" + dll.get_name() + "\n"
 
+		t += "\nProcess Security Descriptor:\n"
+		if self.get_sd():
+			t += self.get_sd().as_text()
+
+		t += "\nProcess Access Token:\n"
 		if self.get_token():
 			t += self.get_token().as_text()
+		else:
+			t += "[unknown]"
 		return t
 
 		

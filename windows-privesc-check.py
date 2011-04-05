@@ -44,6 +44,28 @@ def dump_drivers(opts):
 		else:
 			print d.as_text()
 
+def dump_processes(opts):	
+	for p in processes().get_all():
+		print p.as_text()
+		
+		# When listing DLLs for a process we need to see the filesystem like they do
+		if p.is_wow64():
+			k32.Wow64EnableWow64FsRedirection( ctypes.byref(wow64) )
+			
+		if p.get_exe():
+			print "Security Descriptor for Exe File %s" % p.get_exe().get_name()
+			if p.get_exe().get_sd():
+				print p.get_exe().get_sd().as_text()
+			else:
+				print "[unknown]"
+			
+			for dll in p.get_dlls():
+				print "\nSecurity Descriptor for DLL File %s" % dll.get_name()
+				print dll.get_sd().as_text()
+
+		if p.is_wow64():
+			k32.Wow64DisableWow64FsRedirection( ctypes.byref(wow64) )
+		
 def check_services(report):
 	for s in services().get_services():
 	
@@ -303,6 +325,9 @@ if options.dump_mode:
 	if options.do_drivers:
 		dump_drivers(dump_opts)
 
+	if options.do_processes:
+		dump_processes(dump_opts)
+		
 # Check services
 if options.audit_mode:
 

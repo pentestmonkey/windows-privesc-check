@@ -174,3 +174,56 @@ def dirwalk(dir, extensions, include_dirs):
 			if include_dirs:
 				for dir in dirs:
 					yield root + "\\" + dir
+
+# Attempts to clean up strange looking file paths like:
+#   \??\C:\WINDOWS\system32\csrss.exe
+#   \SystemRoot\System32\smss.exe
+def get_exe_path_clean(binary_dirty):
+	exe_path_clean = None
+	
+	# remove quotes and leading white space
+	m = re.search('^[\s]*?"([^"]+)"', binary_dirty)
+	if m and os.path.exists(m.group(1)):
+		exe_path_clean = m.group(1)
+		return exe_path_clean
+	else:
+		if m:
+			binary_dirty = m.group(1)
+	
+	# Paths for drivers are written in an odd way, so we regex them
+	re1 = re.compile(r'^\\systemroot', re.IGNORECASE)
+	binary_dirty = re1.sub(os.getenv('SystemRoot'), binary_dirty)
+	re2 = re.compile(r'^system32\\', re.IGNORECASE)
+	binary_dirty = re2.sub(os.getenv('SystemRoot') + r'\\system32\\', binary_dirty)
+	re2 = re.compile(r'^\\\?\?\\', re.IGNORECASE)
+	binary_dirty = re2.sub('', binary_dirty)
+
+	if os.path.exists(binary_dirty):
+		exe_path_clean = binary_dirty
+		return exe_path_clean
+	
+	chunks = binary_dirty.split(" ")
+	candidate = ""
+	for chunk in chunks:
+		if candidate:
+			candidate = candidate + " "
+		candidate = candidate + chunk
+		
+		if os.path.exists(candidate) and os.path.isfile(candidate):
+			exe_path_clean = candidate
+			break
+			
+		if os.path.exists(candidate + ".exe") and os.path.isfile(candidate + ".exe"):
+			exe_path_clean = candidate + ".exe"
+			break
+			
+		if wpc.conf.on64bitwindows:
+			candidate2 = candidate.replace("system32", "syswow64")
+			if os.path.exists(candidate2) and os.path.isfile(candidate2):
+				exe_path_clean = candidate2
+				break
+				
+			if os.path.exists(candidate2 + ".exe") and os.path.isfile(candidate2 + ".exe"):
+				exe_path_clean = candidate2 + ".exe"
+				break
+	return exe_path_clean

@@ -349,7 +349,7 @@ class token:
 		return t
 
 	def as_text(self):
-		t = '--- Start Access Token ---\n'
+		t = '--- start access token ---\n'
 		
 		if self.get_token_owner():
 			t += "Token Owner: " + str(self.get_token_owner().get_fq_name()) + "\n"
@@ -368,7 +368,10 @@ class token:
 			t += token(self.get_token_linked_token()).as_text_no_rec()
 		t += "TokenLogonSid: " + str(self.get_token_logon_sid()) + "\n"
 		t += "TokenElevation: " + str(self.get_token_elevation()) + "\n"
-		t += "TokenIntegrityLevel: " + str(self.get_token_integrity_level().get_fq_name()) + "\n"
+		if self.get_token_integrity_level():
+			t += "TokenIntegrityLevel: " + str(self.get_token_integrity_level().get_fq_name()) + "\n"
+		else:
+			t += "TokenIntegrityLevel: [unknown]\n"
 		t += "TokenMandatoryPolicy: " + str(self.get_token_mandatory_policy()) + "\n"
 		t += "Token Resitrcted Sids:\n"
 		for sid in self.get_token_restricted_sids():
@@ -380,8 +383,8 @@ class token:
 		t += "Token Privileges:\n"
 		for p, a in self.get_token_privileges():
 			t += "\t%-32s: %s\n" % (str(p), "|".join(a))
-		t += "Token Security Descriptor:\n"
+		t += "\nToken Security Descriptor:\n"
 		if self.get_sd():
 			t += self.get_sd().as_text()
-		t += '--- End Access Token ---\n'
+		t += '--- end access token ---\n'
 		return t
