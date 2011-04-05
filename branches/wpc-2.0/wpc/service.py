@@ -19,6 +19,8 @@ class service:
 		self.type = None
 		self.sh_read_control = None
 		self.service_info = None
+		self.service_config_failure_actions = None
+		self.service_sid_type = None
 		self.long_description = None
 		self.exe_path = None # e.g. C:\Windows\system32\svchost.exe -k netsvcs
 		self.exe_path_clean = None # e.g. C:\Windows\system32\svchost.exe
@@ -223,6 +225,30 @@ class service:
 		else:
 			return "[unknown]"
 			
+	def get_service_config_failure_actions(self):
+		if not self.service_config_failure_actions:
+			try:
+				self.service_config_failure_actions = win32service.QueryServiceConfig2(self.get_sh_query_config(), win32service.SERVICE_CONFIG_FAILURE_ACTIONS)
+			except:
+				pass
+			if not self.service_config_failure_actions:
+				self.service_config_failure_actions = ""
+		return self.service_config_failure_actions
+	
+	def get_service_sid_type(self):
+		if not self.service_sid_type:
+			try:
+				self.service_sid_type = win32service.QueryServiceConfig2(self.get_sh_query_config(), win32service.SERVICE_CONFIG_SERVICE_SID_INFO)
+				if self.service_sid_type == 0:
+					self.service_sid_type = "SERVICE_SID_TYPE_NONE"
+				if self.service_sid_type == 1:
+					self.service_sid_type = "SERVICE_SID_TYPE_RESTRICTED"
+				if self.service_sid_type == 2:
+					self.service_sid_type = "SERVICE_SID_TYPE_UNRESTRICTED"
+			except:
+				pass
+		return self.service_sid_type
+	
 	def get_long_description(self):
 		if not self.long_description:
 			try:
@@ -254,6 +280,8 @@ class service:
 		else:
 			t +=  "Binary (clean): [Missing Binary]\n"
 		t +=  "Run as:         " + self.get_run_as() + "\n"
+		t +=  "Svc Sid Type:   " + str(self.get_service_sid_type()) + "\n"
+		t +=  "Failure Actions:%s\n" % self.get_service_config_failure_actions()
 		t +=  "\n"
 		t +=  "Service Security Descriptor:\n"
 		if self.get_sd():
