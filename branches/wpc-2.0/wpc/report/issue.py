@@ -78,6 +78,11 @@ class issue:
 				r = data[1]
 				d += " %s (%s) uses registry key %s, owned by %s" % (s.get_description(), s.get_name(), r.get_name(), r.get_sd().get_owner().get_fq_name())		
 
+		elif data_name == 'regkey_untrusted_ownership':
+			for data in self.get_supporting_data(data_name):
+				r = data[0]
+				d += "Registry key %s is owned by %s" % (r.get_name(), r.get_sd().get_owner().get_fq_name())		
+
 		elif data_name == 'service_reg_perms':
 			for data in self.get_supporting_data(data_name):
 				s = data[0]
@@ -85,6 +90,13 @@ class issue:
 				d += " %s (%s) uses registry key %s:\n" % (s.get_description(), s.get_name(), a.get_name())		
 				d += "  %s\n" % (a.as_text())
 
+		elif data_name == 'regkey_perms':
+			for data in self.get_supporting_data(data_name):
+				r = data[0]
+				a = data[1]
+				d += "Registry key %s has permissions:\n" % (r.get_name())		
+				d += "  %s\n" % (a.as_text())
+				
 		elif data_name == 'writeable_dirs' or data_name == 'files_write_perms':
 			for o in self.get_supporting_data(data_name):
 				d += o.as_text() + "\n"

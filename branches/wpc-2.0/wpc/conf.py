@@ -32,19 +32,19 @@ kb_nos = {
 
 reg_paths = (
 	'HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services',
-	'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run',
+#	'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run',
 	'HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Run',
 	'HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\RunOnce',
 	'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run',
 	'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\Shell',
 	'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\Userinit',
 	'HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunOnce',
-	'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\RunOnce',
+#	'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\RunOnce',
 	'HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunServices',
 	'HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunServicesOnce',
-	'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\RunServices',
-	'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\RunServicesOnce',
-	'HKEY_CURRENT_USER\Software\Microsoft\Windows NT\CurrentVersion\Windows',
+#	'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\RunServices',
+#	'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\RunServicesOnce',
+#	'HKEY_CURRENT_USER\Software\Microsoft\Windows NT\CurrentVersion\Windows',
 )
 
 # We don't care if some users / groups hold dangerous permission because they're trusted
@@ -54,7 +54,6 @@ trusted_principals_fq = (
 	"NT SERVICE\\TrustedInstaller",
 	"NT AUTHORITY\\SYSTEM"
 )
-
 
 # We don't care if members of these groups hold dangerous permission because they're trusted
 # These have names without a domain:
@@ -1079,6 +1078,68 @@ This could allow certain users on the system to place malicious code into certai
        }
     },
 	
+    'WPC046': {
+       'title': "Windows Registry Keys Containing Program Owned By Untrusted Users",
+       'description': '''Some of the registry keys holding the names of programs run by other users could be changed by non-administrative users.  TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'regkey_untrusted_ownership': {
+             'section': "description",
+             'preamble': "The registry keys below can be changed by non-administrative users:",
+          },
+       }
+    },
+	
+    'WPC047': {
+       'title': "Windows Registry Keys Containing Programs Can Have Permissions Changed By Untrusted Users",
+       'description': '''Some of the registry keys holding the names of programs run by other users could be changed by non-administrative users.  TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'regkey_perms': {
+             'section': "description",
+             'preamble': "The registry keys below can be changed by non-administrative users:",
+          },
+       }
+    },	
+	
+    'WPC048': {
+       'title': "Windows Registry Keys Containing Program Names Can Be Changed By Untrusted Users",
+       'description': '''Some of the registry keys holding the names of programs run by other users could be changed by non-administrative users.  It would be possible for an attacker to substitute the name of malicious program which then stole the privileges of other accounts.''',
+       'recommendation': '''The keys below should only have write access for administrators.''',
+       'supporting_data': {
+          'regkey_perms': {
+             'section': "description",
+             'preamble': "The registry keys below can be changed by non-administrative users:",
+          },
+       }
+    },
+
+    'WPC049': {
+       'title': "Windows Registry Keys Containing Programs Can Have Subkey Added By Untrusted Users",
+       'description': '''Some of the registry keys holding the names of programs run by other users could be changed by non-administrative users.  TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'regkey_perms': {
+             'section': "description",
+             'preamble': "The registry keys below can be changed by non-administrative users:",
+          },
+       }
+    },	
+	
+    'WPC050': {
+       'title': "Windows Registry Keys Containing Programs Can Be Deleted",
+       'description': '''Some of the registry keys holding the names of programs run by other users could be changed by non-administrative users.  TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'regkey_perms': {
+             'section': "description",
+             'preamble': "The registry keys below can be changed by non-administrative users:",
+          },
+       }
+    },	
+	
+				
+				
 }
 
 issue_template_html = '''

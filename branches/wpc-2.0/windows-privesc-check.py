@@ -66,7 +66,7 @@ def dump_processes(opts):
 		if p.is_wow64():
 			k32.Wow64DisableWow64FsRedirection( ctypes.byref(wow64) )
 		
-def check_services(report):
+def audit_services(report):
 	for s in services().get_services():
 	
 		#
@@ -233,13 +233,44 @@ def check_services(report):
 			for a in s.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["WRITE_OWNER"]).get_aces():
 				report.get_by_id("WPC024").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
 
-def check_drivers(report):		
-	for d in drivers().get_services():
-		print d.as_text()
-		print_dangerous_untrusted_s(d)
-		if d.get_exe_file():
-			print_dangerous_untrusted(d.get_exe_file())
+def audit_drivers(report):	
+	pass
+	# TODO - same as services, but need to edit|replace wording of issues
 
+def audit_registry(report):
+	for key_string in wpc.conf.reg_paths:
+		#parts = key_string.split("\\")
+		#hive = parts[0]
+		#key_string = "\\".join(parts[1:])
+		
+		r = regkey(key_string)
+		
+		if r.get_sd():
+		
+			# Check owner
+			if not r.get_sd().get_owner().is_trusted():
+				report.get_by_id("WPC046").add_supporting_data('regkey_program_untrusted_ownership', [r])
+			
+			# Untrusted users can change permissions
+			acl = r.get_issue_acl_for_perms(["WRITE_OWNER", "WRITE_DAC"])
+			if acl:
+				report.get_by_id("WPC047").add_supporting_data('regkey_perms', [r, acl])
+				
+#			"KEY_SET_VALUE", # GUI "Set Value".  Required to create, delete, or set a registry value.
+			acl = r.get_issue_acl_for_perms(["KEY_SET_VALUE"])
+			if acl:
+				report.get_by_id("WPC048").add_supporting_data('regkey_perms', [r, acl])
+				
+#			"KEY_CREATE_LINK", # GUI "Create Link".  Reserved for system use.
+			acl = r.get_issue_acl_for_perms(["KEY_CREATE_LINK", "KEY_CREATE_SUB_KEY"])
+			if acl:
+				report.get_by_id("WPC049").add_supporting_data('regkey_perms', [r, acl])
+	
+#			"DELETE", # GUI "Delete"
+			acl = r.get_issue_acl_for_perms(["DELETE"])
+			if acl:
+				report.get_by_id("WPC050").add_supporting_data('regkey_perms', [r, acl])
+	
 # Gather info about files and directories
 def gather_file_info(file_info):
 	# Record info about all directories
@@ -332,7 +363,14 @@ if options.dump_mode:
 if options.audit_mode:
 
 	if options.do_services:
-		check_services(report)
+		audit_services(report)
+		
+	# TODO audit_drivers
+	
+	# TODO audit_processes
+	
+	if options.do_registry:
+		audit_registry(report)
 
 	print report.as_text()
 

@@ -18,7 +18,7 @@ def parseOptions():
 	examine.add_option("-s", "--services", dest="do_services", default=False, action="store_true", help="Windows Services")
 	examine.add_option("-d", "--drivers",  dest="do_drivers",  default=False, action="store_true", help="Kernel Drivers")
 	examine.add_option("-P", "--processes",dest="do_processes",default=False, action="store_true", help="Processes")
-	#examine.add_option("-r", "--registry", dest="do_registry", default=False, action="store_true", help="Registry Setting + Permissions")
+	examine.add_option("-r", "--registry", dest="do_registry", default=False, action="store_true", help="Registry Setting + Permissions")
 
 	host.add_option("-t", "--target", dest="remote_host", help="Remote host or IP")
 	host.add_option("-u", "--user",   dest="remote_user", help="Remote username") # TODO unused
@@ -31,13 +31,13 @@ def parseOptions():
 	parser.add_option_group(dump)
 	
 	(options, args) = parser.parse_args()
-	#print options
+
 	if not options.dump_mode and not options.audit_mode:
 		print "[E] Specify either --dump or --audit"
 		sys.exit()
 		
-	if not (options.do_services or options.do_drivers or options.do_processes):
-		print "[E] Specify something to look at.  At least one of: -s, -d, -p"
+	if not (options.do_services or options.do_drivers or options.do_processes or options.do_registry):
+		print "[E] Specify something to look at.  At least one of: -s, -d, -P, -r"
 		sys.exit()
 		
 	return options

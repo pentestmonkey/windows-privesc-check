@@ -104,7 +104,8 @@ class regkey:
 				# self.keyh = win32api.RegOpenKeyEx(getattr(win32con, self.get_hive()), self.get_path(), 0, win32con.KEY_ENUMERATE_SUB_KEYS | win32con.KEY_QUERY_VALUE | win32con.KEY_READ)
 				self.keyh = win32api.RegOpenKeyEx(getattr(win32con, self.get_hive()), self.get_path(), 0, win32con.KEY_ENUMERATE_SUB_KEYS | win32con.KEY_QUERY_VALUE | ntsecuritycon.READ_CONTROL)
 			except:
-				print "Can't open: " + self.get_name()
+				pass
+				# print "Can't open: " + self.get_name()
 		return self.keyh
 				
 	def get_sd(self):
@@ -115,7 +116,7 @@ class regkey:
 				self.sd = wpc.conf.cache.sd('regkey', sd)
 				#print "[D]: Got security descriptor for " + self.get_name()
 			except:
-				print "WARNING: Can't get security descriptor for regkey: " + self.get_name()
+				# print "WARNING: Can't get security descriptor for regkey: " + self.get_name()
 				self.sd = None
 		
 		return self.sd
