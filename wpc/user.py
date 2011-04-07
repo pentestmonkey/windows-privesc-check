@@ -3,6 +3,7 @@ import ntsecuritycon
 import _winreg
 import win32service
 import win32con
+import win32net
 import wpc.conf
 from wpc.principal import principal
 #from wpc.group import group as group
@@ -29,3 +30,13 @@ class user(principal):
 			gsid, s, i = win32security.LookupAccountName(wpc.conf.remote_server, group)
 			principals.append(Group(gsid))	
 		return principals
+		
+	def get_info(self, key):
+		if not self.info:
+			try:
+				self.info = win32net.NetUserGetInfo(None, self.get_fq_name, 4)
+				return self.info[key]
+			except:
+				pass
+		return None
+			

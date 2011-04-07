@@ -8,6 +8,7 @@ import win32con
 import win32security
 import win32net
 import wpc.conf
+from wpc.users import users
 from wpc.shares import shares
 from wpc.token import token
 from wpc.cache import cache
@@ -66,6 +67,12 @@ def dump_processes(opts):
 		if p.is_wow64():
 			k32.Wow64DisableWow64FsRedirection( ctypes.byref(wow64) )
 		
+def dump_users(opts):
+	print "[+] Dumping user list:"
+	userlist = users()
+	for u in userlist.get_all():
+		print u.get_fq_name()
+
 def audit_services(report):
 	for s in services().get_services():
 	
@@ -358,6 +365,9 @@ if options.dump_mode:
 
 	if options.do_processes:
 		dump_processes(dump_opts)
+		
+	if options.do_users:
+		dump_users(dump_opts)
 		
 # Check services
 if options.audit_mode:
