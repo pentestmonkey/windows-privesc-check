@@ -16,6 +16,7 @@ import win32security
 class cache:
 	def __init__(self):
 		self.namefromsid = {}
+		self.sidfromname = {}
 		self.stringfromsid = {}
 		self.sidingroup = {}
 		self.files = {}
@@ -30,6 +31,8 @@ class cache:
 		self.misses['sd'] = 0
 		self.hits['LookupAccountSid'] = 0
 		self.misses['LookupAccountSid'] = 0
+		self.hits['LookupAccountName'] = 0
+		self.misses['LookupAccountName'] = 0
 		self.hits['is_in_group'] = 0
 		self.misses['is_in_group'] = 0
 	
@@ -67,7 +70,6 @@ class cache:
 		return f
 	
 	def LookupAccountSid(self, server, s):
-		# TODO cache code
 		sid = win32security.ConvertSidToStringSid(s)
 		#print "zzzz"
 		if not server in self.namefromsid.keys():
@@ -86,6 +88,23 @@ class cache:
 		# owner_name, owner_domain, type = 
 		
 		return self.namefromsid[server][sid]
+
+	def LookupAccountName(self, server, name):
+		if not server in self.sidfromname.keys():
+			self.sidfromname[server] = {}
+		if not name in self.sidfromname[server].keys():
+			#print "xxxx %s %s" % (server, name)
+			try:
+				self.sidfromname[server][name] = win32security.LookupAccountName(server, name)		
+			except:
+				self.sidfromname[server][name] = None
+			self.miss('LookupAccountName')
+		else:
+			self.hit('LookupAccountName')
+			#print self.sidfromname[server][name]
+		# owner_name, owner_domain, type = 
+		
+		return self.sidfromname[server][name]
 
 	def hit(self, name):
 		#print "Hit"
