@@ -9,6 +9,7 @@ import win32security
 import win32net
 import wpc.conf
 from wpc.users import users
+from wpc.groups import groups
 from wpc.shares import shares
 from wpc.token import token
 from wpc.cache import cache
@@ -72,6 +73,15 @@ def dump_users(opts):
 	userlist = users()
 	for u in userlist.get_all():
 		print u.get_fq_name()
+
+def dump_groups(opts):
+	print "[+] Dumping group list:"
+	grouplist = groups()
+	for g in grouplist.get_all():
+		print g.get_fq_name()
+		if opts['get_members']:
+			for m in g.get_members():
+				print "\t%s" % m.get_fq_name()
 
 def audit_services(report):
 	for s in services().get_services():
@@ -348,14 +358,14 @@ options = parseOptions()
 	
 # Initialise WPC
 # TODO be able to enable/disable caching
-wpc.utils.init(options.remote_host)
+wpc.utils.init(options)
 
 # Object to hold all the issues we find
 report = issues()
 
 # Dump data if required
 if options.dump_mode:
-	dump_opts = { 'ignore_trusted': options.ignore_trusted }
+	dump_opts = { 'ignore_trusted': options.ignore_trusted, 'get_members': options.get_members }
 	
 	if options.do_services:
 		dump_services(dump_opts)
@@ -368,6 +378,9 @@ if options.dump_mode:
 		
 	if options.do_users:
 		dump_users(dump_opts)
+		
+	if options.do_groups:
+		dump_groups(dump_opts)
 		
 # Check services
 if options.audit_mode:

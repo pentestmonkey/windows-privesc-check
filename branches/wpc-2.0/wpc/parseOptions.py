@@ -20,12 +20,15 @@ def parseOptions():
 	examine.add_option("-P", "--processes",dest="do_processes",default=False, action="store_true", help="Processes")
 	examine.add_option("-r", "--registry", dest="do_registry", default=False, action="store_true", help="Registry Settings + Permissions")
 	examine.add_option("-U", "--users"    ,dest="do_users",    default=False, action="store_true", help="Users")
+	examine.add_option("-G", "--groups"   ,dest="do_groups",   default=False, action="store_true", help="Groups")
 
-	host.add_option("-t", "--target", dest="remote_host", help="Remote host or IP")
-	host.add_option("-u", "--user",   dest="remote_user", help="Remote username") # TODO unused
-	host.add_option("-p", "--pass",   dest="remote_pass", help="Remote password") # TODO unused
+	host.add_option("-t", "--target", dest="remote_host",   help="Remote host or IP")
+	host.add_option("-u", "--user",   dest="remote_user",   help="Remote username")
+	host.add_option("-p", "--pass",   dest="remote_pass",   help="Remote password")
+	host.add_option("-D", "--domain", dest="remote_domain", help="Remote domain") 
 
 	dump.add_option("-i", "--ignore_trusted", dest="ignore_trusted", default=False, action="store_true", help="Ignore ACEs for Trusted Users")
+	dump.add_option("-m", "--get_members",    dest="get_members",    default=False, action="store_true", help="Dump group members (use with -G)")
 
 	parser.add_option_group(examine)
 	parser.add_option_group(host)
@@ -37,8 +40,10 @@ def parseOptions():
 		print "[E] Specify either --dump or --audit"
 		sys.exit()
 		
-	if not (options.do_services or options.do_drivers or options.do_processes or options.do_registry or options.do_users):
-		print "[E] Specify something to look at.  At least one of: -s, -d, -P, -r, -U"
+	# TODO can't use -m without -G
+		
+	if not (options.do_services or options.do_drivers or options.do_processes or options.do_registry or options.do_users or options.do_groups):
+		print "[E] Specify something to look at.  At least one of: -s, -d, -P, -r, -U, -G"
 		sys.exit()
 		
 	return options
