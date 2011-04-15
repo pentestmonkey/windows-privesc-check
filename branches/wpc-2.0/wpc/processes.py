@@ -14,7 +14,12 @@ class processes:
 	def get_all(self):
 		if self.processes == []:
 			pids = win32process.EnumProcesses()
-			proc_infos = win32ts.WTSEnumerateProcesses(wpc.conf.remote_server, 1, 0)
+			try:
+				proc_infos = win32ts.WTSEnumerateProcesses(wpc.conf.remote_server, 1, 0)
+			except:
+				proc_infos = []
+				pass
+				
 			for pid in pids:
 				p = process(pid)
 				self.add(p)
