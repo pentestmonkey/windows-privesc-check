@@ -22,7 +22,7 @@ on64bitwindows = 1
 #
 # args:
 #   remote_server can IP be None (should be None if on localhost)
-def init(remote_server):
+def init(options):
 	# Use some libs.  This will malfunction if we don't use them BEFORE we disable WOW64.
 	load_libs()
 	
@@ -34,7 +34,7 @@ def init(remote_server):
 	get_extra_privs()
 	
 	# Set remote server - needed for sid resolution before we call wpc.* code
-	wpc.conf.remote_server = remote_server
+	wpc.conf.remote_server = options.remote_host
 	
 	# Create cache object to cache SID lookups and other data
 	# This is (or should) be used by many wpc.* classes
@@ -50,6 +50,9 @@ def init(remote_server):
 
 	# Which permissions do we NOT care about? == who do we trust?
 	define_trusted_principals()
+	
+	# Use the crendentials supplied (OK to call if no creds were supplied)
+	impersonate(options.remote_user, options.remote_pass, options.remote_domain)
 
 # If we're admin then we assign ourselves some extra privs
 def get_extra_privs():
@@ -227,3 +230,16 @@ def get_exe_path_clean(binary_dirty):
 				exe_path_clean = candidate2 + ".exe"
 				break
 	return exe_path_clean
+	
+def impersonate(username, password, domain):
+	if username:
+		print "Using alternative credentials:"
+		print "Username: " + str(username)
+		print "Password: " + str(password)
+		print "Domain:   " + str(domain)
+		handle = win32security.LogonUser( username, domain, password, win32security.LOGON32_LOGON_NEW_CREDENTIALS, win32security.LOGON32_PROVIDER_WINNT50 )
+		win32security.ImpersonateLoggedOnUser( handle )
+	else:
+		print "Running as current user.  No logon creds supplied (-u, -D, -p)."
+	print
+	
