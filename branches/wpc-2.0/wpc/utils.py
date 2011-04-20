@@ -23,6 +23,9 @@ on64bitwindows = 1
 # args:
 #   remote_server can IP be None (should be None if on localhost)
 def init(options):
+	# Print banner with version and URL
+#	print_banner()
+
 	# Use some libs.  This will malfunction if we don't use them BEFORE we disable WOW64.
 	load_libs()
 	
@@ -40,20 +43,27 @@ def init(options):
 	# This is (or should) be used by many wpc.* classes
 	wpc.conf.cache = cache()
 	
-	wpc.conf.version = "2.0"
-	svnversion="$Revision$" # Don't change this line.  Auto-updated.
-	svnnum=re.sub('[^0-9]', '', svnversion)
-	if svnnum:
-		wpc.conf.version = wpc.conf.version + "svn" + svnnum
-
-	print "windows-privesc-check v%s (http://pentestmonkey.net/windows-privesc-check)\n" % wpc.conf.version
-
 	# Which permissions do we NOT care about? == who do we trust?
 	define_trusted_principals()
 	
 	# Use the crendentials supplied (OK to call if no creds were supplied)
 	impersonate(options.remote_user, options.remote_pass, options.remote_domain)
 
+def get_banner():
+	return "windows-privesc-check v%s (http://pentestmonkey.net/windows-privesc-check)\n" % get_version()
+	
+def print_banner():
+	print get_banner()
+
+def get_version():
+	wpc.conf.version = "2.0"
+	svnversion="$Revision$" # Don't change this line.  Auto-updated.
+	svnnum=re.sub('[^0-9]', '', svnversion)
+	if svnnum:
+		wpc.conf.version = wpc.conf.version + "svn" + svnnum
+
+	return wpc.conf.version
+	
 # If we're admin then we assign ourselves some extra privs
 def get_extra_privs():
 	# Try to give ourselves some extra privs (only works if we're admin):
@@ -123,8 +133,6 @@ def enabled_wow64():
 
 def define_trusted_principals():
 	for t in wpc.conf.trusted_principals_fq:
-	#for t in "x":
-		#print t
 		try:
 			sid, name, i = win32security.LookupAccountName(wpc.conf.remote_server, t)
 			if sid:
@@ -240,6 +248,6 @@ def impersonate(username, password, domain):
 		handle = win32security.LogonUser( username, domain, password, win32security.LOGON32_LOGON_NEW_CREDENTIALS, win32security.LOGON32_PROVIDER_WINNT50 )
 		win32security.ImpersonateLoggedOnUser( handle )
 	else:
-		print "Running as current user.  No logon creds supplied (-u, -D, -p)."
+		print "[i] Running as current user.  No logon creds supplied (-u, -D, -p)."
 	print
 	

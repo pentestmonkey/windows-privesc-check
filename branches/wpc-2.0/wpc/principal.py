@@ -17,6 +17,13 @@ class principal:
 		self.trusted = None
 		self.trusted_set = 0
 		self.cant_resolve = 0
+
+	def get_privs(self):
+		try:
+			ph = win32security.LsaOpenPolicy(self.get_remote_server(), win32security.POLICY_VIEW_LOCAL_INFORMATION | win32security.POLICY_LOOKUP_NAMES)
+			return win32security.LsaEnumerateAccountRights(ph, self.get_sid())
+		except:
+			return []
 		
 	def set_sid(self, sid):
 		self.sid = sid

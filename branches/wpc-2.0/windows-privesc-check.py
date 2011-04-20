@@ -34,14 +34,14 @@ import wpc.utils
 
 def dump_services(opts):
 	for s in services().get_services():
-		if opts['ignore_trusted']:
+		if opts.ignore_trusted:
 			print s.untrusted_as_text()
 		else:
 			print s.as_text()
 
 def dump_drivers(opts):		
 	for d in drivers().get_services():
-		if opts['ignore_trusted']:
+		if opts.ignore_trusted:
 			print d.untrusted_as_text()
 		else:
 			print d.as_text()
@@ -73,16 +73,49 @@ def dump_users(opts):
 	userlist = users()
 	for u in userlist.get_all():
 		print u.get_fq_name()
+		
+		if opts.get_privs:
+			print "\n\t[+] Privileges of this user:"
+			for priv in u.get_privs():
+				print "\t%s" % priv
+
+			print "\n\t[+] Privileges of this user + the groups it is in:"
+			print "\t[!] Not implemented yet"
 
 def dump_groups(opts):
 	print "[+] Dumping group list:"
 	grouplist = groups()
 	for g in grouplist.get_all():
 		print g.get_fq_name()
-		if opts['get_members']:
+		
+		if opts.get_members:
+			print "\n\t[+] Members:"
 			for m in g.get_members():
 				print "\t%s" % m.get_fq_name()
+				
+		if opts.get_privs:
+			print "\n\t[+] Privileges of this group:"
+			for priv in g.get_privs():
+				print "\t%s" % priv
 
+			print "\n\t[+] Privileges of this group + the groups it is in:"
+			print "\t[!] Not implemented yet"
+
+def dump_registry(opts):
+	print "[!] Registry dump option not implemented yet.  Sorry." # TODO
+
+def audit_drivers(opts):
+	print "[!] Driver audit option not implemented yet.  Sorry." # TODO
+
+def audit_processes(opts):
+	print "[!] Process audit option not implemented yet.  Sorry." # TODO
+
+def audit_users(opts):
+	print "[!] User audit option not implemented yet.  Sorry." # TODO
+		
+def audit_groups(opts):
+	print "[!] Group audit option not implemented yet.  Sorry." # TODO
+		
 def audit_services(report):
 	for s in services().get_services():
 	
@@ -250,10 +283,6 @@ def audit_services(report):
 			for a in s.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["WRITE_OWNER"]).get_aces():
 				report.get_by_id("WPC024").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
 
-def audit_drivers(report):	
-	pass
-	# TODO - same as services, but need to edit|replace wording of issues
-
 def audit_registry(report):
 	for key_string in wpc.conf.reg_paths:
 		#parts = key_string.split("\\")
@@ -310,8 +339,7 @@ def analyse_file_info(file_info, report):
 	for f in file_info.get_files():
 		#print "[D] Analysing: " + f.get_name()
 		a = f.get_dangerous_aces()
-		
-		
+				
 		if not a == []:
 			if f.is_dir():
 				report.get_by_id("WPC001").add_supporting_data('writable_dirs', fileAcl(f.get_name(), a))
@@ -365,33 +393,42 @@ report = issues()
 
 # Dump data if required
 if options.dump_mode:
-	dump_opts = { 'ignore_trusted': options.ignore_trusted, 'get_members': options.get_members }
 	
 	if options.do_services:
-		dump_services(dump_opts)
+		dump_services(options)
 
 	if options.do_drivers:
-		dump_drivers(dump_opts)
+		dump_drivers(options)
 
 	if options.do_processes:
-		dump_processes(dump_opts)
+		dump_processes(options)
 		
 	if options.do_users:
-		dump_users(dump_opts)
+		dump_users(options)
 		
 	if options.do_groups:
-		dump_groups(dump_opts)
+		dump_groups(options)
 		
+	if options.do_registry:
+		dump_registry(options)
+
 # Check services
 if options.audit_mode:
-
 	if options.do_services:
 		audit_services(report)
+
+	if options.do_drivers:
+		audit_drivers(report)
+
+	if options.do_processes:
+		audit_processes(report)
 		
-	# TODO audit_drivers
-	
-	# TODO audit_processes
-	
+	if options.do_users:
+		audit_users(report)
+		
+	if options.do_groups:
+		audit_groups(report)
+
 	if options.do_registry:
 		audit_registry(report)
 
