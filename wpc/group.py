@@ -33,7 +33,6 @@ class group(principal):
 				
 			if not p.get_sid() in map(lambda x: x.get_sid(), ignore_principals):
 				principals.append(p)
-
 		
 		# Local Groups		
 		level = 2
@@ -46,12 +45,9 @@ class group(principal):
 				
 			if not p.get_sid() in map(lambda x: x.get_sid(), ignore_principals):
 				principals.append(p)
-
-
-		# TODO: should be able to list members of group "None"
 				
 		# TODO: make this an option
-		# TODO: If we also want to list members of subgroups recursively...
+		# If we also want to list members of subgroups recursively...
 		ignore_principals.extend(principals)
 		for p in principals:
 			if p.is_group_type():

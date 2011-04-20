@@ -1,13 +1,13 @@
+import wpc.utils
 from optparse import OptionParser
 from optparse import OptionGroup
 import sys
 
 def parseOptions():
-	remote_server = None # TODO parse from command line
-	VERSION_STRING="v2.0-pre1"
-	usage = "%s (--dump [ dump opts] |--audit) [examine opts] [host opts]" % sys.argv[0]
+	wpc.utils.print_banner()
+	usage = "%s (--dump [ dump opts] |--audit) [examine opts] [host opts]" % (sys.argv[0])
 
-	parser = OptionParser(usage=usage, version=VERSION_STRING)
+	parser = OptionParser(usage=usage, version=wpc.utils.get_version())
 	examine = OptionGroup(parser, "examine opts", "At least one of these to indicate what to examine")
 	host    = OptionGroup(parser, "host opts",    "Optional details about a remote host (experimental).  Default is current host.")
 	dump    = OptionGroup(parser, "dump opts",    "Options to modify the behaviour of dump mode")
@@ -29,6 +29,7 @@ def parseOptions():
 
 	dump.add_option("-i", "--ignore_trusted", dest="ignore_trusted", default=False, action="store_true", help="Ignore ACEs for Trusted Users")
 	dump.add_option("-m", "--get_members",    dest="get_members",    default=False, action="store_true", help="Dump group members (use with -G)")
+	dump.add_option("-V", "--get_privs",      dest="get_privs",      default=False, action="store_true", help="Dump privileges for users/groups")
 
 	parser.add_option_group(examine)
 	parser.add_option_group(host)
@@ -37,7 +38,7 @@ def parseOptions():
 	(options, args) = parser.parse_args()
 
 	if not options.dump_mode and not options.audit_mode:
-		print "[E] Specify either --dump or --audit"
+		print "[E] Specify either --dump or --audit.  -h for help."
 		sys.exit()
 		
 	# TODO can't use -m without -G
