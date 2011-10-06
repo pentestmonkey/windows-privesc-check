@@ -9,7 +9,7 @@ import win32security
 import win32net
 import wpc.conf
 from wpc.users import users
-from wpc.groups import groups
+#from wpc.groups import groups
 from wpc.shares import shares
 from wpc.token import token
 from wpc.cache import cache
@@ -181,7 +181,11 @@ def audit_services(report):
 				
 				parent = parent.get_parent_key()
 			
-		
+		# Check that the binary name is properly quoted
+		if str(s.get_exe_path_clean()).find(" ") > 0: # clean path contains a space
+			if str(s.get_exe_path()).find(str('"' + s.get_exe_path_clean()) + '"') < 0: # TODO need regexp.  Could get false positive from this.
+				report.get_by_id("WPC051").add_supporting_data('service_info', [s])
+					
 		#
 		# Examine executable for service
 		#
@@ -189,7 +193,7 @@ def audit_services(report):
 		
 			# Examine parent directories
 			parent = s.get_exe_file().get_parent_dir()
-			while parent: # TODO and can get sd?
+			while parent and parent.get_sd():
 				# Untrusted user owns parent directory
 				if not parent.get_sd().get_owner().is_trusted():
 					report.get_by_id("WPC033").add_supporting_data('service_exe_parent_dir_untrusted_ownership', [s, parent])
