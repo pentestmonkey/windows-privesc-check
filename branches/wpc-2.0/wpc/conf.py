@@ -1138,7 +1138,17 @@ This could allow certain users on the system to place malicious code into certai
        }
     },	
 	
-				
+	'WPC051': {
+       'title': "Windows Service Has Insecurely Quoted Path",
+       'description': '''The path to the executable for the service contains one or more spaces and quotes have not been correctly used around the path.  The path is therefore ambiguous which could result in the wrong program being executed when the service is started - e.g. "C:\\program.exe" instead of "C:\\program files\\foo\bar.exe".  The issue is not necessarily exploitable unless a local attacker has permissions to add an alternative executable to the correct location on the filesystem.  The impact of the issue should be considered higher for services that run with high privileges.''',
+       'recommendation': '''Use quotes around the path to executables if they contain spaces: C:\\program files\\foo\\bar.exe -> "C:\\program files\\foo\\bar.exe".''',
+       'supporting_data': {
+          'service_info': {
+             'section': "description",
+             'preamble': "The following services have insecurely quoted paths:",
+          },
+       }
+    },				
 				
 }
 
