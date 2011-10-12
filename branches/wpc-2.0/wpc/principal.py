@@ -119,7 +119,7 @@ class principal:
 		for p in wpc.conf.trusted_principals:
 			# This also recurses through sub groups
 			#print "Testing if %s is in %s" % (self.get_fq_name(), p.get_fq_name())
-			if self.is_in_group(p):
+			if p.is_group_type() and self.is_in_group(p):
 				#print "Yes"
 				self.trusted_set = 1
 				self.trusted = 1

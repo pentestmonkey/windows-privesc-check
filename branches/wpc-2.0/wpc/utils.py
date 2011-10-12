@@ -131,6 +131,14 @@ def enabled_wow64():
 	except:
 		pass
 
+# We don't report issues about permissions being held by trusted users or groups
+# hard-coded users and groups (wpc.conf.trusted_principals_fq[]) done
+# user-defined users and groups (--ignore) TODO
+# hard-coded SIDs (S-1-5-32-549 is common) TODO
+# user-defined SIDs (--ignore) TODO
+# SIDs which don't resolve (probably only want to ignore local SIDs, not domain SIDs) TODO
+# Group that are empty (e.g. Power Users should normally be ignored because it's empty) TODO - make it an option
+# Ignore everything that the current user isn't a member of (for privescing) TODO
 def define_trusted_principals():
 	for t in wpc.conf.trusted_principals_fq:
 		try:
@@ -152,6 +160,17 @@ def define_trusted_principals():
 				print "[E] can't look up sid for " + t
 		except:
 			pass
+
+	# TODO we only want to ignore this if it doesn't resolve
+	try:
+		#print "[D] converting string sid"
+		#print "%s" % win32security.ConvertStringSidToSid("S-1-5-32-549")
+		p = user(win32security.ConvertStringSidToSid("S-1-5-32-549"))
+		wpc.conf.trusted_principals.append(p)
+	except:
+		pass
+
+	# TODO: TERMINAL SERVICE USER - only if registry indicates we can safely ignore
 	
 	print "Considering these users to be trusted:"
 	for p in wpc.conf.trusted_principals:

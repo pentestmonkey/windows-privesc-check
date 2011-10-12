@@ -1008,7 +1008,7 @@ This could allow certain users on the system to place malicious code into certai
 
     'WPC038': {
        'title': "Windows Service Registry Keys Allow KEY_CREATE_LINK",
-       'description': '''Configuration information for Windows Service is stored in the registry.  Some of the keys were found to have the KEY_CREATE_LINK permission granted for non-administrative users.  This allows low-privileged users to create Registry Symbolic Links.  While this feature appears to be poorly documented by Microsoft, there is sample code freely available on the Internet.  The impact of this issue is similar to that for the KEY_CREATE_SUB_KEY issue: It may be possible for low privileged users to manipulate service - though this would depend on how the service responded to the addition of new registry keys.''',
+       'description': '''Configuration information for Windows Service is stored in the registry.  Some of the keys were found to have the KEY_CREATE_LINK permission granted for non-administrative users.  This allows low-privileged users to create Registry Symbolic Links.  While this feature appears to be poorly documented by Microsoft, there is sample code freely available on the Internet.  The impact of this issue is similar to that for the KEY_CREATE_SUB_KEY issue: It may be possible for low privileged users to manipulate services - though this would depend on how the service responded to the addition of new registry keys.''',
        'recommendation': '''Change the permissions of registry keys pertaining to Windows Servies.  Service registry keys should never allow KEY_CREATE_LINK for low-privileged users.''',
        'supporting_data': {
           'service_reg_perms': {
