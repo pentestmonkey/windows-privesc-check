@@ -173,8 +173,8 @@ class file:
 		if not self.parent_dir:
 			mypath = self.get_name()
 			# Check there is a parent dir - e.g. there isn't for "C:"
-			if not mypath.find("\\") == -1:
-				parentpath = "\\".join( mypath.split("\\")[0:-1] )
+			if not len(mypath) == 3: # "c:\"
+				parentpath = "\\".join( mypath.split("\\")[0:-2] ) + "\\"
 				# We frequently refer to parent dirs, so must cache and work we do
 				self.parent_dir = wpc.conf.cache.File(parentpath)
 		#		print self.parent_dir
