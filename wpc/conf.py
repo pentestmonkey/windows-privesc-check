@@ -49,11 +49,11 @@ reg_paths = (
 
 # We don't care if some users / groups hold dangerous permission because they're trusted
 # These have fully qualified names:
-trusted_principals_fq = (
+trusted_principals_fq = [
 	"BUILTIN\\Administrators",
 	"NT SERVICE\\TrustedInstaller",
 	"NT AUTHORITY\\SYSTEM"
-)
+]
 
 # We don't care if members of these groups hold dangerous permission because they're trusted
 # These have names without a domain:

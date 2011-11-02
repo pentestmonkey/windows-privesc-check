@@ -13,6 +13,7 @@ from wpc.principal import principal
 from wpc.user import user
 from wpc.group import group as Group
 from wpc.cache import cache
+from wpc.regkey import regkey
 k32 = ctypes.windll.kernel32
 wow64 = ctypes.c_long( 0 )
 on64bitwindows = 1
@@ -140,6 +141,23 @@ def enabled_wow64():
 # Group that are empty (e.g. Power Users should normally be ignored because it's empty) TODO - make it an option
 # Ignore everything that the current user isn't a member of (for privescing) TODO
 def define_trusted_principals():
+	# Ignore "NT AUTHORITY\TERMINAL SERVER USER" if HKLM\System\CurrentControlSet\Control\Terminal Server\TSUserEnabled = 0 or doesn't exist
+	# See http://support.microsoft.com/kb/238965 for details
+	r = regkey(r"HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Terminal Server")
+	
+	if r.is_present():
+		v = r.get_value("TSUserEnabled")
+		if v is None:
+			print "[i] TSUserEnabled registry value is absent. Excluding TERMINAL SERVER USER"
+		elif v[0] != 0:
+			print "[i] TSUserEnabled registry value is %s. Including TERMINAL SERVER USER" % v[0]
+			wpc.conf.trusted_principals_fq.append("NT AUTHORITY\TERMINAL SERVER USER")
+		else:
+			print "[i] TSUserEnabled registry value is 0. Excluding TERMINAL SERVER USER"
+	else:
+		print "[i] TSUserEnabled registry key is absent. Excluding TERMINAL SERVER USER"
+	print
+	
 	for t in wpc.conf.trusted_principals_fq:
 		try:
 			sid, name, i = win32security.LookupAccountName(wpc.conf.remote_server, t)
@@ -170,8 +188,6 @@ def define_trusted_principals():
 	except:
 		pass
 
-	# TODO: TERMINAL SERVICE USER - only if registry indicates we can safely ignore
-	
 	print "Considering these users to be trusted:"
 	for p in wpc.conf.trusted_principals:
 		print "* " + p.get_fq_name()
