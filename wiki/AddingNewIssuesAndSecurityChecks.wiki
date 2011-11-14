@@ -1,5 +1,3 @@
-#How to add new issues to windows-privesc-check
-
 = How to add new issues to windows-privesc-check =
 
 There are essentially 3 things you need to do to add a new issue:
@@ -51,4 +49,3 @@ Any data structure you need to generate your supporting data must be passed as t
 So how does wpc know how to display the supporting data?  Open up wpc/report/issue.py and locate the "render_supporting_data" method.  It contains an "if" statement for every possible type of supporting data - "service_info" is an example of a type of supporting data.  It is called to convert the data structures you passed to "add_supporting_data" into text for the report.
 
 You should check the supporting data type you want to use is in issue.py.  Add a new "if" clause for it if not.
-
