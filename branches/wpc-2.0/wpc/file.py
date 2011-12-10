@@ -18,7 +18,9 @@ class file:
 		self.parent_dir = None
 		self.replaceable_set = None
 		self.replaceable = None
-		# TODO could be defer this check?
+		self.exist = None
+		self.existsset = 0
+		# TODO could we defer this check?
 		if os.path.isdir(self.name):
 			self.type = 'dir'
 		else:
@@ -36,6 +38,12 @@ class file:
 	def get_name(self):
 		return self.name
 	
+	def exists(self):
+		if not self.existsset:
+			self.exist = os.path.exists(self.get_name())
+		
+		return self.exist
+		
 	def is_dir(self):
 		if self.type == 'dir':
 			return 1

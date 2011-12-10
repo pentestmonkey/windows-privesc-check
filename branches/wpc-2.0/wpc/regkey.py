@@ -97,7 +97,8 @@ class regkey:
 
 	def get_value(self, v):
 		try:
-			return win32api.RegQueryValueEx(self.get_keyh(), v)
+			(data, type) = win32api.RegQueryValueEx(self.get_keyh(), v)
+			return data
 		except:
 			return None
 		

@@ -1150,6 +1150,18 @@ This could allow certain users on the system to place malicious code into certai
        }
     },				
 				
+	'WPC052': {
+       'title': "Windows Service DLL Can Be Replaced",
+       'description': '''Each windows service has a corresponding registry key in HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\services.  Some services have a "Parameters" subkey and a value called "ServiceDll" (e.g. HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\services\\someservice\\Parameters\\ServiceDll = c:\\dir\\foo.dll").  The DLL for some of the services on the system audited can be replaced by non-administrative users.  TODO how and by whom?  Users able to replace the service DLL could run code of their choosing with the privileges of the service.''',
+       'recommendation': '''Set strong file permissions on the service DLLs and their partent directories.''',
+       'supporting_data': {
+          'service_dll': {
+             'section': "description",
+             'preamble': "The following services have weak file permissions on the service DLLs:",
+          },
+       }
+    },				
+				
 }
 
 issue_template_html = '''

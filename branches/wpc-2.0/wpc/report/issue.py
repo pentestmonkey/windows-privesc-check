@@ -102,6 +102,13 @@ class issue:
 				s = data[0]
 				d += " %s (%s) runs as %s and has path: %s:\n" % (s.get_description(), s.get_name(), s.get_run_as(), s.get_exe_path())		
 								
+		elif data_name == 'service_dll':
+			for data in self.get_supporting_data(data_name):
+				s = data[0]
+				r = data[1]
+				f = data[2]
+				d += " Service %s (%s) runs as %s: Regkey %s references %s which has weak file permissions (TODO how so?)\n" % (s.get_description(), s.get_name(), s.get_run_as(), r.get_name(), f.get_name())
+
 		elif data_name == 'writeable_dirs' or data_name == 'files_write_perms':
 			for o in self.get_supporting_data(data_name):
 				d += o.as_text() + "\n"
