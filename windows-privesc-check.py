@@ -155,6 +155,15 @@ def audit_services(report):
 				
 			# TODO walk sub keys looking for weak perms - not necessarily a problem, but could be interesting
 			
+			pkey = regkey(s.get_reg_key().get_name() + "\Parameters" )
+			if pkey.is_present():
+				v = pkey.get_value("ServiceDll")
+				if v:
+					f = File(wpc.utils.env_expand(v))
+					if f.exists():
+						if f.is_replaceable():
+							report.get_by_id("WPC052").add_supporting_data('service_dll', [s, pkey, f])
+			
 			# TODO checks on parent keys
 			parent = s.get_reg_key().get_parent_key()
 			while parent and parent.get_sd():

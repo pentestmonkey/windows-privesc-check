@@ -149,8 +149,8 @@ def define_trusted_principals():
 		v = r.get_value("TSUserEnabled")
 		if v is None:
 			print "[i] TSUserEnabled registry value is absent. Excluding TERMINAL SERVER USER"
-		elif v[0] != 0:
-			print "[i] TSUserEnabled registry value is %s. Including TERMINAL SERVER USER" % v[0]
+		elif v != 0:
+			print "[i] TSUserEnabled registry value is %s. Including TERMINAL SERVER USER" % v
 			wpc.conf.trusted_principals_fq.append("NT AUTHORITY\TERMINAL SERVER USER")
 		else:
 			print "[i] TSUserEnabled registry value is 0. Excluding TERMINAL SERVER USER"
@@ -221,6 +221,14 @@ def dirwalk(dir, extensions, include_dirs):
 				for dir in dirs:
 					yield root + "\\" + dir
 
+# arg s contains windows-style env vars like: %windir%\foo
+def env_expand(s):
+	re_env = re.compile(r'%\w+%') 
+	return re_env.sub(expander, s)
+
+def expander(mo):
+	return os.environ.get(mo.group()[1:-1], 'UNKNOWN')
+		
 # Attempts to clean up strange looking file paths like:
 #   \??\C:\WINDOWS\system32\csrss.exe
 #   \SystemRoot\System32\smss.exe
