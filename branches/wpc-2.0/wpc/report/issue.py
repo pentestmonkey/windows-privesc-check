@@ -118,6 +118,13 @@ class issue:
 				r = data[4]
 				d += " %s \"%s\" uses CLSID %s which references the following file with weak permissions: %s [defined in %s] - TODO how are perms weak?\n" % (type, name, clsid, f.get_name(), r.get_name())
 
+		elif data_name == 'regkey_ref_file':
+			for data in self.get_supporting_data(data_name):
+				r = data[0]
+				v = data[1]
+				f = data[2]
+				d += " %s references %s which has weak permissions.  TODO weak how?\n" % (r.get_name() + "\\" + v, f.get_name())
+
 		elif data_name == 'writeable_dirs' or data_name == 'files_write_perms':
 			for o in self.get_supporting_data(data_name):
 				d += o.as_text() + "\n"

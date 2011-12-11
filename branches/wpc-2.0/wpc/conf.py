@@ -1245,6 +1245,33 @@ Shell Extenstion Handlers more generally are described here: http://msdn.microso
 	# TODO checks for these:
 	# Icon Overlay Handlers http://msdn.microsoft.com/en-us/library/windows/desktop/cc144123(v=vs.85).aspx
 	# Search Handlers http://msdn.microsoft.com/en-us/library/windows/desktop/bb776834(v=vs.85).aspx
+	
+	# TODO add RunOnceEx keys to this issue + HKCU\run, runonce, runonceex
+	'WPC058': {
+       'title': "Registry \"Run\" Keys Reference Programs With Weak Permissions",
+       'description': '''The Run and RunOnce keys under HKLM reference programs that are run when a user logs in with the privielges of that user.  Some of the programs referenced by the registry keys can be modified by non-administrative user.  This could allow a malcious user to run code of their choosing under the context of other user accounts.  Run and RunOnce are described here: http://msdn.microsoft.com/en-us/library/aa376977(v=vs.85).aspx''',
+       'recommendation': '''Set strong file permissions on the executables their parent directories.''',
+       'supporting_data': {
+          'regkey_ref_file': {
+             'section': "description",
+             'preamble': "The programs referenced from the registry can be modified by non-admin users:",
+          },
+       }
+    },				
+
+	'WPC059': {
+       'title': "Registry \"RunServices\" Keys Reference Programs With Weak Permissions",
+       'description': '''The RunServices and RunServicesOnce keys under HKLM reference programs that are run before the Login Dialog box appears.  Commands are run as SYSTEM.  Some of the programs referenced by the registry keys can be modified by non-administrative user.  This could allow a malcious user to run code of their choosing under the context of the SYSTEM account.  RunServices and RunServicesOnce are described here: http://support.microsoft.com/kb/179365''',
+       'recommendation': '''Set strong file permissions on the executables their parent directories.''',
+       'supporting_data': {
+          'regkey_ref_file': {
+             'section': "description",
+             'preamble': "The programs referenced from the registry can be modified by non-admin users:",
+          },
+       }
+    },				
+
+
 }
 
 issue_template_html = '''
