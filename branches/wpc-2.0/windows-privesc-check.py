@@ -357,7 +357,11 @@ def audit_registry(report):
 						if f and f.is_replaceable():
 							name = s.get_name().split("\\")[-1]
 							report.get_by_id(check_id).add_supporting_data('regkey_ref_replacable_file', [check_type, name, clsid, f, s])
-					
+			
+	#
+	# Run, RunOnce, RunServices, RunServicesOnce
+	#
+	
 	runkeys_hklm = (
 		[ "WPC058", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" ],
 		[ "WPC058", "HKLM\Software\Microsoft\Windows\CurrentVersion\RunOnce" ],
@@ -389,6 +393,34 @@ def audit_registry(report):
 					if f and f.is_replaceable():
 						report.get_by_id(issueid).add_supporting_data('regkey_ref_file', [rk, v, f])
 						
+	#
+	# KnownDlls
+	#
+	
+	r = regkey("HKLM\System\CurrentControlSet\Control\Session Manager\KnownDlls")
+	
+	dirs = []
+	
+	d = r.get_value("DllDirectory")
+	if d:
+		dirs.append(wpc.utils.env_expand(d))
+		
+	d = r.get_value("DllDirectory32")
+	if d:
+		dirs.append(wpc.utils.env_expand(d))
+	
+	if r.is_present() and not dirs == []:
+		for v in r.get_values():
+			if v == "DllDirectory" or v == "DllDirectory32" or v == "":
+				continue
+			
+			file_str = r.get_value(v)
+			for d in dirs:
+				if os.path.exists(d + "\\" + file_str):
+					f = File(d + "\\" + file_str)
+					if f.is_replaceable():
+						report.get_by_id("WPC060").add_supporting_data('regkey_ref_file', [r, v, f])
+
 	for key_string in wpc.conf.reg_paths:
 		#parts = key_string.split("\\")
 		#hive = parts[0]

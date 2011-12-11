@@ -1271,6 +1271,18 @@ Shell Extenstion Handlers more generally are described here: http://msdn.microso
        }
     },				
 
+	'WPC060': {
+       'title': "KnownDLLs Have Weak Permissions",
+       'description': '''The KnownDLLs registry key holds the name and path of various DLLs.  Programs that rely on these DLLs will load them from the known location instead of searching the rest of the PATH.  More information on KnownDLLs can be found here: http://support.microsoft.com/kb/164501''',
+       'recommendation': '''Set strong file permissions on the DLLs their parent directories.''',
+       'supporting_data': {
+          'regkey_ref_file': {
+             'section': "description",
+             'preamble': "The programs referenced from the registry can be modified by non-admin users:",
+          },
+       }
+    },				
+
 
 }
 
