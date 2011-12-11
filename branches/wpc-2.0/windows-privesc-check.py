@@ -297,6 +297,63 @@ def audit_services(report):
 				report.get_by_id("WPC024").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
 
 def audit_registry(report):
+	
+	checks = (
+		["Context Menu", "WPC053", "HKLM\Software\Classes\*\ShellEx\ContextMenuHandlers"],
+		["Context Menu", "WPC053", "HKLM\Software\Wow6432Node\Classes\*\ShellEx\ContextMenuHandlers"],
+		["Context Menu", "WPC053", "HKLM\Software\Classes\Folder\ShellEx\ContextMenuHandlers"],
+		["Context Menu", "WPC053", "HKLM\Software\Wow6432Node\Classes\Folder\ShellEx\ContextMenuHandlers"],
+		["Context Menu", "WPC053", "HKLM\Software\Classes\Directory\ShellEx\ContextMenuHandlers"],
+		["Context Menu", "WPC053", "HKLM\Software\Wow6432Node\Classes\Directory\ShellEx\ContextMenuHandlers"],
+		["Context Menu", "WPC053", "HKLM\Software\Classes\AllFileSystemObjects\ShellEx\ContextMenuHandlers"],
+		["Context Menu", "WPC053", "HKLM\Software\Wow6432Node\Classes\AllFileSystemObjects\ShellEx\ContextMenuHandlers"],
+		["Context Menu", "WPC053", "HKLM\Software\Classes\Directory\Background\ShellEx\ContextMenuHandlers"],
+		["Context Menu", "WPC053", "HKLM\Software\Wow6432Node\Classes\Directory\Background\ShellEx\ContextMenuHandlers"],
+		
+		
+		["Property Sheet", "WPC054", "HKLM\Software\Classes\*\ShellEx\PropertySheetHandlers"],
+		["Property Sheet", "WPC054", "HKLM\Software\Wow6432Node\Classes\*\ShellEx\PropertySheetHandlers"],
+		["Property Sheet", "WPC054", "HKLM\Software\Classes\Folder\ShellEx\PropertySheetHandlers"],
+		["Property Sheet", "WPC054", "HKLM\Software\Wow6432Node\Classes\Folder\ShellEx\PropertySheetHandlers"],
+		["Property Sheet", "WPC054", "HKLM\Software\Classes\Directory\Shellex\PropertySheetHandlers"],
+		["Property Sheet", "WPC054", "HKLM\Software\Wow6432Node\Classes\Directory\Shellex\PropertySheetHandlers"],
+		["Property Sheet", "WPC054", "HKLM\Software\Classes\AllFileSystemObjects\ShellEx\PropertySheetHandlers"],
+		["Property Sheet", "WPC054", "HKLM\Software\Wow6432Node\Classes\AllFileSystemObjects\ShellEx\PropertySheetHandlers"],
+		
+		["Copy Hook", "WPC055", "HKLM\Software\Classes\Directory\Shellex\CopyHookHandlers"],
+		["Copy Hook", "WPC055", "HKLM\Software\Wow6432Node\Classes\Directory\Shellex\CopyHookHandlers"],
+
+		["DragDrop Handler", "WPC056", "HKLM\Software\Classes\Directory\Shellex\DragDropHandlers"],
+		["DragDrop Handler", "WPC056", "HKLM\Software\Wow6432Node\Classes\Directory\Shellex\DragDropHandlers"],
+		["DragDrop Handler", "WPC056", "HKLM\Software\Classes\Folder\ShellEx\DragDropHandlers"],
+		["DragDrop Handler", "WPC056", "HKLM\Software\Wow6432Node\Classes\Folder\ShellEx\DragDropHandlers"],
+		
+		["Column Handler", "WPC057", "HKLM\Software\Classes\Folder\Shellex\ColumnHandlers"],
+		["Column Handler", "WPC057", "HKLM\Software\Wow6432Node\Classes\Folder\Shellex\ColumnHandlers"],
+	)
+	for check in checks:
+		check_type = check[0]
+		check_id   = check[1]
+		check_key  = check[2]
+		rk = regkey(check_key)
+		if rk.is_present:
+			for s in rk.get_subkeys():
+				# TODO check regkey permissions
+				# TODO some of the subkeys are CLSIDs.  We don't process these properly yet.
+				clsid = s.get_value("") # This value appears as "(Default)" in regedit
+				if clsid:
+					reg_val_files = wpc.utils.lookup_files_for_clsid(clsid)
+					for reg_val_file in reg_val_files:
+						(r, v, f) = reg_val_file
+						# print "[D] regkey: %s, file: %s" % (r.get_name() + "\\" + v, f.get_name())
+						if not f.exists():
+							f = wpc.utils.find_in_path(f)
+							
+						if f and f.is_replaceable():
+							name = s.get_name().split("\\")[-1]
+							report.get_by_id(check_id).add_supporting_data('regkey_ref_replacable_file', [check_type, name, clsid, f, s])
+					
+	
 	for key_string in wpc.conf.reg_paths:
 		#parts = key_string.split("\\")
 		#hive = parts[0]

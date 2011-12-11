@@ -73,4 +73,7 @@ class acelist:
 			if not trusted:
 				a.add(ace)
 		return a
-		
+	
+	def as_text(self):
+		for ace in self.get_aces():
+			print ace.as_text()

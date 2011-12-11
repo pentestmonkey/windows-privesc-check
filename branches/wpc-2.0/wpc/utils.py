@@ -14,6 +14,7 @@ from wpc.user import user
 from wpc.group import group as Group
 from wpc.cache import cache
 from wpc.regkey import regkey
+from wpc.file import file as File
 k32 = ctypes.windll.kernel32
 wow64 = ctypes.c_long( 0 )
 on64bitwindows = 1
@@ -226,6 +227,29 @@ def env_expand(s):
 	re_env = re.compile(r'%\w+%') 
 	return re_env.sub(expander, s)
 
+def find_in_path(f):
+	f_str = f.get_name()
+	for d in os.environ.get('PATH').split(';'):
+		if os.path.exists(d + "\\" + f_str):
+			return File(d + "\\" + f_str)
+
+def lookup_files_for_clsid(clsid):
+	results = []
+	# Potentially intersting subkeys of clsids are listed here:
+	# http://msdn.microsoft.com/en-us/library/windows/desktop/ms691424(v=vs.85).aspx
+	
+	for v in ("InprocServer", "InprocServer32", "LocalServer", "LocalServer32"):
+		r = regkey("HKEY_LOCAL_MACHINE\\SOFTWARE\\Classes\\CLSID\\" + clsid + "\\" + v)
+		if r.is_present:
+			d = r.get_value("") # "(Default)" value
+			if d:
+				d = env_expand(d)
+				results.append([r, v, File(d)])
+#	else:
+#		print "[i] Skipping non-existent clsid: %s" % r.get_name()
+	
+	return results
+	
 def expander(mo):
 	return os.environ.get(mo.group()[1:-1], 'UNKNOWN')
 		

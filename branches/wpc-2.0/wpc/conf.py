@@ -1162,6 +1162,89 @@ This could allow certain users on the system to place malicious code into certai
        }
     },				
 				
+	'WPC053': {
+       'title': "Context Handler Menus Use Poorly Protected Files",
+       'description': '''Context Menus appear in Windows Explorer when files are right-clicked.  Each has a corresponding DLL or .EXE.  Some of the referenced DLLs or .EXE file can be replaced by non-administrative users.  As these context menus are used by all system users, there is a possibility that a user might run malicious code of an attacker's choosing if the DLLs or .EXEs are modified.  TODO how can the files be modified?
+	   
+Context Menu Handlers are described here: http://msdn.microsoft.com/en-us/library/windows/desktop/cc144171(v=vs.85).aspx
+
+Shell Extenstion Handlers more generally are described here: http://msdn.microsoft.com/en-us/library/windows/desktop/cc144067(v=vs.85).aspx	   ''',
+       'recommendation': '''Set strong file permissions on the service DLLs and their partent directories.''',
+       'supporting_data': {
+          'regkey_ref_replacable_file': {
+             'section': "description",
+             'preamble': "The following shell extension use DLLs or .EXE files with weak file permissions:",
+          },
+       }
+    },				
+				
+	'WPC054': {
+       'title': "Property Sheet Handlers Use Poorly Protected Files",
+       'description': '''"Property Sheets" appear in Windows Explorer when files are right-clicked and the "Properties" context menu selected.  The DLLs or .EXEs used to generate these property sheets can be replaced by non-administrative users.  As these property sheets are used by all system users, there is a possibility that a user might run malicious code of an attacker's choosing if the DLLs or .EXEs are modified.  TODO how can the files be modified?  
+	   
+Property Sheet Handlers are described here: http://msdn.microsoft.com/en-us/library/windows/desktop/cc144106(v=vs.85).aspx
+
+Shell Extenstion Handlers more generally are described here: http://msdn.microsoft.com/en-us/library/windows/desktop/cc144067(v=vs.85).aspx	   ''',
+       'recommendation': '''Set strong file permissions on the service DLLs and their partent directories.''',
+       'supporting_data': {
+          'regkey_ref_replacable_file': {
+             'section': "description",
+             'preamble': "The following shell extension use DLLs or .EXE files with weak file permissions:",
+          },
+       }
+    },				
+
+	'WPC055': {
+       'title': "Copy Hook Handlers Use Poorly Protected Files",
+       'description': '''"Copy Hook Handlers" are a type of Windows Explorer shell extension that can control the copying, moving, deleting and renaming of files and folder.  Each as a corresponding DLL or .EXE.  Some of DLLs or .EXEs used can be replaced by non-administrative users.  As Copy Hooks are used by all system users, there is a possibility that a user might run malicious code of an attacker's choosing if the DLLs or .EXEs are modified.  TODO how can the files be modified?
+	   
+Copy Hook Handlers are described here: http://msdn.microsoft.com/en-us/library/windows/desktop/cc144063(v=vs.85).aspx
+
+Shell Extenstion Handlers more generally are described here: http://msdn.microsoft.com/en-us/library/windows/desktop/cc144067(v=vs.85).aspx	   ''',
+       'recommendation': '''Set strong file permissions on the service DLLs and their partent directories.''',
+       'supporting_data': {
+          'regkey_ref_replacable_file': {
+             'section': "description",
+             'preamble': "The following shell extension use DLLs or .EXE files with weak file permissions:",
+          },
+       }
+    },				
+
+	'WPC056': {
+       'title': "DragDrop Handlers Use Poorly Protected Files",
+       'description': '''"DragDrop Handlers" are a type of Windows Explorer shell extension that determine behaviour when files or folders are dragged and dropped.  Each as a corresponding DLL or .EXE.  Some of DLLs or .EXEs used can be replaced by non-administrative users.  As DragDrop Handlers are used by all system users, there is a possibility that a user might run malicious code of an attacker's choosing if the DLLs or .EXEs are modified.  TODO how can the files be modified?
+	   
+DragDrop Handlers are described here: http://msdn.microsoft.com/en-us/library/windows/desktop/cc144171(v=vs.85).aspx
+
+Shell Extenstion Handlers more generally are described here: http://msdn.microsoft.com/en-us/library/windows/desktop/cc144067(v=vs.85).aspx	   ''',
+       'recommendation': '''Set strong file permissions on the service DLLs and their partent directories.''',
+       'supporting_data': {
+          'regkey_ref_replacable_file': {
+             'section': "description",
+             'preamble': "The following shell extension use DLLs or .EXE files with weak file permissions:",
+          },
+       }
+    },				
+
+	'WPC057': {
+       'title': "Column Handlers Use Poorly Protected Files",
+       'description': '''"Column Handlers" are a type of Windows Explorer shell extension that determine behaviour the users tries to add or remove columns from the display.  Each as a corresponding DLL or .EXE.  Some of DLLs or .EXEs used can be replaced by non-administrative users.  As Column Handlers are used by all system users, there is a possibility that a user might run malicious code of an attacker's choosing if the DLLs or .EXEs are modified.  TODO how can the files be modified?
+	   
+Column Handlers are described here: http://msdn.microsoft.com/en-us/library/windows/desktop/bb776831(v=vs.85).aspx
+
+Shell Extenstion Handlers more generally are described here: http://msdn.microsoft.com/en-us/library/windows/desktop/cc144067(v=vs.85).aspx	   ''',
+       'recommendation': '''Set strong file permissions on the service DLLs and their partent directories.''',
+       'supporting_data': {
+          'regkey_ref_replacable_file': {
+             'section': "description",
+             'preamble': "The following shell extension use DLLs or .EXE files with weak file permissions:",
+          },
+       }
+    },				
+
+	# TODO checks for these:
+	# Icon Overlay Handlers http://msdn.microsoft.com/en-us/library/windows/desktop/cc144123(v=vs.85).aspx
+	# Search Handlers http://msdn.microsoft.com/en-us/library/windows/desktop/bb776834(v=vs.85).aspx
 }
 
 issue_template_html = '''

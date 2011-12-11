@@ -108,6 +108,15 @@ class issue:
 				r = data[1]
 				f = data[2]
 				d += " Service %s (%s) runs as %s: Regkey %s references %s which has weak file permissions (TODO how so?)\n" % (s.get_description(), s.get_name(), s.get_run_as(), r.get_name(), f.get_name())
+				
+		elif data_name == 'regkey_ref_replacable_file':
+			for data in self.get_supporting_data(data_name):
+				type = data[0]
+				name = data[1]
+				clsid = data[2]
+				f = data[3]
+				r = data[4]
+				d += " %s \"%s\" uses CLSID %s which references the following file with weak permissions: %s [defined in %s] - TODO how are perms weak?\n" % (type, name, clsid, f.get_name(), r.get_name())
 
 		elif data_name == 'writeable_dirs' or data_name == 'files_write_perms':
 			for o in self.get_supporting_data(data_name):

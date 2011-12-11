@@ -22,6 +22,8 @@ class regkey:
 
 	def set_name(self, key_string):
 		parts = key_string.split("\\")
+		if parts[0] == "HKLM":
+			parts[0] = "HKEY_LOCAL_MACHINE"
 		self.set_hive(parts[0])
 		self.set_path("\\".join(parts[1:]))
 	
@@ -101,7 +103,18 @@ class regkey:
 			return data
 		except:
 			return None
-		
+	
+	def get_values(self):
+		try:
+			values = []
+			(subkey_count, value_count, mod_time) = win32api.RegQueryInfoKey(self.get_keyh())
+			for i in range(0, value_count):
+				(s, o, t) = win32api.RegEnumValue(self.get_keyh(), i)
+				values.append(s)
+			return values
+		except:
+			return []
+			
 	def get_name(self):
 		return self.hive + "\\" + self.path
 	
@@ -111,8 +124,8 @@ class regkey:
 				# self.keyh = win32api.RegOpenKeyEx(getattr(win32con, self.get_hive()), self.get_path(), 0, win32con.KEY_ENUMERATE_SUB_KEYS | win32con.KEY_QUERY_VALUE | win32con.KEY_READ)
 				self.keyh = win32api.RegOpenKeyEx(getattr(win32con, self.get_hive()), self.get_path(), 0, win32con.KEY_ENUMERATE_SUB_KEYS | win32con.KEY_QUERY_VALUE | ntsecuritycon.READ_CONTROL)
 			except:
-				#pass
-				print "Can't open: " + self.get_name()
+				pass
+				# print "Can't open: " + self.get_name()
 		return self.keyh
 		
 	def is_present(self):
