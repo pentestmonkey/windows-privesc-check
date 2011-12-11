@@ -297,6 +297,10 @@ def audit_services(report):
 				report.get_by_id("WPC024").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
 
 def audit_registry(report):
+
+	#
+	# Shell Extensions
+	#
 	
 	checks = (
 		["Context Menu", "WPC053", "HKLM\Software\Classes\*\ShellEx\ContextMenuHandlers"],
@@ -331,6 +335,7 @@ def audit_registry(report):
 		["Column Handler", "WPC057", "HKLM\Software\Classes\Folder\Shellex\ColumnHandlers"],
 		["Column Handler", "WPC057", "HKLM\Software\Wow6432Node\Classes\Folder\Shellex\ColumnHandlers"],
 	)
+	
 	for check in checks:
 		check_type = check[0]
 		check_id   = check[1]
@@ -353,7 +358,37 @@ def audit_registry(report):
 							name = s.get_name().split("\\")[-1]
 							report.get_by_id(check_id).add_supporting_data('regkey_ref_replacable_file', [check_type, name, clsid, f, s])
 					
+	runkeys_hklm = (
+		[ "WPC058", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" ],
+		[ "WPC058", "HKLM\Software\Microsoft\Windows\CurrentVersion\RunOnce" ],
+		[ "WPC058", "HKLM\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Run" ],
+		[ "WPC058", "HKLM\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\RunOnce" ],
+		
+# TODO RunOnceEx doesn't work like this.  Fix it.  See http://support.microsoft.com/kb/310593/
+#		[ "WPC058", "HKLM\Software\Microsoft\Windows\CurrentVersion\RunOnceEx" ],
+#		[ "WPC058", "HKLM\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\RunOnceEx" ],
+
+		[ "WPC059", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\RunService" ],
+		[ "WPC059", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnceService" ],
+		[ "WPC059", "HKLM\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\RunService" ],
+		[ "WPC059", "HKLM\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\RunOnceService" ],
+		
+	# TODO what about HKCU - trawl for run keys of every single user?
+	)
 	
+	for runkey_hklm in runkeys_hklm:
+		issueid = runkey_hklm[0]
+		rk  = regkey(runkey_hklm[1])
+		
+		if rk.is_present:
+			for v in rk.get_values():
+				# TODO check regkey permissions
+				imagepath = rk.get_value(v)
+				if imagepath:
+					f = File(wpc.utils.get_exe_path_clean(imagepath))
+					if f and f.is_replaceable():
+						report.get_by_id(issueid).add_supporting_data('regkey_ref_file', [rk, v, f])
+						
 	for key_string in wpc.conf.reg_paths:
 		#parts = key_string.split("\\")
 		#hive = parts[0]
