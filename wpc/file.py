@@ -41,7 +41,7 @@ class file:
 	def exists(self):
 		if not self.existsset:
 			self.exist = os.path.exists(self.get_name())
-		
+			self.existsset = 1
 		return self.exist
 		
 	def is_dir(self):
@@ -76,6 +76,10 @@ class file:
 	
 	# Can an untrusted user replace this file/dir? TODO unused
 	def is_replaceable(self):
+		if not self.exists():
+			print "[W] is_replaceable called for non-existent file %s" % self.get_name()
+			return 0
+	
 		# There are a few things that could cause a file/dir to be replacable.  Firstly let's define "replaceable":
 		# Replaceable file: Contents can be replaced by untrusted user.  Boils down to either write access, or being able to delete then re-add
 		# Replaceable dir:  Untrusted user can deleting anything within and re-add
@@ -173,6 +177,8 @@ class file:
 		# File/dir is not replaceable if we get this far
 		self.replaceable_set = 1
 		self.replaceable = 0
+		
+		# print "[D] is_replaceable returning 0 for %s " % self.get_name()
 		return 0
 		
 	# Doesn't return a trailing slash
