@@ -119,6 +119,13 @@ def audit_groups(opts):
 def audit_services(report):
 	for s in services().get_services():
 	
+		# Check if service runs as a domain user
+		u = s.get_run_as()
+		if len(u.split("\\")) == 2:
+			d = u.split("\\")[0]
+			if not d in (".", "NT AUTHORITY", "NT Authority"): # TODO better way to tell if acct is a domain acct?
+				report.get_by_id("WPC063").add_supporting_data('service_domain_user', [s])
+			
 		#
 		# Examine registry key for service
 		#
@@ -127,7 +134,7 @@ def audit_services(report):
 			# Check owner
 			if not s.get_reg_key().get_sd().get_owner().is_trusted():
 				report.get_by_id("WPC035").add_supporting_data('service_exe_regkey_untrusted_ownership', [s, s.get_reg_key()])
-			
+				
 			# Untrusted users can change permissions
 			acl = s.get_reg_key().get_issue_acl_for_perms(["WRITE_OWNER", "WRITE_DAC"])
 			if acl:
