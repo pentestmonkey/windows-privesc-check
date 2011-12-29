@@ -421,6 +421,58 @@ def audit_registry(report):
 					if f.is_replaceable():
 						report.get_by_id("WPC060").add_supporting_data('regkey_ref_file', [r, v, f])
 
+	#
+	# All CLSIDs (experimental)
+	#
+	
+	results = []
+	# Potentially intersting subkeys of clsids are listed here:
+	# http://msdn.microsoft.com/en-us/library/windows/desktop/ms691424(v=vs.85).aspx
+	
+	# TODO doesn't report files that are not found or check perms of dll passed to rundll32.exe
+	# [D] can't find %SystemRoot%\system32\eapa3hst.dll
+	# [D] can't find rundll32.exe shell32.dll,SHCreateLocalServerRunDll {601ac3dc-786a-4eb0-bf40-ee3521e70bfb}
+	# [D] can't find rundll32.exe C:\WINDOWS\system32\hotplug.dll,CreateLocalServer {783C030F-E948-487D-B35D-94FCF0F0C172}
+	# [D] can't find rundll32.exe shell32.dll,SHCreateLocalServerRunDll {995C996E-D918-4a8c-A302-45719A6F4EA7}
+	# [D] can't find rundll32.exe shell32.dll,SHCreateLocalServerRunDll {FFB8655F-81B9-4fce-B89C-9A6BA76D13E7}
+
+	r = regkey("HKEY_LOCAL_MACHINE\\SOFTWARE\\Classes\\CLSID")
+	for clsid_key in r.get_subkeys():
+		print "[D] Processing clsid %s" % clsid_key.get_name()
+		for v in ("InprocServer", "InprocServer32", "LocalServer", "LocalServer32"):
+			s = regkey(clsid_key.get_name() + "\\" + v)
+			if r.is_present:
+				f_str = s.get_value("") # "(Default)" value
+				if f_str:
+					f_str_expanded = wpc.utils.env_expand(f_str)
+					f = File(f_str_expanded)
+					if not f.exists():
+						f = wpc.utils.find_in_path(f)
+						
+					if f and f.exists():
+						print "[D] checking security of %s" % f.get_name()
+					else:
+						
+						f_str2 = wpc.utils.get_exe_path_clean(f_str_expanded)
+						if f_str2:
+							f = File(f_str2)
+						else:
+							#might be:
+							#"foo.exe /args"
+							#foo.exe /args
+							f_str2 = f_str.replace("\"", "")
+							f = wpc.utils.find_in_path(File(f_str2))
+							if not f or not f.exists():
+								f_str2 = f_str2.split(" ")[0]
+								f = wpc.utils.find_in_path(File(f_str2))
+								if f:
+									print "[D] how about %s" % f.get_name()
+					if not f:
+						print "[D] can't find %s" % f_str
+
+					if f and f.is_replaceable():
+						report.get_by_id("WPC061").add_supporting_data('regkey_ref_file', [s, v, f])
+
 	for key_string in wpc.conf.reg_paths:
 		#parts = key_string.split("\\")
 		#hive = parts[0]
