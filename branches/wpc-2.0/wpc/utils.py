@@ -230,8 +230,11 @@ def env_expand(s):
 def find_in_path(f):
 	f_str = f.get_name()
 	for d in os.environ.get('PATH').split(';'):
+		#print "[D] looking in path for %s" % d + "\\" + f_str
 		if os.path.exists(d + "\\" + f_str):
+			#print "[D] found in path %s" % d + "\\" + f_str
 			return File(d + "\\" + f_str)
+	return None
 
 def lookup_files_for_clsid(clsid):
 	results = []
