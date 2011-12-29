@@ -102,6 +102,11 @@ class issue:
 				s = data[0]
 				d += " %s (%s) runs as %s and has path: %s:\n" % (s.get_description(), s.get_name(), s.get_run_as(), s.get_exe_path())		
 								
+		elif data_name == 'service_domain_user':
+			for data in self.get_supporting_data(data_name):
+				s = data[0]
+				d += " %s (%s) runs as %s\n" % (s.get_description(), s.get_name(), s.get_run_as())		
+								
 		elif data_name == 'service_dll':
 			for data in self.get_supporting_data(data_name):
 				s = data[0]
