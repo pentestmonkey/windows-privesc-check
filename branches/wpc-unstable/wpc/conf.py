@@ -121,7 +121,7 @@ share_types = (
     "STYPE_PRINTQ",
     "STYPE_DEVICE",
 )
-    
+
 sv_types = (
         "SV_TYPE_WORKSTATION",
         "SV_TYPE_SERVER",
@@ -156,7 +156,7 @@ sv_types = (
         "SV_TYPE_DOMAIN_ENUM"
 )
 
-win32netcon.SV_TYPE_TERMINALSERVER = 0x2000000 
+win32netcon.SV_TYPE_TERMINALSERVER = 0x2000000
 
 sid_is_group_type = {
     ntsecuritycon.SidTypeUser: 0,
@@ -243,7 +243,7 @@ dangerous_perms_write = {
     # "READ_CONTROL",
     # "WRITE_DAC",
     #"WRITE_OWNER",
-    'regkey': {        
+    'regkey': {
         _winreg: (
             #"KEY_ALL_ACCESS", # Combines the STANDARD_RIGHTS_REQUIRED, KEY_QUERY_VALUE, KEY_SET_VALUE, KEY_CREATE_SUB_KEY, KEY_ENUMERATE_SUB_KEYS, KEY_NOTIFY, and KEY_CREATE_LINK access rights.
             #"KEY_QUERY_VALUE", # GUI "Query Value"
@@ -344,7 +344,7 @@ dangerous_perms_write = {
 
 win32con.PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
 win32con.PROCESS_SUSPEND_RESUME = 0x0800
-            
+
 all_perms = {
     'share': {
         ntsecuritycon: (
@@ -380,7 +380,7 @@ all_perms = {
             "SYNCHRONIZE",
         )
     },
-    'regkey': {        
+    'regkey': {
         _winreg: (
             #"KEY_ALL_ACCESS",
             "KEY_CREATE_LINK",
@@ -577,7 +577,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-    
+
     'WPC002': {
        'title': "Insecure Permissions on Files and Directories in Path (OBSELETE ISSUE)",
        'description': '''Some of the programs and directories in the %PATH% variable could be changed by non-administrative users.
@@ -596,7 +596,7 @@ This could allow certain users on the system to place malicious code into certai
           }
        }
     },
-    
+
     'WPC003': {
        'title': "Insecure Permissions In Windows Registry",
        'description': '''Some registry keys that hold the names of programs run by other users were checked and found to have insecure permissions.  It would be possible for non-administrative users to modify the registry to cause a different programs to be run.  This weakness could be abused by low-privileged users to run commands of their choosing with higher privileges.''',
@@ -608,7 +608,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-    
+
     'WPC005': {
        'title': "Insecure Permissions On Windows Service Registry Keys (NOT IMPLEMENTED YET)",
        'description': '''Some registry keys that hold the names of programs that are run when Windows Services start were found to have weak file permissions.  They could be changed by non-administrative users to cause malicious programs to be run instead of the intended Windows Service Executable.''',
@@ -722,7 +722,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-    
+
     'WPC015': {
        'title': "Insecure Permissions On Files / Directories In Users' PATHs (NEED TO CHECK THIS WORKS)",
        'description': '''Some programs/directories in the paths of users on this system have weak permissions.''',
@@ -787,7 +787,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-    
+
     'WPC020': {
        'title': "Service Can Be Paused/Resumed By Non-Admin Users",
        'description': '''The service-level permissions on some Windows services allow them to be paused/resumed by non-administrative users.  This can often be desirable, in which case this issue can be ignored.  However, sometimes it can allow users to allow users to evade monitoring - e.g. from Anti-virus services.  The permission is not always dangerous on its own, but can sometimes aid a local attacker.''',
@@ -799,7 +799,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-    
+
     'WPC021': {
        'title': "Service Can Be Reconfigured By Non-Admin Users",
        'description': '''The service-level permissions on some Windows services allow them to be reconfigured by non-administrative users.  This should not normally be required and is inherently insecure.  It could certain users alter the program which is run when this service start and to alter which user the service runs as.  The most likely attack would be to reconfigure the service to run as LocalSystem with no password and to select a malicious executable.  This would give the attacker administrator level access to the local system.''',
@@ -811,7 +811,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-    
+
     'WPC022': {
        'title': "Service Can Be Deleted By Non-Admin Users",
        'description': '''The service-level permissions on some Windows services allow them to be deleted by non-administrative users.  This should not normally be required and is inherently insecure.  It could allow local users to delete the service.  This may allow them to evade monitor - e.g. from Anti-virus - or to disrupt normal business operations.  Note that the user would not be able to replace the service as administrator level rights are required to create new services.''',
@@ -824,7 +824,7 @@ This could allow certain users on the system to place malicious code into certai
        }
     },
 
-        
+
     'WPC023': {
        'title': "Service Permissions Can Be Altered By Non-Admin Users",
        'description': '''The service-level permissions on some Windows services allow some non-administrative users to set any service-level permissions of their choosing.  This should not normally be required and is inherently insecure.  It has a similar effect to granting the user DELETE and SERVICE_CHANGE_CONFIG.  These powerful rights could allow the user to reconfigure a service to provide them with administrator level access, or simply to delete the service, disrupting normal business operations.''',
@@ -836,7 +836,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-    
+
     'WPC024': {
        'title': "Non-Admin Users Can Take Ownership of Service",
        'description': '''The service-level permissions on some Windows services allow ownership to be claimed by some non-administrative users.  This should not normally be required and is inherently insecure.  It has a similar effect to granting the user WRITE_DAC (and thus DELETE and SERVICE_CHANGE_CONFIG).  These powerful rights could allow the user to reconfigure a service to provide them with administrator level access, or simply to delete the service, disrupting normal business operations.''',
@@ -848,7 +848,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-    
+
     'WPC025': {
        'title': "Services Owned By Non-Admin Users",
        'description': '''The owner in the security descriptor for some services is set to a non-administrative user.  This should not normally be required and is inherently insecure.  It has a similar effect to granting the user WRITE_DAC (and thus DELETE and SERVICE_CHANGE_CONFIG).  These powerful rights could allow the user to reconfigure a service to provide them with administrator level access, or simply to delete the service, disrupting normal business operations.''',
@@ -860,7 +860,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-    
+
     'WPC026': {
        'title': "Delete Permission Granted On Windows Service Executables",
        'description': '''Some of the programs that are run when Windows Services start were found to have weak file permissions.  It is possible for non-administrative local users to delete some of the Windows Service executables with malicious programs.  This could lead to disruption or denial of service.''',
@@ -872,7 +872,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-    
+
     'WPC027': {
        'title': "Append Permission Granted Windows Service Executables",
        'description': '''Some of the programs that are run when Windows Services start were found to have weak file permissions.  It is possible for non-administrative local users to append to some of the Windows Service executables with malicious programs.  This is unlikely to be exploitable for .exe files, but is it bad security practise to allow more access than necessary to low-privileged users.''',
@@ -884,7 +884,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-    
+
     'WPC028': {
        'title': "Untrusted Users Can Modify Windows Service Executables",
        'description': '''Some of the programs that are run when Windows Services start were found to have weak file permissions.  It is possible for non-administrative local users to replace some of the Windows Service executables with malicious programs.  This could be abused to execute programs with the privileges of the Windows services concerned.''',
@@ -896,7 +896,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-    
+
     'WPC029': {
        'title': "Windows Service Executables Owned By Untrusted Users",
        'description': '''Some of the programs that are run when Windows Services start were found to be owned by untrusted users.  Consequently, these programs can be replace with malicious programs by low-privileged users.  This could result is users stealing the privileges of the services affected.''',
@@ -920,8 +920,8 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-    
-    
+
+
     'WPC031': {
        'title': "Parent Directories of Windows Service Executables Allow Untrusted Users DELETE Permissions And Can Be Replaced Because of FILE_ADD_SUBDIR Permission",
        'description': '''Some of the programs that are run when Windows Services start were found to have parent directories that had DELETE permission granted to untrusted users. Further the parent directories of the directories affected had FILE_ADD_SUBDIR granted for low-privileged users.  This combination of directory permissions allows entire portions of the parent directory structure can be deleted and replaced, allowing the service executable to be susbstituted with a malicoius one.  In this way low-privileged users could steal the privileges of the services affected.''',
@@ -933,7 +933,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-    
+
     'WPC032': {
        'title': "Parent Directories of Windows Service Executables Can Have File Permissions Altered By Untrusted Users",
        'description': '''Some of the programs that are run when Windows Services start were found to have parent directories that had the permissions WRITE_OWNER or WRITE_DAC granted to untrusted users.  Consequently, low-privileged users could grant themselves any privilege they desired on these directories.  This could result in entire portions of the parent directory structure can be deleted and replaced, allowing the service executable to be susbstituted with a malicoius one.  In this way low-privileged users could steal the privileges of the services affected.''',
@@ -945,7 +945,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-    
+
     'WPC033': {
        'title': "Parent Directories of Windows Service Executables Owned By Untrusted Users",
        'description': '''Some of the programs that are run when Windows Services start were found to have parent directories that were owned by untrusted users.  Consequently, entire portions of the parent directory structure can be deleted and replaced, allowing the service executable to be susbstituted with a malicoius one.  This could result is users stealing the privileges of the services affected.''',
@@ -957,7 +957,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-    
+
     'WPC034': {
        'title': "Windows Service Executables Allow DELETE Permissions To Untrusted Users And Can Be Replaced Because of FILE_ADD_FILE Permission On Parent Directory",
        'description': '''Some of the programs that are run when Windows Services start were found to have DELETE permission granted to low-privileged users.  Furthermore, the parent directory allowed FILE_ADD_FILE permission to low-privileged users.  This combination of directory permissions allows the service executable to be deleted and replaced malicoius program.  In this way low-privileged users could steal the privileges of the services affected.''',
@@ -1017,7 +1017,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-    
+
     'WPC039': {
        'title': "Windows Service Registry Keys Allow Untrusted Users To Create Subkeys",
        'description': '''Configuration information for Windows Service is stored in the registry.  Some of the keys were found to have the KEY_CREATE_SUB_KEY permission granted for non-administrative users.  It may be possible for low privileged users to manipulate service - though this would depend on how the service responded to the addition of new registry keys.''',
@@ -1041,7 +1041,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-    
+
     'WPC041': {
        'title': "Windows Service Registry Keys Have Parent Keys Owned By Untrusted Users",
        'description': '''Configuration information for Windows Service is stored in the registry.  Some of the parent keys were found to be owned by non-administrative users.  This could allow low-privileged users to alter the permissions on the keys concerned, delete them, add subkeys and add/alter registry values for that key.  This probably constitutes a denial of service risk, but may also allow privilege escalation depending on how the service responds to registry keys being tampered with.''',
@@ -1053,7 +1053,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-    
+
     'WPC042': {
        'title': "Permissions on Windows Service Registry Keys Can Be Changed By Untrusted Users",
        'description': '''Configuration information for Windows Service is stored in the registry.  TODO.''',
@@ -1065,7 +1065,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-    
+
     'WPC043': {
        'title': "Windows Service Registry Keys Can Be Deleted And Replaced By Untrusted Users",
        'description': '''Configuration information for Windows Service is stored in the registry.  TODO.''',
@@ -1077,7 +1077,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-    
+
     'WPC046': {
        'title': "Windows Registry Keys Containing Program Owned By Untrusted Users",
        'description': '''Some of the registry keys holding the names of programs run by other users could be changed by non-administrative users.  TODO''',
@@ -1089,7 +1089,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-    
+
     'WPC047': {
        'title': "Windows Registry Keys Containing Programs Can Have Permissions Changed By Untrusted Users",
        'description': '''Some of the registry keys holding the names of programs run by other users could be changed by non-administrative users.  TODO''',
@@ -1100,8 +1100,8 @@ This could allow certain users on the system to place malicious code into certai
              'preamble': "The registry keys below can be changed by non-administrative users:",
           },
        }
-    },    
-    
+    },
+
     'WPC048': {
        'title': "Windows Registry Keys Containing Program Names Can Be Changed By Untrusted Users",
        'description': '''Some of the registry keys holding the names of programs run by other users could be changed by non-administrative users.  It would be possible for an attacker to substitute the name of malicious program which then stole the privileges of other accounts.''',
@@ -1124,8 +1124,8 @@ This could allow certain users on the system to place malicious code into certai
              'preamble': "The registry keys below can be changed by non-administrative users:",
           },
        }
-    },    
-    
+    },
+
     'WPC050': {
        'title': "Windows Registry Keys Containing Programs Can Be Deleted",
        'description': '''Some of the registry keys holding the names of programs run by other users could be changed by non-administrative users.  TODO''',
@@ -1136,8 +1136,8 @@ This could allow certain users on the system to place malicious code into certai
              'preamble': "The registry keys below can be changed by non-administrative users:",
           },
        }
-    },    
-    
+    },
+
     'WPC051': {
        'title': "Windows Service Has Insecurely Quoted Path",
        'description': '''The path to the executable for the service contains one or more spaces and quotes have not been correctly used around the path.  The path is therefore ambiguous which could result in the wrong program being executed when the service is started - e.g. "C:\\program.exe" instead of "C:\\program files\\foo\\bar.exe".  The issue is not necessarily exploitable unless a local attacker has permissions to add an alternative executable to the correct location on the filesystem.  The impact of the issue should be considered higher for services that run with high privileges.''',
@@ -1148,8 +1148,8 @@ This could allow certain users on the system to place malicious code into certai
              'preamble': "The following services have insecurely quoted paths:",
           },
        }
-    },                
-                
+    },
+
     'WPC052': {
        'title': "Windows Service DLL Can Be Replaced",
        'description': '''Each windows service has a corresponding registry key in HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\services.  Some services have a "Parameters" subkey and a value called "ServiceDll" (e.g. HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\services\\someservice\\Parameters\\ServiceDll = c:\\dir\\foo.dll").  The DLL for some of the services on the system audited can be replaced by non-administrative users.  TODO how and by whom?  Users able to replace the service DLL could run code of their choosing with the privileges of the service.''',
@@ -1160,8 +1160,8 @@ This could allow certain users on the system to place malicious code into certai
              'preamble': "The following services have weak file permissions on the service DLLs:",
           },
        }
-    },                
-                
+    },
+
     'WPC053': {
        'title': "Context Handler Menus Use Poorly Protected Files",
        'description': '''Context Menus appear in Windows Explorer when files are right-clicked.  Each has a corresponding DLL or .EXE.  Some of the referenced DLLs or .EXE file can be replaced by non-administrative users.  As these context menus are used by all system users, there is a possibility that a user might run malicious code of an attacker's choosing if the DLLs or .EXEs are modified.  TODO how can the files be modified?
@@ -1176,8 +1176,8 @@ Shell Extenstion Handlers more generally are described here: http://msdn.microso
              'preamble': "The following shell extension use DLLs or .EXE files with weak file permissions:",
           },
        }
-    },                
-                
+    },
+
     'WPC054': {
        'title': "Property Sheet Handlers Use Poorly Protected Files",
        'description': '''"Property Sheets" appear in Windows Explorer when files are right-clicked and the "Properties" context menu selected.  The DLLs or .EXEs used to generate these property sheets can be replaced by non-administrative users.  As these property sheets are used by all system users, there is a possibility that a user might run malicious code of an attacker's choosing if the DLLs or .EXEs are modified.  TODO how can the files be modified?  
@@ -1192,7 +1192,7 @@ Shell Extenstion Handlers more generally are described here: http://msdn.microso
              'preamble': "The following shell extension use DLLs or .EXE files with weak file permissions:",
           },
        }
-    },                
+    },
 
     'WPC055': {
        'title': "Copy Hook Handlers Use Poorly Protected Files",
@@ -1208,7 +1208,7 @@ Shell Extenstion Handlers more generally are described here: http://msdn.microso
              'preamble': "The following shell extension use DLLs or .EXE files with weak file permissions:",
           },
        }
-    },                
+    },
 
     'WPC056': {
        'title': "DragDrop Handlers Use Poorly Protected Files",
@@ -1224,7 +1224,7 @@ Shell Extenstion Handlers more generally are described here: http://msdn.microso
              'preamble': "The following shell extension use DLLs or .EXE files with weak file permissions:",
           },
        }
-    },                
+    },
 
     'WPC057': {
        'title': "Column Handlers Use Poorly Protected Files",
@@ -1240,12 +1240,12 @@ Shell Extenstion Handlers more generally are described here: http://msdn.microso
              'preamble': "The following shell extension use DLLs or .EXE files with weak file permissions:",
           },
        }
-    },                
+    },
 
     # TODO checks for these:
     # Icon Overlay Handlers http://msdn.microsoft.com/en-us/library/windows/desktop/cc144123(v=vs.85).aspx
     # Search Handlers http://msdn.microsoft.com/en-us/library/windows/desktop/bb776834(v=vs.85).aspx
-    
+
     # TODO add RunOnceEx keys to this issue + HKCU\run, runonce, runonceex
     'WPC058': {
        'title': "Registry \"Run\" Keys Reference Programs With Weak Permissions",
@@ -1257,7 +1257,7 @@ Shell Extenstion Handlers more generally are described here: http://msdn.microso
              'preamble': "The programs referenced from the registry can be modified by non-admin users:",
           },
        }
-    },                
+    },
 
     'WPC059': {
        'title': "Registry \"RunServices\" Keys Reference Programs With Weak Permissions",
@@ -1269,7 +1269,7 @@ Shell Extenstion Handlers more generally are described here: http://msdn.microso
              'preamble': "The programs referenced from the registry can be modified by non-admin users:",
           },
        }
-    },                
+    },
 
     'WPC060': {
        'title': "KnownDLLs Have Weak Permissions",
@@ -1281,7 +1281,7 @@ Shell Extenstion Handlers more generally are described here: http://msdn.microso
              'preamble': "The programs referenced from the registry can be modified by non-admin users:",
           },
        }
-    },                
+    },
 
     'WPC061': {
        'title': "CLSID Reference DLLs/EXEs With Weak File Permissions (experimental)",
@@ -1295,7 +1295,7 @@ Further information about CLSIDs is available here: http://msdn.microsoft.com/en
              'preamble': "The programs referenced from the registry can be modified by non-admin users:",
           },
        }
-    },                
+    },
 
     'WPC062': {
        'title': "Windows Service Executable Is Missing",
@@ -1307,7 +1307,7 @@ Further information about CLSIDs is available here: http://msdn.microsoft.com/en
              'preamble': "The following Windows Services has missing executables:",
           },
        }
-    },                
+    },
 
     'WPC063': {
        'title': "Windows Service Running Under Domain Account",
@@ -1319,7 +1319,7 @@ Further information about CLSIDs is available here: http://msdn.microsoft.com/en
              'preamble': "The following windows services run in the context of Domain accounts:",
           },
        }
-    },                
+    },
 
     'WPC064': {
        'title': "Windows Service Running Under Named Local Account",
@@ -1331,7 +1331,7 @@ Further information about CLSIDs is available here: http://msdn.microsoft.com/en
              'preamble': "The following windows services run in the context of local accounts:",
           },
        }
-    },                
+    },
 
 }
 
@@ -1361,7 +1361,7 @@ REPLACE_RECOMMENDATION_DATA
 </table>
 '''
 
-issue_list_html ='''
+issue_list_html = '''
 REPLACE_PREAMBLE
 <ul>
 REPLACE_ITEM
@@ -1468,5 +1468,5 @@ The following file/directory/registry permissions were considered to be potentia
 REPLACE_DANGEROUS_PERMS
 </ul>
 </html>
-'''    
+'''
 

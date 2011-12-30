@@ -30,7 +30,7 @@ class token:
 
     def get_th(self):
         return self.th
-        
+
     def get_sd(self):
         if not self.sd:
             try:
@@ -40,7 +40,7 @@ class token:
             except:
                 pass
         return self.sd
-    
+
     def get_token_groups(self):
         if self.token_groups == []:
             try:
@@ -49,7 +49,7 @@ class token:
                     attr = tup[1]
                     attr_str = attr
                     if attr < 0:
-                        attr = 2**32 + attr
+                        attr = 2 ** 32 + attr
                     attr_str_a = []
                     if attr & 1:
                         attr_str_a.append("MANDATORY")
@@ -70,7 +70,7 @@ class token:
         if not self.token_origin and self.get_th():
             self.token_origin = win32security.GetTokenInformation(self.get_th(), ntsecuritycon.TokenOrigin)
         return self.token_origin
-        
+
     def get_token_source(self):
         if not self.token_source and self.get_th():
             try:
@@ -78,7 +78,7 @@ class token:
             except:
                 pass
         return self.token_source
-        
+
     def get_token_impersonation_level(self):
         if not self.token_impersonation_level and self.get_th():
             try:
@@ -86,7 +86,7 @@ class token:
             except:
                 pass
         return self.token_impersonation_level
-                    
+
     def get_token_restrictions(self):
         if not self.token_restrictions and self.get_th():
             try:
@@ -94,7 +94,7 @@ class token:
             except:
                 pass
         return self.token_restrictions
-        
+
     def get_token_restricted_sids(self):
         if self.token_restricted_sids == [] and self.get_th():
             try:
@@ -104,23 +104,23 @@ class token:
             except:
                 pass
         return self.token_restricted_sids
-        
+
     def get_token_elevation_type(self):
         if not self.token_elevation_type and self.get_th():
             try:
                 self.token_elevation_type = win32security.GetTokenInformation(self.get_th(), ntsecuritycon.TokenElevationType)
                 if self.token_elevation_type == 1:
-                    self.token_elevation_type =  "TokenElevationTypeDefault"
+                    self.token_elevation_type = "TokenElevationTypeDefault"
                 elif self.token_elevation_type == 2:
                     self.token_elevation_type = "TokenElevationTypeFull"
                 elif self.token_elevation_type == 3:
-                    self.token_elevation_type =  "TokenElevationTypeLimited"
+                    self.token_elevation_type = "TokenElevationTypeLimited"
                 else:
                     self.token_elevation_type = "Unknown (%s)" % self.token_elevation_type
             except:
                 pass
         return self.token_elevation_type
-                        
+
     def get_token_ui_access(self):
         if not self.token_ui_access and self.get_th():
             try:
@@ -128,7 +128,7 @@ class token:
             except:
                 pass
         return self.token_ui_access
-        
+
     def get_token_linked_token(self):
         if not self.token_linked_token and self.get_th():
             try:
@@ -136,7 +136,7 @@ class token:
             except:
                 pass
         return self.token_linked_token
-        
+
     def get_token_logon_sid(self):
         if not self.token_logon_sid and self.get_th():
             try:
@@ -144,7 +144,7 @@ class token:
             except:
                 pass
         return self.token_logon_sid
-        
+
     def get_token_elevation(self):
         if not self.token_elevation and self.get_th():
             try:
@@ -152,7 +152,7 @@ class token:
             except:
                 pass
         return self.token_elevation
-        
+
     def get_token_integrity_level(self):
         if not self.token_integrity_level and self.get_th():
             try:
@@ -161,12 +161,12 @@ class token:
             except:
                 pass
         return self.token_integrity_level
-            
+
     def get_token_mandatory_policy(self):
         if not self.token_mandatory_policy and self.get_th():
             try:
                 m = win32security.GetTokenInformation(self.get_th(), ntsecuritycon.TokenMandatoryPolicy)
-                
+
                 if m == 0:
                     m = "OFF"
                 elif m == 1:
@@ -181,7 +181,7 @@ class token:
             except:
                 pass
         return self.token_mandatory_policy
-        
+
     def get_token_type(self):
         if not self.token_type == [] and self.get_th():
             try:
@@ -193,7 +193,7 @@ class token:
             except:
                 pass
         return self.token_type
-        
+
     def get_token_restricted(self):
         if not self.token_restricted and self.get_th():
             try:
@@ -201,14 +201,14 @@ class token:
             except:
                 pass
         return self.token_restricted
-        
+
     # Link that explains how privs are added / removed from tokens:
     # http://support.microsoft.com/kb/326256
     def get_token_privileges(self):
         if self.token_privileges == [] and self.get_th():
             #try:
                 privs = win32security.GetTokenInformation(self.get_th(), ntsecuritycon.TokenPrivileges)
-                
+
                 for priv_tuple in privs:
                     attr_str_a = []
                     priv_val = priv_tuple[0]
@@ -225,8 +225,8 @@ class token:
                     if attr & 4:
                         attr_str_a.append("REMOVED")
 
-                    self.token_privileges.append((win32security.LookupPrivilegeName(wpc.conf.remote_server, priv_val), attr_str_a)) 
-            
+                    self.token_privileges.append((win32security.LookupPrivilegeName(wpc.conf.remote_server, priv_val), attr_str_a))
+
             #except:
             #    pass
         return self.token_privileges
@@ -237,31 +237,31 @@ class token:
             if sidObj:
                 self.token_user = principal(sidObj)
         return self.token_user
-        
+
     def get_token_primary_group(self):
         if not self.token_primary_group and self.get_th():
             sidObj = win32security.GetTokenInformation(self.get_th(), ntsecuritycon.TokenPrimaryGroup)
             if sidObj:
                 self.token_primary_group = principal(sidObj)
         return self.token_primary_group
-        
+
     def get_token_owner(self):
         if not self.token_owner and self.get_th():
             sidObj = win32security.GetTokenInformation(self.get_th(), ntsecuritycon.TokenOwner)
             if sidObj:
                 self.token_owner = principal(sidObj)
         return self.token_owner
-        
+
     def as_text_no_rec(self):
         t = '--- Start Access Token ---\n'
-        
+
         if self.get_token_owner():
             t += "Token Owner: " + str(self.get_token_owner().get_fq_name()) + "\n"
         if self.get_token_user():
             t += "Token User: " + str(self.get_token_user().get_fq_name()) + "\n"
         if self.get_token_primary_group():
             t += "Token Group: " + str(self.get_token_primary_group().get_fq_name()) + "\n"
-        t += "Token Type: " + str(self.get_token_type()) + "\n" 
+        t += "Token Type: " + str(self.get_token_type()) + "\n"
         t += "Token Origin: " + str(self.get_token_origin()) + "\n"
         t += "Token Source: " + str(self.get_token_source()) + "\n"
         t += "TokenHasRestrictions: " + str(self.get_token_restrictions()) + "\n"
@@ -286,14 +286,14 @@ class token:
 
     def as_text_no_rec3(self):
         t = '--- Start Access Token ---\n'
-        
+
         if self.get_token_owner():
             t += "Token Owner: " + str(self.get_token_owner().get_fq_name()) + "\n"
         if self.get_token_user():
             t += "Token User: " + str(self.get_token_user().get_fq_name()) + "\n"
         if self.get_token_primary_group():
             t += "Token Group: " + str(self.get_token_primary_group().get_fq_name()) + "\n"
-        t += "Token Type: " + str(self.get_token_type()) + "\n" 
+        t += "Token Type: " + str(self.get_token_type()) + "\n"
         t += "Token Origin: " + str(self.get_token_origin()) + "\n"
         t += "Token Source: " + str(self.get_token_source()) + "\n"
         t += "TokenHasRestrictions: " + str(self.get_token_restrictions()) + "\n"
@@ -318,14 +318,14 @@ class token:
 
     def as_text_no_rec2(self):
         t = '--- Start Access Token ---\n'
-        
+
         if self.get_token_owner():
             t += "Token Owner: " + str(self.get_token_owner().get_fq_name()) + "\n"
         if self.get_token_user():
             t += "Token User: " + str(self.get_token_user().get_fq_name()) + "\n"
         if self.get_token_primary_group():
             t += "Token Group: " + str(self.get_token_primary_group().get_fq_name()) + "\n"
-        t += "Token Type: " + str(self.get_token_type()) + "\n" 
+        t += "Token Type: " + str(self.get_token_type()) + "\n"
         t += "Token Origin: " + str(self.get_token_origin()) + "\n"
         t += "Token Source: " + str(self.get_token_source()) + "\n"
         t += "TokenHasRestrictions: " + str(self.get_token_restrictions()) + "\n"
@@ -350,14 +350,14 @@ class token:
 
     def as_text(self):
         t = '--- start access token ---\n'
-        
+
         if self.get_token_owner():
             t += "Token Owner: " + str(self.get_token_owner().get_fq_name()) + "\n"
         if self.get_token_user():
             t += "Token User: " + str(self.get_token_user().get_fq_name()) + "\n"
         if self.get_token_primary_group():
             t += "Token Group: " + str(self.get_token_primary_group().get_fq_name()) + "\n"
-        t += "Token Type: " + str(self.get_token_type()) + "\n" 
+        t += "Token Type: " + str(self.get_token_type()) + "\n"
         t += "Token Origin: " + str(self.get_token_origin()) + "\n"
         t += "Token Source: " + str(self.get_token_source()) + "\n"
         t += "TokenHasRestrictions: " + str(self.get_token_restrictions()) + "\n"

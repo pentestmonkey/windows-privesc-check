@@ -35,12 +35,12 @@ class cache:
         self.misses['LookupAccountName'] = 0
         self.hits['is_in_group'] = 0
         self.misses['is_in_group'] = 0
-    
+
     def print_stats(self):
         for k in self.hits.keys():
             print "Hits for %s: %s" % (k, self.get_hits(k))
             print "Misses for %s: %s" % (k, self.get_misses(k))
-    
+
     def sd(self, type, name):
         # TODO caching code here
         return sd(type, name)
@@ -56,7 +56,7 @@ class cache:
             f = wpc.file.file(name)
             self.files[name] = f
         return f
-    
+
     def regkey(self, name):
         f = None # might save 1 x dict lookup
         if name in self.regkeys.keys():
@@ -68,20 +68,20 @@ class cache:
             f = wpc.regkey.regkey(name)
             self.regkeys[name] = f
         return f
-    
+
     def LookupAccountSid(self, server, s):
         sid = win32security.ConvertSidToStringSid(s)
         if not server in self.namefromsid.keys():
             self.namefromsid[server] = {}
         if not sid in self.namefromsid[server].keys():
             try:
-                self.namefromsid[server][sid] = win32security.LookupAccountSid(server, s)        
+                self.namefromsid[server][sid] = win32security.LookupAccountSid(server, s)
             except:
                 self.namefromsid[server][sid] = (win32security.ConvertSidToStringSid(s), "[unknown]", 8)
             self.miss('LookupAccountSid')
         else:
             self.hit('LookupAccountSid')
-        
+
         return self.namefromsid[server][sid]
 
     def LookupAccountName(self, server, name):
@@ -89,27 +89,27 @@ class cache:
             self.sidfromname[server] = {}
         if not name in self.sidfromname[server].keys():
             try:
-                self.sidfromname[server][name] = win32security.LookupAccountName(server, name)        
+                self.sidfromname[server][name] = win32security.LookupAccountName(server, name)
             except:
                 self.sidfromname[server][name] = None
             self.miss('LookupAccountName')
         else:
             self.hit('LookupAccountName')
-        
+
         return self.sidfromname[server][name]
 
     def hit(self, name):
         self.hits[name] = self.hits[name] + 1
-        
+
     def miss(self, name):
         self.misses[name] = self.misses[name] + 1
-    
+
     def get_hits(self, name):
         return self.hits[name]
-    
+
     def get_misses(self, name):
         return self.misses[name]
-    
+
     def is_in_group(self, p, group):
         #sid = win32security.ConvertSidToStringSid(s)
         #print "cache.is_in_group called"
@@ -137,14 +137,14 @@ class cache:
                 m, total, resume = win32net.NetGroupGetUsers(server, name, level, resume, win32netcon.MAX_PREFERRED_LENGTH)
             except:
                 return []
-                
+
             for member in m:
                 members.append(member)
-                
+
             if not resume:
                 keepgoing = 0
         return members
-        
+
     def NetLocalGroupGetMembers(self, server, name, level):
         keepgoing = 1
         resume = 0
@@ -154,10 +154,10 @@ class cache:
                 m, total, resume = win32net.NetLocalGroupGetMembers(server, name, level, resume, win32netcon.MAX_PREFERRED_LENGTH)
             except:
                 return []
-                
+
             for member in m:
                 members.append(member)
-                
+
             if not resume:
                 keepgoing = 0
         return members

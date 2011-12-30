@@ -15,25 +15,25 @@ class issueAcl:
         self.name = None
         self.set_name(n)
         self.set_acelist(a)
-        
+
     def set_acelist(self, aces):
         self.acelist = acelist()
         for ace in aces:
             self.acelist.add(ace)
-        
+
     def set_name(self, n):
         self.name = n
-        
+
     def get_name(self):
         return self.name
-        
+
     def get_acelist(self):
         return self.acelist
-        
+
     def as_text(self):
         t = ''
         for ace in self.get_acelist().get_aces():
             t += self.get_name() + ":\n  " + ace.as_text() + "\n"
         return t
-        
+
     # TODO owner?
