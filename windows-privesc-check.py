@@ -119,12 +119,19 @@ def audit_groups(opts):
 def audit_services(report):
 	for s in services().get_services():
 	
-		# Check if service runs as a domain user
+		#
+		# Check if service runs as a domain/local user
+		#
 		u = s.get_run_as()
 		if len(u.split("\\")) == 2:
 			d = u.split("\\")[0]
-			if not d in (".", "NT AUTHORITY", "NT Authority"): # TODO better way to tell if acct is a domain acct?
-				report.get_by_id("WPC063").add_supporting_data('service_domain_user', [s])
+			if not d in ("NT AUTHORITY", "NT Authority"):
+				if d in ("."):
+					# Local account - TODO better way to tell if acct is a local acct?
+					report.get_by_id("WPC064").add_supporting_data('service_domain_user', [s])
+				else:
+					# Domain account - TODO better way to tell if acct is a domain acct?
+					report.get_by_id("WPC063").add_supporting_data('service_domain_user', [s])
 			
 		#
 		# Examine registry key for service
@@ -265,6 +272,9 @@ def audit_services(report):
 				report.get_by_id("WPC028").add_supporting_data('service_exe_write_perms', [s, fa])
 
 			# TODO write_file on a dir containing an exe might allow a dll to be added
+		else:
+			if not s.get_exe_file():
+				report.get_by_id("WPC062").add_supporting_data('service_no_exe', [s])
 			
 		#
 		# Examine security descriptor for service
