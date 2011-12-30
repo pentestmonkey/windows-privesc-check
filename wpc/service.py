@@ -1,5 +1,4 @@
 import win32service
-import sys
 import win32con
 import win32security
 import os
@@ -41,15 +40,15 @@ class service:
     #
     # We try to get a different handle for each.  That way we only ask for what we need and should
     # get the maximum info about each service.
-        
+
     def get_sh_query_config(self):
-        if not self.sh_query_config:    
+        if not self.sh_query_config:
             try:
                 self.sh_query_config = win32service.OpenService(self.get_scm(), self.get_name(), win32service.SERVICE_QUERY_CONFIG)
-                
+
             except:
                 print "Service Perms: Unknown (Access Denied)"
-                
+
         return self.sh_query_config
 
     def get_sh_query_status(self):
@@ -59,7 +58,7 @@ class service:
             except:
                 pass
         return self.sh_query_status
-        
+
     def get_sh_read_control(self):
         if not self.sh_read_control:
             try:
@@ -67,7 +66,7 @@ class service:
             except:
                 pass
         return self.sh_read_control
-        
+
     def get_status(self):
         if not self.status:
             try:
@@ -80,10 +79,10 @@ class service:
             except:
                 pass
         return self.status
-        
+
     def get_scm(self):
         return self.scm
-        
+
     def get_sd(self):
         if not self.sd:
             # Need a handle with generic_read
@@ -94,10 +93,10 @@ class service:
                 print "ERROR: OpenService failed for '%s' (%s)" % (self.get_description(), self.get_name())
 
         return self.sd
-    
+
     def get_name(self):
         return self.name
-        
+
     def get_exe_file(self):
         if not self.exe_file:
             filename = self.get_exe_path_clean()
@@ -106,12 +105,12 @@ class service:
             else:
                 self.exe_file = None
         return self.exe_file
-                
+
     def get_exe_path_clean(self):
         if not self.exe_path_clean:
             self.exe_path_clean = None
             binary_dirty = self.get_exe_path()
-            
+
             # remove quotes and leading white space
             m = re.search('^[\s]*?"([^"]+)"', binary_dirty)
             if m and os.path.exists(m.group(1)):
@@ -120,7 +119,7 @@ class service:
             else:
                 if m:
                     binary_dirty = m.group(1)
-            
+
             # Paths for drivers are written in an odd way, so we regex them
             re1 = re.compile(r'^\\systemroot', re.IGNORECASE)
             binary_dirty = re1.sub(os.getenv('SystemRoot'), binary_dirty)
@@ -132,28 +131,28 @@ class service:
             if os.path.exists(binary_dirty):
                 self.exe_path_clean = binary_dirty
                 return self.exe_path_clean
-            
+
             chunks = binary_dirty.split(" ")
             candidate = ""
             for chunk in chunks:
                 if candidate:
                     candidate = candidate + " "
                 candidate = candidate + chunk
-                
+
                 if os.path.exists(candidate) and os.path.isfile(candidate):
                     self.exe_path_clean = candidate
                     break
-                    
+
                 if os.path.exists(candidate + ".exe") and os.path.isfile(candidate + ".exe"):
                     self.exe_path_clean = candidate + ".exe"
                     break
-                    
+
                 if wpc.conf.on64bitwindows:
                     candidate2 = candidate.replace("system32", "syswow64")
                     if os.path.exists(candidate2) and os.path.isfile(candidate2):
                         self.exe_path_clean = candidate2
                         break
-                        
+
                     if os.path.exists(candidate2 + ".exe") and os.path.isfile(candidate2 + ".exe"):
                         self.exe_path_clean = candidate2 + ".exe"
                         break
@@ -163,15 +162,15 @@ class service:
         if not self.exe_path:
             self.exe_path = self.get_service_info(3)
         return self.exe_path
-        
+
     def get_run_as(self):
         if not self.run_as:
             self.run_as = self.get_service_info(7)
         return self.run_as
-    
+
     def set_interactive(self, n):
         self.interactive = n
-        
+
     # service or driver?
     def get_type(self):
         if not self.type:
@@ -182,7 +181,7 @@ class service:
                     self.set_interactive(1)
                 else:
                     self.set_interactive(0)
-                    
+
                 if self.type == 1:
                     self.type = "KERNEL_DRIVER"
                 elif self.type == 2:
@@ -192,7 +191,7 @@ class service:
                 elif self.type == 16:
                     self.type = "WIN32_OWN_PROCESS"
         return self.type
-        
+
     def get_startup_type(self):
         if not self.startup_type:
             self.startup_type = self.get_service_info(1)
@@ -207,12 +206,12 @@ class service:
             elif self.startup_type == 1:
                 self.startup_type = "SYSTEM_START"
         return self.startup_type
-        
+
     def get_description(self):
         if not self.description:
             self.description = self.get_service_info(8)
         return self.description
-        
+
     def get_service_info(self, n):
         if not self.service_info:
             try:
@@ -224,7 +223,7 @@ class service:
             return self.service_info[n]
         else:
             return "[unknown]"
-            
+
     def get_service_config_failure_actions(self):
         if not self.service_config_failure_actions:
             try:
@@ -234,7 +233,7 @@ class service:
             if not self.service_config_failure_actions:
                 self.service_config_failure_actions = ""
         return self.service_config_failure_actions
-    
+
     def get_service_sid_type(self):
         if not self.service_sid_type:
             try:
@@ -248,7 +247,7 @@ class service:
             except:
                 pass
         return self.service_sid_type
-    
+
     def get_long_description(self):
         if not self.long_description:
             try:
@@ -258,58 +257,58 @@ class service:
             if not self.long_description:
                 self.long_description = ""
         return self.long_description
-    
+
     def as_text(self):
         return self._as_text(0)
-        
+
     def untrusted_as_text(self):
         return self._as_text(1)
-        
+
     def _as_text(self, flag):
         t = ""
         t += "---------------------------------------\n"
-        t +=  "Service:        " + self.get_name() + "\n"
-        t +=  "Description:    " + self.get_description() + "\n"
-        t +=  "Type:           " + str(self.get_type()) + "\n"
-        t +=  "Status:         " + str(self.get_status()) + "\n"
-        t +=  "Startup:        " + str(self.get_startup_type()) + "\n"
-        t +=  "Long Desc:      " + self.removeNonAscii(self.get_long_description())  + "\n" # in case of stupid chars in desc
-        t +=  "Binary:         " + self.get_exe_path() + "\n"
+        t += "Service:        " + self.get_name() + "\n"
+        t += "Description:    " + self.get_description() + "\n"
+        t += "Type:           " + str(self.get_type()) + "\n"
+        t += "Status:         " + str(self.get_status()) + "\n"
+        t += "Startup:        " + str(self.get_startup_type()) + "\n"
+        t += "Long Desc:      " + self.removeNonAscii(self.get_long_description()) + "\n" # in case of stupid chars in desc
+        t += "Binary:         " + self.get_exe_path() + "\n"
         if self.get_exe_path_clean():
-            t +=  "Binary (clean): " + self.get_exe_path_clean() + "\n"
+            t += "Binary (clean): " + self.get_exe_path_clean() + "\n"
         else:
-            t +=  "Binary (clean): [Missing Binary]\n"
-        t +=  "Run as:         " + self.get_run_as() + "\n"
-        t +=  "Svc Sid Type:   " + str(self.get_service_sid_type()) + "\n"
-        t +=  "Failure Actions:%s\n" % self.get_service_config_failure_actions()
-        t +=  "\n"
-        t +=  "Service Security Descriptor:\n"
+            t += "Binary (clean): [Missing Binary]\n"
+        t += "Run as:         " + self.get_run_as() + "\n"
+        t += "Svc Sid Type:   " + str(self.get_service_sid_type()) + "\n"
+        t += "Failure Actions:%s\n" % self.get_service_config_failure_actions()
+        t += "\n"
+        t += "Service Security Descriptor:\n"
         if self.get_sd():
             if flag:
                 t += self.get_sd().untrusted_as_text() + "\n"
             else:
                 t += self.get_sd().as_text() + "\n"
         else:
-            t +=  "[unknown]\n"
-        t +=  "\n"
-        t +=  "Security Descriptor for Executable:" + "\n"
+            t += "[unknown]\n"
+        t += "\n"
+        t += "Security Descriptor for Executable:" + "\n"
         if self.get_exe_file():
             if flag:
-                t +=  self.get_exe_file().get_sd().untrusted_as_text() + "\n"
+                t += self.get_exe_file().get_sd().untrusted_as_text() + "\n"
             else:
-                t +=  self.get_exe_file().get_sd().as_text() + "\n"
+                t += self.get_exe_file().get_sd().as_text() + "\n"
         else:
-            t +=  "[unknown]\n"
-        
-        t +=  "Security Descriptor for Registry Key:" + "\n"
+            t += "[unknown]\n"
+
+        t += "Security Descriptor for Registry Key:" + "\n"
         if self.get_reg_key():
             if flag:
                 t += self.get_reg_key().get_sd().untrusted_as_text()
             else:
                 t += self.get_reg_key().as_text()
         else:
-            t +=  "[unknown]\n"
-            
+            t += "[unknown]\n"
+
         t += "\n"
         return t
         return t
@@ -318,6 +317,6 @@ class service:
         if not self.reg_key:
             self.reg_key = regkey("HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\" + self.get_name())
         return self.reg_key
-        
-    def removeNonAscii(self,s): 
-        return "".join(i for i in s if ord(i)<128)
+
+    def removeNonAscii(self, s):
+        return "".join(i for i in s if ord(i) < 128)

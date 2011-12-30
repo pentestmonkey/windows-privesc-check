@@ -2,11 +2,9 @@ import win32process
 import win32con
 import win32api
 import win32security
-import ntsecuritycon
 import wpc.utils
 from wpc.token import token
 from wpc.file import file as File
-from wpc.principal import principal
 from wpc.sd import sd
 
 class process:
@@ -25,28 +23,28 @@ class process:
         self.wts_sid = None
         self.token = None
         self.sd = None
-        
+
     def get_pid(self):
         return self.pid
-    
+
     def set_wts_name(self, wts_name):
         self.wts_name = wts_name
-        
+
     def get_wts_session_id(self):
         return self.wts_session_id
-        
+
     def set_wts_session_id(self, wts_session_id):
         self.wts_session_id = wts_session_id
-        
+
     def get_wts_sid(self):
         return self.wts_sid
-        
+
     def set_wts_sid(self, wts_sid):
         self.wts_sid = wts_sid
-        
+
     def get_wts_name(self):
         return self.wts_name
-    
+
     def get_sd(self):
         if not self.sd:
             try:
@@ -55,7 +53,7 @@ class process:
             except:
                 pass
         return self.sd
-    
+
     def get_mhs(self):
         if not self.mhs:
             if self.get_ph():
@@ -65,7 +63,7 @@ class process:
                 except:
                     pass
         return self.mhs
-        
+
     def get_dlls(self):
         if self.dlls == []:
             if self.get_mhs():
@@ -75,14 +73,14 @@ class process:
                     self.dlls.append(File(dll))
                     #dump_perms(dll, 'file', {'brief': 1})
         return self.dlls
-        
+
     def get_exe_path_clean(self):
         if not self.exe_path_clean:
             self.exe_path_clean = wpc.utils.get_exe_path_clean(self.get_exe_path_dirty())
             if not self.exe_path_clean:
                 self.exe_path_clean = self.get_exe_path_dirty()
         return self.exe_path_clean
-        
+
     def get_exe_path_dirty(self):
         if not self.exe_path_dirty:
             if self.get_mhs():
@@ -94,7 +92,7 @@ class process:
             if self.get_exe_path_dirty():
                 self.exe = File(self.get_exe_path_clean())
         return self.exe
-        
+
     def get_ph(self):
         if not self.ph:
             try:
@@ -110,7 +108,7 @@ class process:
                     #print "OpenProcess with VM_READ and PROCESS_QUERY_INFORMATION: Failed"
                     try:
                         # We can still get some info without PROCESS_VM_READ
-                        self.ph = win32api.OpenProcess(win32con.PROCESS_QUERY_INFORMATION , False,self.get_pid())
+                        self.ph = win32api.OpenProcess(win32con.PROCESS_QUERY_INFORMATION , False, self.get_pid())
                         #print "OpenProcess with PROCESS_QUERY_INFORMATION: Success"
                     except:
                         #print "OpenProcess with PROCESS_QUERY_INFORMATION: Failed"
@@ -123,7 +121,7 @@ class process:
                             #print "OpenProcess with PROCESS_QUERY_LIMITED_INFORMATION: Failed"
                             self.ph = None
         return self.ph
-    
+
     def get_pth(self):
         if not self.pth:
             try:
@@ -138,7 +136,7 @@ class process:
                     except:
                         pass
         return self.pth
-        
+
     def is_wow64(self):
         if not self.wow64 and self.get_ph():
             self.wow64 = win32process.IsWow64Process(self.get_ph())
@@ -149,7 +147,7 @@ class process:
             if self.get_pth():
                 self.token = token(self.get_pth())
         return self.token
-        
+
     def as_text(self):
         t = ''
         t += "-------------------------------------------------\n"
@@ -181,4 +179,4 @@ class process:
             t += "[unknown]"
         return t
 
-        
+

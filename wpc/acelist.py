@@ -1,9 +1,4 @@
-import win32security
 import ntsecuritycon
-import _winreg
-import win32service
-import win32con
-from wpc.principal import principal
 from wpc.ace import ace
 
 # just a list of ACEs.  No owner, group, dacl, sd
@@ -20,17 +15,17 @@ class acelist:
         # Ignore ACE if it doesn't apply to this object (i.e. it is instead just inherited by children)
         if not ace.get_flags() & ntsecuritycon.INHERIT_ONLY_ACE:
             self.aces.append(ace)
-        
+
     def get_aces(self):
         return self.aces
-        
+
     def get_aces_for(self, principal):
         a = acelist()
         for ace in self.get_aces():
             if principal.get_sid() == ace.get_sid():
                 a.add(ace)
         return a
-    
+
     def get_untrusted(self):
         if not self.untrusted_acelist:
             self.untrusted_acelist = acelist()
@@ -60,7 +55,7 @@ class acelist:
                 newace.set_perms(found_perms)
                 a.add(newace)
         return a
-        
+
     def get_aces_except_for(self, principals):
         a = acelist
         for ace in self.get_aces():
@@ -68,12 +63,12 @@ class acelist:
             for p in principals:
                 #print "comparing %s with %s" % (p.get_sid(), ace.get_sid())
                 if p.get_sid() == ace.get_sid():
-                    trusted=1
+                    trusted = 1
                     break
             if not trusted:
                 a.add(ace)
         return a
-    
+
     def as_text(self):
         for ace in self.get_aces():
             print ace.as_text()

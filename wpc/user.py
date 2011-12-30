@@ -1,9 +1,4 @@
 import win32security
-import ntsecuritycon
-import _winreg
-import win32service
-import win32con
-import win32net
 import wpc.conf
 from wpc.principal import principal
 #from wpc.group import group as group
@@ -28,9 +23,9 @@ class user(principal):
             g1.append(g[0])
         for group in g1:
             gsid, s, i = win32security.LookupAccountName(wpc.conf.remote_server, group)
-            principals.append(Group(gsid))    
+            principals.append(Group(gsid))
         return principals
-        
+
     def get_info(self, key):
         if not self.info:
             try:
@@ -39,4 +34,3 @@ class user(principal):
             except:
                 pass
         return None
-            

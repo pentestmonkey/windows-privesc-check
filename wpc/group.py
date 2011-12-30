@@ -1,10 +1,3 @@
-import win32security
-import ntsecuritycon
-import _winreg
-import win32service
-import win32con
-import win32net
-import win32netcon
 from wpc.principal import principal
 from wpc.user import user
 import wpc.conf
@@ -13,7 +6,7 @@ class group(principal):
     def get_members(self):
         #print "get_members called for %s" % self.get_fq_name()
         return self.get_members_except([self])
-    
+
     def get_members_except(self, ignore_principals):
         #for i in ignore_principals:
         #    print "Ignoring: " + i.get_fq_name()
@@ -37,7 +30,7 @@ class group(principal):
                 p = group(member['sid'])
             else:
                 p = user(member['sid'])
-                
+
             #for i in ignore_principals:
             #    print "checking if %s is %s" % (p.get_sid(), i.get_sid())
             if not p.get_sid() in map(lambda x: x.get_sid(), ignore_principals):
@@ -49,7 +42,7 @@ class group(principal):
             keepgoing = 0
 
         # TODO: should be able to list members of group "None"
-                
+
         # TODO: make this an option
         # TODO: If we also want to list members of subgroups recursively...
         ignore_principals.extend(principals)
@@ -60,8 +53,7 @@ class group(principal):
 #                principals.append(g)
                 for new_principals in g.get_members_except(ignore_principals):
                     principals.append(new_principals)
-                
+
         return principals
-        
-        
-        
+
+
