@@ -1298,11 +1298,11 @@ Further information about CLSIDs is available here: http://msdn.microsoft.com/en
     },				
 
 	'WPC062': {
-       'title': "Windows Service Executable Is Missing (TODO)",
+       'title': "Windows Service Executable Is Missing",
        'description': '''Each Windows Service has a corresponding executable.  The executables for some services were missing at the time of the audit.  This can sometimes be caused programs being manually deleted instead of being properly uninstalled.  Although this configuration is unusual and probably undesirable, it is unlikely to be a security issue unless an attacker can recreate the executables in question - an issue that was NOT checked for (please check manually).  It may be an indication that an attacker has previously abused a Windows service and left it in a half-configured state, so investigating the cause of the problem is advised.''',
-	   'recommendation': '''TODO''',
+	   'recommendation': '''Investigate why the service is broken and either fix or remove the service as appropriate.''',
        'supporting_data': {
-          'regkey_ref_file': {
+          'service_no_exe': {
              'section': "description",
              'preamble': "The following Windows Services has missing executables:",
           },
@@ -1310,7 +1310,7 @@ Further information about CLSIDs is available here: http://msdn.microsoft.com/en
     },				
 
 	'WPC063': {
-       'title': "Windows Service Running Under Domain Account (TODO)",
+       'title': "Windows Service Running Under Domain Account",
        'description': '''The configuration for each Windows Service specifies the user context under which the service runs.  Often services run as Built-in security pricipals such as LocalSystem, Network Service, Local Service, etc. or as a dedicated local user account.  In the case of the system audited, some of the Windows Services were found to run in the context of a Domain account.  It would therefore be possible for any attacker who gained local admin rights on the system to recover the cleartext password for the Domain accounts in question.  Depending on the priviliges of those accounts, it may be possible for an attacker to abuse the accounts to compromise further systems on the network.''',
        'recommendation': '''Ensure that Domain accounts are only used when absolutely necessary.  When they are used, ensure that the group memberships of the account are restricted to only those required - avoiding membership of Domain Admins.  Where possible also ensure that service accounts are only able to logon from a whitelist of named workstations.  These recommendations help to limit the potential abuse of domain accounts.''',
        'supporting_data': {
@@ -1322,11 +1322,11 @@ Further information about CLSIDs is available here: http://msdn.microsoft.com/en
     },				
 
 	'WPC064': {
-       'title': "Windows Service Running Under Named Local Account (TODO)",
+       'title': "Windows Service Running Under Named Local Account",
        'description': '''The configuration for each Windows Service specifies the user context under which the service runs.  Often services run as Built-in security pricipals such as LocalSystem, Network Service, Local Service, etc.  In the case of the system audited, some of the Windows Services were found to run in the context of a local account that wasn't a Built-in security principal.  This can be a secure configuration and indeed is recommended configuration for some services such as SQL Server.  However, if administrators have similar services running on other systems, they sometimes configure the Windows Service account to have the same password on each.  It would therefore be possible for any attacker who gained local admin rights on the system to recover the cleartext password for the local Windows Service accounts in question.  It passwords are reused, it may be possible for an attacker to abuse the accounts to compromise further systems on the network.''',
 	   'recommendation': '''Ensure that the group memberships of the account are restricted to only those required - avoiding membership of the Administrators group.  Where possible also ensure that service accounts are not able to log on interactively, as batch jobs or log in over the network.  These recommendations help to limit the potential abuse of windows service accounts.''',
        'supporting_data': {
-          'regkey_ref_file': {
+          'service_domain_user': {
              'section': "description",
              'preamble': "The following windows services run in the context of local accounts:",
           },
