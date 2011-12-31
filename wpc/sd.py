@@ -1,7 +1,7 @@
-import win32security
-from wpc.principal import principal
 from wpc.ace import ace
 from wpc.acelist import acelist
+from wpc.principal import principal
+import win32security
 import wpc.conf
 
 

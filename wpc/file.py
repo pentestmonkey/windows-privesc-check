@@ -1,8 +1,8 @@
+from wpc.report.fileAcl import fileAcl
+from wpc.sd import sd
+import os
 import win32security
 import wpc.conf
-import os
-from wpc.sd import sd
-from wpc.report.fileAcl import fileAcl
 
 
 # files or directories

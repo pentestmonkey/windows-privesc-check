@@ -1,6 +1,6 @@
+from wpc.service import service
 import win32service
 import wpc.conf
-from wpc.service import service
 
 
 class services:

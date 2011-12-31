@@ -1,6 +1,6 @@
-import win32security
-import ntsecuritycon
 from wpc.ace import ace
+import ntsecuritycon
+import win32security
 
 
 # just a list of ACEs.  No owner, group, dacl, sd

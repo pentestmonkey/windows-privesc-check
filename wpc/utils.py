@@ -1,20 +1,20 @@
 # Not a class
 # Just a collection of useful subs
+from wpc.cache import cache
+from wpc.file import file as File
+from wpc.group import group as Group
+from wpc.principal import principal
+from wpc.regkey import regkey
+from wpc.user import user
+import ctypes
+import ntsecuritycon
 import os
 import re
-import ctypes
+import win32api
+import win32con
 import win32net
 import win32security
 import wpc.conf
-import win32api
-import win32con
-import ntsecuritycon
-from wpc.principal import principal
-from wpc.user import user
-from wpc.group import group as Group
-from wpc.cache import cache
-from wpc.regkey import regkey
-from wpc.file import file as File
 k32 = ctypes.windll.kernel32
 wow64 = ctypes.c_long(0)
 on64bitwindows = 1

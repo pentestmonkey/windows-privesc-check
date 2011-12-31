@@ -1,11 +1,11 @@
-import win32service
-import win32con
-import win32security
-import os
-import re
 from wpc.file import file as File
 from wpc.regkey import regkey
 from wpc.sd import sd
+import os
+import re
+import win32con
+import win32security
+import win32service
 import wpc.conf
 
 

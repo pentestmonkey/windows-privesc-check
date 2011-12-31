@@ -1,11 +1,11 @@
-import win32process
-import win32con
-import win32api
-import win32security
-import wpc.utils
-from wpc.token import token
 from wpc.file import file as File
 from wpc.sd import sd
+from wpc.token import token
+import win32api
+import win32con
+import win32process
+import win32security
+import wpc.utils
 
 
 class process:
@@ -116,6 +116,7 @@ class process:
                         try:
                             # If we have to resort to using PROCESS_QUERY_LIMITED_INFORMATION, the process is protected.
                             # There's no point trying PROCESS_VM_READ
+                            # Ignore pydev warning.  We define this at runtime because win32con is out of date.
                             self.ph = win32api.OpenProcess(win32con.PROCESS_QUERY_LIMITED_INFORMATION, False, self.get_pid())
                             #print "OpenProcess with PROCESS_QUERY_LIMITED_INFORMATION: Success"
                         except:

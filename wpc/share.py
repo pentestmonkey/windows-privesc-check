@@ -1,6 +1,6 @@
-import win32net
-from wpc.sd import sd
 from wpc.file import file as File
+from wpc.sd import sd
+import win32net
 import wpc.conf
 
 

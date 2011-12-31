@@ -1,9 +1,9 @@
-import win32security
+from wpc.report.issueAcl import issueAcl
+from wpc.sd import sd
 import ntsecuritycon
 import win32api
 import win32con
-from wpc.sd import sd
-from wpc.report.issueAcl import issueAcl
+import win32security
 import wpc.conf
 
 

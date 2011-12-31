@@ -1,5 +1,5 @@
-from wpc.process import process
 from wpc.principal import principal
+from wpc.process import process
 import win32process
 import win32ts
 import wpc.conf
