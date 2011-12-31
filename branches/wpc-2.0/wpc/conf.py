@@ -6,8 +6,9 @@ import win32service
 import win32con
 
 remote_server = None
-
 executable_file_extensions = ('exe', 'com', 'bat', 'dll', 'pl', 'rb', 'py', 'php', 'inc', 'asp', 'aspx', 'ocx', 'vbs')
+version = None
+cache = None
 
 kb_nos = {
         '977165': 'MS10_015 Vulnerabilities in Windows Kernel Could Allow Elevation of Privilege (kitrap0d - meterpreter "getsystem")',
@@ -31,36 +32,36 @@ kb_nos = {
 }
 
 reg_paths = (
-	'HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services',
-#	'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run',
-	'HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Run',
-	'HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\RunOnce',
-	'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run',
-	'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\Shell',
-	'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\Userinit',
-	'HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunOnce',
-#	'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\RunOnce',
-	'HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunServices',
-	'HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunServicesOnce',
-#	'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\RunServices',
-#	'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\RunServicesOnce',
-#	'HKEY_CURRENT_USER\Software\Microsoft\Windows NT\CurrentVersion\Windows',
+    'HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services',
+#    'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run',
+    'HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Run',
+    'HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\RunOnce',
+    'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run',
+    'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\Shell',
+    'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\Userinit',
+    'HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunOnce',
+#    'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\RunOnce',
+    'HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunServices',
+    'HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunServicesOnce',
+#    'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\RunServices',
+#    'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\RunServicesOnce',
+#    'HKEY_CURRENT_USER\Software\Microsoft\Windows NT\CurrentVersion\Windows',
 )
 
 # We don't care if some users / groups hold dangerous permission because they're trusted
 # These have fully qualified names:
 trusted_principals_fq = [
-	"BUILTIN\\Administrators",
-	"NT SERVICE\\TrustedInstaller",
-	"NT AUTHORITY\\SYSTEM"
+    "BUILTIN\\Administrators",
+    "NT SERVICE\\TrustedInstaller",
+    "NT AUTHORITY\\SYSTEM"
 ]
 
 # We don't care if members of these groups hold dangerous permission because they're trusted
 # These have names without a domain:
 #trusted_principals = (
-	#"Administrators",
-	#"Domain Admins",
-	#"Enterprise Admins",
+    #"Administrators",
+    #"Domain Admins",
+    #"Enterprise Admins",
 #)
 trusted_principals = []
 
@@ -116,12 +117,12 @@ windows_privileges = (
 )
 
 share_types = (
-	"STYPE_IPC",
-	"STYPE_DISKTREE",
-	"STYPE_PRINTQ",
-	"STYPE_DEVICE",
+    "STYPE_IPC",
+    "STYPE_DISKTREE",
+    "STYPE_PRINTQ",
+    "STYPE_DEVICE",
 )
-	
+    
 sv_types = (
         "SV_TYPE_WORKSTATION",
         "SV_TYPE_SERVER",
@@ -148,8 +149,8 @@ sv_types = (
         "SV_TYPE_WINDOWS",
         "SV_TYPE_DFS",
         "SV_TYPE_CLUSTER_NT",
-        "SV_TYPE_TERMINALSERVER", # missing from win32netcon.py
-        #"SV_TYPE_CLUSTER_VS_NT", # missing from win32netcon.py
+        "SV_TYPE_TERMINALSERVER",  # missing from win32netcon.py
+        #"SV_TYPE_CLUSTER_VS_NT",  # missing from win32netcon.py
         "SV_TYPE_DCE",
         "SV_TYPE_ALTERNATE_XPORT",
         "SV_TYPE_LOCAL_LIST_ONLY",
@@ -159,399 +160,399 @@ sv_types = (
 win32netcon.SV_TYPE_TERMINALSERVER = 0x2000000 
 
 sid_is_group_type = {
-	ntsecuritycon.SidTypeUser: 0,
-	ntsecuritycon.SidTypeGroup: 1,
-	ntsecuritycon.SidTypeDomain: 0,
-	ntsecuritycon.SidTypeAlias: 1,
-	ntsecuritycon.SidTypeWellKnownGroup: 1,
-	ntsecuritycon.SidTypeDeletedAccount: 0,
-	ntsecuritycon.SidTypeInvalid: 0,
-	ntsecuritycon.SidTypeUnknown: 0,
-	ntsecuritycon.SidTypeComputer: 0,
-	ntsecuritycon.SidTypeLabel: 0
+    ntsecuritycon.SidTypeUser: 0,
+    ntsecuritycon.SidTypeGroup: 1,
+    ntsecuritycon.SidTypeDomain: 0,
+    ntsecuritycon.SidTypeAlias: 1,
+    ntsecuritycon.SidTypeWellKnownGroup: 1,
+    ntsecuritycon.SidTypeDeletedAccount: 0,
+    ntsecuritycon.SidTypeInvalid: 0,
+    ntsecuritycon.SidTypeUnknown: 0,
+    ntsecuritycon.SidTypeComputer: 0,
+    ntsecuritycon.SidTypeLabel: 0
 }
 
 sid_type = {
-	ntsecuritycon.SidTypeUser: "user",
-	ntsecuritycon.SidTypeGroup: "group",
-	ntsecuritycon.SidTypeDomain: "domain",
-	ntsecuritycon.SidTypeAlias: "alias",
-	ntsecuritycon.SidTypeWellKnownGroup: "wellknowngroup",
-	ntsecuritycon.SidTypeDeletedAccount: "deletedaccount",
-	ntsecuritycon.SidTypeInvalid: "invalid",
-	ntsecuritycon.SidTypeUnknown: "unknown",
-	ntsecuritycon.SidTypeComputer: "computer",
-	ntsecuritycon.SidTypeLabel: "label"
+    ntsecuritycon.SidTypeUser: "user",
+    ntsecuritycon.SidTypeGroup: "group",
+    ntsecuritycon.SidTypeDomain: "domain",
+    ntsecuritycon.SidTypeAlias: "alias",
+    ntsecuritycon.SidTypeWellKnownGroup: "wellknowngroup",
+    ntsecuritycon.SidTypeDeletedAccount: "deletedaccount",
+    ntsecuritycon.SidTypeInvalid: "invalid",
+    ntsecuritycon.SidTypeUnknown: "unknown",
+    ntsecuritycon.SidTypeComputer: "computer",
+    ntsecuritycon.SidTypeLabel: "label"
 }
 
 dangerous_perms_write = {
-	# http://www.tek-tips.com/faqs.cfm?fid
-	'share': {
-		ntsecuritycon: (
-			"FILE_READ_DATA", #
-			"FILE_WRITE_DATA",
-			"FILE_APPEND_DATA",
-			"FILE_READ_EA", #
-			"FILE_WRITE_EA",
-			"FILE_EXECUTE", #
-			"FILE_READ_ATTRIBUTES", #
-			"FILE_WRITE_ATTRIBUTES",
-			"DELETE",
-			"READ_CONTROL", #
-			"WRITE_DAC",
-			"WRITE_OWNER",
-			"SYNCHRONIZE", #
-		)
-	},
-	'file': {
-		ntsecuritycon: (
-			#"FILE_READ_DATA",
-			"FILE_WRITE_DATA",
-			"FILE_APPEND_DATA", # probably not dangerous for .exe files, but could be dangerous for .bat (or other script) files
-			#"FILE_READ_EA",
-			#"FILE_WRITE_EA",
-			#"FILE_EXECUTE",
-			#"FILE_READ_ATTRIBUTES",
-			#"FILE_WRITE_ATTRIBUTES",
-			"DELETE",
-			#"READ_CONTROL",
-			"WRITE_DAC",
-			"WRITE_OWNER",
-			#"SYNCHRONIZE",
-		)
-	},
-	# http://msdn.microsoft.com/en-us/library/ms724878(VS.85).aspx
-	# KEY_ALL_ACCESS: STANDARD_RIGHTS_REQUIRED KEY_QUERY_VALUE KEY_SET_VALUE KEY_CREATE_SUB_KEY KEY_ENUMERATE_SUB_KEYS KEY_NOTIFY KEY_CREATE_LINK
-	# KEY_CREATE_LINK (0x0020) Reserved for system use.
-	# KEY_CREATE_SUB_KEY (0x0004)	Required to create a subkey of a registry key.
-	# KEY_ENUMERATE_SUB_KEYS (0x0008)	Required to enumerate the subkeys of a registry key.
-	# KEY_EXECUTE (0x20019)	Equivalent to KEY_READ.
-	# KEY_NOTIFY (0x0010)	Required to request change notifications for a registry key or for subkeys of a registry key.
-	# KEY_QUERY_VALUE (0x0001)	Required to query the values of a registry key.
-	# KEY_READ (0x20019)	Combines the STANDARD_RIGHTS_READ, KEY_QUERY_VALUE, KEY_ENUMERATE_SUB_KEYS, and KEY_NOTIFY values.
-	# KEY_SET_VALUE (0x0002)	Required to create, delete, or set a registry value.
-	# KEY_WOW64_32KEY (0x0200)	Indicates that an application on 64-bit Windows should operate on the 32-bit registry view. For more information, see Accessing an Alternate Registry View.	This flag must be combined using the OR operator with the other flags in this table that either query or access registry values.
-	# Windows 2000:  This flag is not supported.
-	# KEY_WOW64_64KEY (0x0100)	Indicates that an application on 64-bit Windows should operate on the 64-bit registry view. For more information, see Accessing an Alternate Registry View.
-	# This flag must be combined using the OR operator with the other flags in this table that either query or access registry values.
-	# Windows 2000:  This flag is not supported.
-	# KEY_WRITE (0x20006)	Combines the STANDARD_RIGHTS_WRITE, KEY_SET_VALUE, and KEY_CREATE_SUB_KEY access rights.
-	# "STANDARD_RIGHTS_REQUIRED",
-	# "STANDARD_RIGHTS_WRITE",
-	# "STANDARD_RIGHTS_READ",
-	# "DELETE",
-	# "READ_CONTROL",
-	# "WRITE_DAC",
-	#"WRITE_OWNER",
-	'regkey': {		
-		_winreg: (
-			#"KEY_ALL_ACCESS", # Combines the STANDARD_RIGHTS_REQUIRED, KEY_QUERY_VALUE, KEY_SET_VALUE, KEY_CREATE_SUB_KEY, KEY_ENUMERATE_SUB_KEYS, KEY_NOTIFY, and KEY_CREATE_LINK access rights.
-			#"KEY_QUERY_VALUE", # GUI "Query Value"
-			"KEY_SET_VALUE", # GUI "Set Value".  Required to create, delete, or set a registry value.
-			"KEY_CREATE_LINK", # GUI "Create Link".  Reserved for system use.
-			"KEY_CREATE_SUB_KEY", # GUI "Create subkey"
-			# "KEY_ENUMERATE_SUB_KEYS", # GUI "Create subkeys"
-			# "KEY_NOTIFY", # GUI "Notify"
-			#"KEY_EXECUTE", # same as KEY_READ
-			#"KEY_READ",
-			#"KEY_WOW64_32KEY",
-			#"KEY_WOW64_64KEY",
-			# "KEY_WRITE", # Combines the STANDARD_RIGHTS_WRITE, KEY_SET_VALUE, and KEY_CREATE_SUB_KEY access rights.
-		),
-		ntsecuritycon: (
-			"DELETE", # GUI "Delete"
-			# "READ_CONTROL", # GUI "Read Control" - read security descriptor
-			"WRITE_DAC", # GUI "Write DAC"
-			"WRITE_OWNER", # GUI "Write Owner"
-			#"STANDARD_RIGHTS_REQUIRED",
-			#"STANDARD_RIGHTS_WRITE",
-			#"STANDARD_RIGHTS_READ",
-		)
-	},
-	'directory': {
-		ntsecuritycon: (
-			#"FILE_LIST_DIRECTORY",
-			"FILE_ADD_FILE",
-			"FILE_ADD_SUBDIRECTORY",
-			#"FILE_READ_EA",
-			"FILE_WRITE_EA",
-			#"FILE_TRAVERSE",
-			"FILE_DELETE_CHILD",
-			#"FILE_READ_ATTRIBUTES",
-			"FILE_WRITE_ATTRIBUTES",
-			"DELETE",
-			#"READ_CONTROL",
-			"WRITE_DAC",
-			"WRITE_OWNER",
-			#"SYNCHRONIZE",
-		)
-	},
-	'service_manager': {
-		# For service manager
-		# http://msdn.microsoft.com/en-us/library/ms685981(VS.85).aspx
-		# SC_MANAGER_ALL_ACCESS (0xF003F)	Includes STANDARD_RIGHTS_REQUIRED, in addition to all access rights in this table.
-		# SC_MANAGER_CREATE_SERVICE (0x0002)	Required to call the CreateService function to create a service object and add it to the database.
-		# SC_MANAGER_CONNECT (0x0001)	Required to connect to the service control manager.
-		# SC_MANAGER_ENUMERATE_SERVICE (0x0004)	Required to call the EnumServicesStatusEx function to list the services that are in the database.
-		# SC_MANAGER_LOCK (0x0008)	Required to call the LockServiceDatabase function to acquire a lock on the database.
-		# SC_MANAGER_MODIFY_BOOT_CONFIG (0x0020)	Required to call the NotifyBootConfigStatus function.
-		# SC_MANAGER_QUERY_LOCK_STATUS (0x0010)Required to call the  QueryServiceLockStatus function to retrieve the lock status information for the database.
-		win32service: (
-			"SC_MANAGER_ALL_ACCESS",
-			"SC_MANAGER_CREATE_SERVICE",
-			"SC_MANAGER_CONNECT",
-			"SC_MANAGER_ENUMERATE_SERVICE",
-			"SC_MANAGER_LOCK",
-			"SC_MANAGER_MODIFY_BOOT_CONFIG",
-			"SC_MANAGER_QUERY_LOCK_STATUS",
-		)
-	},
-	'service': {
-		# For services:
-		# http://msdn.microsoft.com/en-us/library/ms685981(VS.85).aspx
-		# SERVICE_ALL_ACCESS (0xF01FF)	Includes STANDARD_RIGHTS_REQUIRED in addition to all access rights in this table.
-		# SERVICE_CHANGE_CONFIG (0x0002)	Required to call the ChangeServiceConfig or ChangeServiceConfig2 function to change the service configuration. Because 	this grants the caller the right to change the executable file that the system runs, it should be granted only to administrators.
-		# SERVICE_ENUMERATE_DEPENDENTS (0x0008)	Required to call the EnumDependentServices function to enumerate all the services dependent on the service.
-		# SERVICE_INTERROGATE (0x0080)	Required to call the ControlService function to ask the service to report its status immediately.
-		# SERVICE_PAUSE_CONTINUE (0x0040)	Required to call the ControlService function to pause or continue the service.
-		# SERVICE_QUERY_CONFIG (0x0001)	Required to call the QueryServiceConfig and QueryServiceConfig2 functions to query the service configuration.
-		# SERVICE_QUERY_STATUS (0x0004)	Required to call the QueryServiceStatusEx function to ask the service control manager about the status of the service.
-		# SERVICE_START (0x0010)	Required to call the StartService function to start the service.
-		# SERVICE_STOP (0x0020)	Required to call the ControlService function to stop the service.
-		# SERVICE_USER_DEFINED_CONTROL(0x0100)	Required to call the ControlService function to specify a user-defined control code.
-		win32service: (
-			# "SERVICE_INTERROGATE",
-			# "SERVICE_QUERY_STATUS",
-			# "SERVICE_ENUMERATE_DEPENDENTS",
-			"SERVICE_ALL_ACCESS",
-			"SERVICE_CHANGE_CONFIG",
-			"SERVICE_PAUSE_CONTINUE",
-			# "SERVICE_QUERY_CONFIG",
-			"SERVICE_START",
-			"SERVICE_STOP",
-			# "SERVICE_USER_DEFINED_CONTROL", # TODO this is granted most of the time.  Double check that's not a bad thing.
-		),
-		ntsecuritycon: (
-			"DELETE",
-			"WRITE_DAC",
-			"WRITE_OWNER"
-		)
-#		win32con: (
-#			"READ_CONTROL"
-#		)
-	},
+    # http://www.tek-tips.com/faqs.cfm?fid
+    'share': {
+        ntsecuritycon: (
+            "FILE_READ_DATA", 
+            "FILE_WRITE_DATA",
+            "FILE_APPEND_DATA",
+            "FILE_READ_EA", 
+            "FILE_WRITE_EA",
+            "FILE_EXECUTE", 
+            "FILE_READ_ATTRIBUTES", 
+            "FILE_WRITE_ATTRIBUTES",
+            "DELETE",
+            "READ_CONTROL", 
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            "SYNCHRONIZE", 
+        )
+    },
+    'file': {
+        ntsecuritycon: (
+            #"FILE_READ_DATA",
+            "FILE_WRITE_DATA",
+            "FILE_APPEND_DATA",  # probably not dangerous for .exe files, but could be dangerous for .bat (or other script) files
+            #"FILE_READ_EA",
+            #"FILE_WRITE_EA",
+            #"FILE_EXECUTE",
+            #"FILE_READ_ATTRIBUTES",
+            #"FILE_WRITE_ATTRIBUTES",
+            "DELETE",
+            #"READ_CONTROL",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            #"SYNCHRONIZE",
+        )
+    },
+    # http://msdn.microsoft.com/en-us/library/ms724878(VS.85).aspx
+    # KEY_ALL_ACCESS: STANDARD_RIGHTS_REQUIRED KEY_QUERY_VALUE KEY_SET_VALUE KEY_CREATE_SUB_KEY KEY_ENUMERATE_SUB_KEYS KEY_NOTIFY KEY_CREATE_LINK
+    # KEY_CREATE_LINK (0x0020) Reserved for system use.
+    # KEY_CREATE_SUB_KEY (0x0004)    Required to create a subkey of a registry key.
+    # KEY_ENUMERATE_SUB_KEYS (0x0008)    Required to enumerate the subkeys of a registry key.
+    # KEY_EXECUTE (0x20019)    Equivalent to KEY_READ.
+    # KEY_NOTIFY (0x0010)    Required to request change notifications for a registry key or for subkeys of a registry key.
+    # KEY_QUERY_VALUE (0x0001)    Required to query the values of a registry key.
+    # KEY_READ (0x20019)    Combines the STANDARD_RIGHTS_READ, KEY_QUERY_VALUE, KEY_ENUMERATE_SUB_KEYS, and KEY_NOTIFY values.
+    # KEY_SET_VALUE (0x0002)    Required to create, delete, or set a registry value.
+    # KEY_WOW64_32KEY (0x0200)    Indicates that an application on 64-bit Windows should operate on the 32-bit registry view. For more information, see Accessing an Alternate Registry View.    This flag must be combined using the OR operator with the other flags in this table that either query or access registry values.
+    # Windows 2000:  This flag is not supported.
+    # KEY_WOW64_64KEY (0x0100)    Indicates that an application on 64-bit Windows should operate on the 64-bit registry view. For more information, see Accessing an Alternate Registry View.
+    # This flag must be combined using the OR operator with the other flags in this table that either query or access registry values.
+    # Windows 2000:  This flag is not supported.
+    # KEY_WRITE (0x20006)    Combines the STANDARD_RIGHTS_WRITE, KEY_SET_VALUE, and KEY_CREATE_SUB_KEY access rights.
+    # "STANDARD_RIGHTS_REQUIRED",
+    # "STANDARD_RIGHTS_WRITE",
+    # "STANDARD_RIGHTS_READ",
+    # "DELETE",
+    # "READ_CONTROL",
+    # "WRITE_DAC",
+    #"WRITE_OWNER",
+    'regkey': {        
+        _winreg: (
+            #"KEY_ALL_ACCESS",  # Combines the STANDARD_RIGHTS_REQUIRED, KEY_QUERY_VALUE, KEY_SET_VALUE, KEY_CREATE_SUB_KEY, KEY_ENUMERATE_SUB_KEYS, KEY_NOTIFY, and KEY_CREATE_LINK access rights.
+            #"KEY_QUERY_VALUE", # GUI "Query Value"
+            "KEY_SET_VALUE",  # GUI "Set Value".  Required to create, delete, or set a registry value.
+            "KEY_CREATE_LINK",  # GUI "Create Link".  Reserved for system use.
+            "KEY_CREATE_SUB_KEY",  # GUI "Create subkey"
+            # "KEY_ENUMERATE_SUB_KEYS",  # GUI "Create subkeys"
+            # "KEY_NOTIFY", # GUI "Notify"
+            #"KEY_EXECUTE", # same as KEY_READ
+            #"KEY_READ",
+            #"KEY_WOW64_32KEY",
+            #"KEY_WOW64_64KEY",
+            # "KEY_WRITE", # Combines the STANDARD_RIGHTS_WRITE, KEY_SET_VALUE, and KEY_CREATE_SUB_KEY access rights.
+        ),
+        ntsecuritycon: (
+            "DELETE",  # GUI "Delete"
+            # "READ_CONTROL", # GUI "Read Control" - read security descriptor
+            "WRITE_DAC",  # GUI "Write DAC"
+            "WRITE_OWNER",  # GUI "Write Owner"
+            #"STANDARD_RIGHTS_REQUIRED",
+            #"STANDARD_RIGHTS_WRITE",
+            #"STANDARD_RIGHTS_READ",
+        )
+    },
+    'directory': {
+        ntsecuritycon: (
+            #"FILE_LIST_DIRECTORY",
+            "FILE_ADD_FILE",
+            "FILE_ADD_SUBDIRECTORY",
+            #"FILE_READ_EA",
+            "FILE_WRITE_EA",
+            #"FILE_TRAVERSE",
+            "FILE_DELETE_CHILD",
+            #"FILE_READ_ATTRIBUTES",
+            "FILE_WRITE_ATTRIBUTES",
+            "DELETE",
+            #"READ_CONTROL",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            #"SYNCHRONIZE",
+        )
+    },
+    'service_manager': {
+        # For service manager
+        # http://msdn.microsoft.com/en-us/library/ms685981(VS.85).aspx
+        # SC_MANAGER_ALL_ACCESS (0xF003F)    Includes STANDARD_RIGHTS_REQUIRED, in addition to all access rights in this table.
+        # SC_MANAGER_CREATE_SERVICE (0x0002)    Required to call the CreateService function to create a service object and add it to the database.
+        # SC_MANAGER_CONNECT (0x0001)    Required to connect to the service control manager.
+        # SC_MANAGER_ENUMERATE_SERVICE (0x0004)    Required to call the EnumServicesStatusEx function to list the services that are in the database.
+        # SC_MANAGER_LOCK (0x0008)    Required to call the LockServiceDatabase function to acquire a lock on the database.
+        # SC_MANAGER_MODIFY_BOOT_CONFIG (0x0020)    Required to call the NotifyBootConfigStatus function.
+        # SC_MANAGER_QUERY_LOCK_STATUS (0x0010)Required to call the  QueryServiceLockStatus function to retrieve the lock status information for the database.
+        win32service: (
+            "SC_MANAGER_ALL_ACCESS",
+            "SC_MANAGER_CREATE_SERVICE",
+            "SC_MANAGER_CONNECT",
+            "SC_MANAGER_ENUMERATE_SERVICE",
+            "SC_MANAGER_LOCK",
+            "SC_MANAGER_MODIFY_BOOT_CONFIG",
+            "SC_MANAGER_QUERY_LOCK_STATUS",
+        )
+    },
+    'service': {
+        # For services:
+        # http://msdn.microsoft.com/en-us/library/ms685981(VS.85).aspx
+        # SERVICE_ALL_ACCESS (0xF01FF)    Includes STANDARD_RIGHTS_REQUIRED in addition to all access rights in this table.
+        # SERVICE_CHANGE_CONFIG (0x0002)    Required to call the ChangeServiceConfig or ChangeServiceConfig2 function to change the service configuration. Because     this grants the caller the right to change the executable file that the system runs, it should be granted only to administrators.
+        # SERVICE_ENUMERATE_DEPENDENTS (0x0008)    Required to call the EnumDependentServices function to enumerate all the services dependent on the service.
+        # SERVICE_INTERROGATE (0x0080)    Required to call the ControlService function to ask the service to report its status immediately.
+        # SERVICE_PAUSE_CONTINUE (0x0040)    Required to call the ControlService function to pause or continue the service.
+        # SERVICE_QUERY_CONFIG (0x0001)    Required to call the QueryServiceConfig and QueryServiceConfig2 functions to query the service configuration.
+        # SERVICE_QUERY_STATUS (0x0004)    Required to call the QueryServiceStatusEx function to ask the service control manager about the status of the service.
+        # SERVICE_START (0x0010)    Required to call the StartService function to start the service.
+        # SERVICE_STOP (0x0020)    Required to call the ControlService function to stop the service.
+        # SERVICE_USER_DEFINED_CONTROL(0x0100)    Required to call the ControlService function to specify a user-defined control code.
+        win32service: (
+            # "SERVICE_INTERROGATE",
+            # "SERVICE_QUERY_STATUS",
+            # "SERVICE_ENUMERATE_DEPENDENTS",
+            "SERVICE_ALL_ACCESS",
+            "SERVICE_CHANGE_CONFIG",
+            "SERVICE_PAUSE_CONTINUE",
+            # "SERVICE_QUERY_CONFIG",
+            "SERVICE_START",
+            "SERVICE_STOP",
+            # "SERVICE_USER_DEFINED_CONTROL", # TODO this is granted most of the time.  Double check that's not a bad thing.
+        ),
+        ntsecuritycon: (
+            "DELETE",
+            "WRITE_DAC",
+            "WRITE_OWNER"
+        )
+#        win32con: (
+#            "READ_CONTROL"
+#        )
+    },
 }
 
 win32con.PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
 win32con.PROCESS_SUSPEND_RESUME = 0x0800
-			
+            
 all_perms = {
-	'share': {
-		ntsecuritycon: (
-			"FILE_READ_DATA", #
-			"FILE_WRITE_DATA",
-			"FILE_APPEND_DATA",
-			"FILE_READ_EA", #
-			"FILE_WRITE_EA",
-			"FILE_EXECUTE", #
-			"FILE_READ_ATTRIBUTES", #
-			"FILE_WRITE_ATTRIBUTES",
-			"DELETE",
-			"READ_CONTROL", #
-			"WRITE_DAC",
-			"WRITE_OWNER",
-			"SYNCHRONIZE", #
-		)
-	},
-	'file': {
-		ntsecuritycon: (
-			"FILE_READ_DATA",
-			"FILE_WRITE_DATA",
-			"FILE_APPEND_DATA",
-			"FILE_READ_EA",
-			"FILE_WRITE_EA",
-			"FILE_EXECUTE",
-			"FILE_READ_ATTRIBUTES",
-			"FILE_WRITE_ATTRIBUTES",
-			"DELETE",
-			"READ_CONTROL",
-			"WRITE_DAC",
-			"WRITE_OWNER",
-			"SYNCHRONIZE",
-		)
-	},
-	'regkey': {		
-		_winreg: (
-			#"KEY_ALL_ACCESS",
-			"KEY_CREATE_LINK",
-			"KEY_CREATE_SUB_KEY",
-			"KEY_ENUMERATE_SUB_KEYS",
-			#"KEY_EXECUTE", # same as KEY_READ
-			"KEY_NOTIFY",
-			"KEY_QUERY_VALUE",
-			"KEY_READ",
-			"KEY_SET_VALUE",
-			"KEY_WOW64_32KEY",
-			"KEY_WOW64_64KEY",
-			#"KEY_WRITE", #STANDARD_RIGHTS_WRITE, KEY_SET_VALUE, and KEY_CREATE_SUB_KEY access rights.
-		),
-		ntsecuritycon: (
-			"DELETE",
-			"READ_CONTROL",
-			"WRITE_DAC",
-			"WRITE_OWNER",
-			#"STANDARD_RIGHTS_REQUIRED",
-			#"STANDARD_RIGHTS_WRITE", # same as STANDARD_RIGHTS_READ http://msdn.microsoft.com/en-us/library/aa379607(v=vs.85).aspx what is it for?
-			#"STANDARD_RIGHTS_READ", # same as STANDARD_RIGHTS_WRITE http://msdn.microsoft.com/en-us/library/aa379607(v=vs.85).aspx what is it for?
-			#"SYNCHRONIZE",
-		)
-	},
-	'directory': {
-		ntsecuritycon: (
-			"FILE_LIST_DIRECTORY",
-			"FILE_ADD_FILE",
-			"FILE_ADD_SUBDIRECTORY",
-			"FILE_READ_EA",
-			"FILE_WRITE_EA",
-			"FILE_TRAVERSE",
-			"FILE_DELETE_CHILD",
-			"FILE_READ_ATTRIBUTES",
-			"FILE_WRITE_ATTRIBUTES",
-			"DELETE",
-			"READ_CONTROL",
-			"WRITE_DAC",
-			"WRITE_OWNER",
-			"SYNCHRONIZE",
-		)
-	},
-	'service_manager': {
-		win32service: (
-			"SC_MANAGER_ALL_ACCESS",
-			"SC_MANAGER_CREATE_SERVICE",
-			"SC_MANAGER_CONNECT",
-			"SC_MANAGER_ENUMERATE_SERVICE",
-			"SC_MANAGER_LOCK",
-			"SC_MANAGER_MODIFY_BOOT_CONFIG",
-			"SC_MANAGER_QUERY_LOCK_STATUS",
-		)
-	},
-	'service': {
-		win32service: (
-			"SERVICE_INTERROGATE",
-			"SERVICE_QUERY_STATUS",
-			"SERVICE_ENUMERATE_DEPENDENTS",
-			# "SERVICE_ALL_ACCESS", # combination of other rights
-			"SERVICE_CHANGE_CONFIG",
-			"SERVICE_PAUSE_CONTINUE",
-			"SERVICE_QUERY_CONFIG",
-			"SERVICE_START",
-			"SERVICE_STOP",
-			"SERVICE_USER_DEFINED_CONTROL", # TODO this is granted most of the time.  Double check that's not a bad thing.
-		),
-		ntsecuritycon: (
-			"DELETE",
-			"READ_CONTROL", # needed to read acl of service
-			"WRITE_DAC",
-			"WRITE_OWNER",
-			"SYNCHRONIZE",
-			#"STANDARD_RIGHTS_REQUIRED", # combination of other rights
-			#"STANDARD_RIGHTS_READ", # combination of other rights
-			#"STANDARD_RIGHTS_WRITE", # combination of other rights
-			#"STANDARD_RIGHTS_EXECUTE", # combination of other rights
-			#"STANDARD_RIGHTS_ALL", # combination of other rights
-			#"SPECIFIC_RIGHTS_ALL", # combination of other rights
-			"ACCESS_SYSTEM_SECURITY",
-			#"MAXIMUM_ALLOWED",
-			"GENERIC_READ",
-			"GENERIC_WRITE",
-			"GENERIC_EXECUTE",
-			"GENERIC_ALL"
-		)
-	},
-	# http://msdn.microsoft.com/en-us/library/ms684880(v=vs.85).aspx
-	'process': {
-		win32con: (
-			"PROCESS_TERMINATE",
-			"PROCESS_CREATE_THREAD",
-			"PROCESS_VM_OPERATION",
-			"PROCESS_VM_READ",
-			"PROCESS_VM_WRITE",
-			"PROCESS_DUP_HANDLE",
-			"PROCESS_CREATE_PROCESS",
-			"PROCESS_SET_QUOTA",
-			"PROCESS_SET_INFORMATION",
-			"PROCESS_QUERY_INFORMATION",
-			"PROCESS_QUERY_LIMITED_INFORMATION",
-			"PROCESS_SUSPEND_RESUME",
-			#"PROCESS_ALL_ACCESS"
-		),
-		ntsecuritycon: (
-			"DELETE",
-			"READ_CONTROL",
-			"WRITE_DAC",
-			"WRITE_OWNER",
-			"SYNCHRONIZE",
-			#"STANDARD_RIGHTS_REQUIRED",
-			#"STANDARD_RIGHTS_READ",
-			#"STANDARD_RIGHTS_WRITE",
-			#"STANDARD_RIGHTS_EXECUTE",
-			#"STANDARD_RIGHTS_ALL",
-			#"SPECIFIC_RIGHTS_ALL",
-			#"ACCESS_SYSTEM_SECURITY",
-			#"MAXIMUM_ALLOWED",
-			#"GENERIC_READ",
-			#"GENERIC_WRITE",
-			#"GENERIC_EXECUTE",
-			#"GENERIC_ALL"
-		)
-	},
-	'thread': {
-		win32con: (
-			"THREAD_TERMINATE",
-			"THREAD_SUSPEND_RESUME",
-			"THREAD_GET_CONTEXT",
-			"THREAD_SET_CONTEXT",
-			"THREAD_SET_INFORMATION",
-			"THREAD_QUERY_INFORMATION",
-			"THREAD_SET_THREAD_TOKEN",
-			"THREAD_IMPERSONATE",
-			"THREAD_DIRECT_IMPERSONATION",
-			"THREAD_ALL_ACCESS",
-			"THREAD_QUERY_LIMITED_INFORMATION",
-			"THREAD_SET_LIMITED_INFORMATION"
-		),
-		ntsecuritycon: (
-			"DELETE",
-			"READ_CONTROL",
-			"WRITE_DAC",
-			"WRITE_OWNER",
-			"SYNCHRONIZE",
-		)
-	},
-	'token': {
-		win32con: (
-			"TOKEN_ADJUST_DEFAULT",
-			"TOKEN_ADJUST_GROUPS",
-			"TOKEN_ADJUST_PRIVILEGES",
-			#"TOKEN_ADJUST_SESSIONID", TODO what's the number for this?
-			"TOKEN_ASSIGN_PRIMARY",
-			"TOKEN_DUPLICATE",
-			"TOKEN_EXECUTE",
-			"TOKEN_IMPERSONATE",
-			"TOKEN_QUERY",
-			"TOKEN_QUERY_SOURCE",
-			"TOKEN_READ",
-			"TOKEN_WRITE",
-			"TOKEN_ALL_ACCESS"
-		),
-		ntsecuritycon: (
-			"DELETE",
-			"READ_CONTROL",
-			"WRITE_DAC",
-			"WRITE_OWNER",
-			#"SYNCHRONIZE",
-		)
-	},
+    'share': {
+        ntsecuritycon: (
+            "FILE_READ_DATA", 
+            "FILE_WRITE_DATA",
+            "FILE_APPEND_DATA",
+            "FILE_READ_EA", 
+            "FILE_WRITE_EA",
+            "FILE_EXECUTE", 
+            "FILE_READ_ATTRIBUTES", 
+            "FILE_WRITE_ATTRIBUTES",
+            "DELETE",
+            "READ_CONTROL", 
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            "SYNCHRONIZE", 
+        )
+    },
+    'file': {
+        ntsecuritycon: (
+            "FILE_READ_DATA",
+            "FILE_WRITE_DATA",
+            "FILE_APPEND_DATA",
+            "FILE_READ_EA",
+            "FILE_WRITE_EA",
+            "FILE_EXECUTE",
+            "FILE_READ_ATTRIBUTES",
+            "FILE_WRITE_ATTRIBUTES",
+            "DELETE",
+            "READ_CONTROL",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            "SYNCHRONIZE",
+        )
+    },
+    'regkey': {        
+        _winreg: (
+            #"KEY_ALL_ACCESS",
+            "KEY_CREATE_LINK",
+            "KEY_CREATE_SUB_KEY",
+            "KEY_ENUMERATE_SUB_KEYS",
+            #"KEY_EXECUTE", # same as KEY_READ
+            "KEY_NOTIFY",
+            "KEY_QUERY_VALUE",
+            "KEY_READ",
+            "KEY_SET_VALUE",
+            "KEY_WOW64_32KEY",
+            "KEY_WOW64_64KEY",
+            #"KEY_WRITE", #STANDARD_RIGHTS_WRITE, KEY_SET_VALUE, and KEY_CREATE_SUB_KEY access rights.
+        ),
+        ntsecuritycon: (
+            "DELETE",
+            "READ_CONTROL",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            #"STANDARD_RIGHTS_REQUIRED",
+            #"STANDARD_RIGHTS_WRITE", # same as STANDARD_RIGHTS_READ http://msdn.microsoft.com/en-us/library/aa379607(v=vs.85).aspx what is it for?
+            #"STANDARD_RIGHTS_READ", # same as STANDARD_RIGHTS_WRITE http://msdn.microsoft.com/en-us/library/aa379607(v=vs.85).aspx what is it for?
+            #"SYNCHRONIZE",
+        )
+    },
+    'directory': {
+        ntsecuritycon: (
+            "FILE_LIST_DIRECTORY",
+            "FILE_ADD_FILE",
+            "FILE_ADD_SUBDIRECTORY",
+            "FILE_READ_EA",
+            "FILE_WRITE_EA",
+            "FILE_TRAVERSE",
+            "FILE_DELETE_CHILD",
+            "FILE_READ_ATTRIBUTES",
+            "FILE_WRITE_ATTRIBUTES",
+            "DELETE",
+            "READ_CONTROL",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            "SYNCHRONIZE",
+        )
+    },
+    'service_manager': {
+        win32service: (
+            "SC_MANAGER_ALL_ACCESS",
+            "SC_MANAGER_CREATE_SERVICE",
+            "SC_MANAGER_CONNECT",
+            "SC_MANAGER_ENUMERATE_SERVICE",
+            "SC_MANAGER_LOCK",
+            "SC_MANAGER_MODIFY_BOOT_CONFIG",
+            "SC_MANAGER_QUERY_LOCK_STATUS",
+        )
+    },
+    'service': {
+        win32service: (
+            "SERVICE_INTERROGATE",
+            "SERVICE_QUERY_STATUS",
+            "SERVICE_ENUMERATE_DEPENDENTS",
+            # "SERVICE_ALL_ACCESS", # combination of other rights
+            "SERVICE_CHANGE_CONFIG",
+            "SERVICE_PAUSE_CONTINUE",
+            "SERVICE_QUERY_CONFIG",
+            "SERVICE_START",
+            "SERVICE_STOP",
+            "SERVICE_USER_DEFINED_CONTROL",  # TODO this is granted most of the time.  Double check that's not a bad thing.
+        ),
+        ntsecuritycon: (
+            "DELETE",
+            "READ_CONTROL",  # needed to read acl of service
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            "SYNCHRONIZE",
+            #"STANDARD_RIGHTS_REQUIRED", # combination of other rights
+            #"STANDARD_RIGHTS_READ", # combination of other rights
+            #"STANDARD_RIGHTS_WRITE", # combination of other rights
+            #"STANDARD_RIGHTS_EXECUTE", # combination of other rights
+            #"STANDARD_RIGHTS_ALL", # combination of other rights
+            #"SPECIFIC_RIGHTS_ALL", # combination of other rights
+            "ACCESS_SYSTEM_SECURITY",
+            #"MAXIMUM_ALLOWED",
+            "GENERIC_READ",
+            "GENERIC_WRITE",
+            "GENERIC_EXECUTE",
+            "GENERIC_ALL"
+        )
+    },
+    # http://msdn.microsoft.com/en-us/library/ms684880(v=vs.85).aspx
+    'process': {
+        win32con: (
+            "PROCESS_TERMINATE",
+            "PROCESS_CREATE_THREAD",
+            "PROCESS_VM_OPERATION",
+            "PROCESS_VM_READ",
+            "PROCESS_VM_WRITE",
+            "PROCESS_DUP_HANDLE",
+            "PROCESS_CREATE_PROCESS",
+            "PROCESS_SET_QUOTA",
+            "PROCESS_SET_INFORMATION",
+            "PROCESS_QUERY_INFORMATION",
+            "PROCESS_QUERY_LIMITED_INFORMATION",
+            "PROCESS_SUSPEND_RESUME",
+            #"PROCESS_ALL_ACCESS"
+        ),
+        ntsecuritycon: (
+            "DELETE",
+            "READ_CONTROL",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            "SYNCHRONIZE",
+            #"STANDARD_RIGHTS_REQUIRED",
+            #"STANDARD_RIGHTS_READ",
+            #"STANDARD_RIGHTS_WRITE",
+            #"STANDARD_RIGHTS_EXECUTE",
+            #"STANDARD_RIGHTS_ALL",
+            #"SPECIFIC_RIGHTS_ALL",
+            #"ACCESS_SYSTEM_SECURITY",
+            #"MAXIMUM_ALLOWED",
+            #"GENERIC_READ",
+            #"GENERIC_WRITE",
+            #"GENERIC_EXECUTE",
+            #"GENERIC_ALL"
+        )
+    },
+    'thread': {
+        win32con: (
+            "THREAD_TERMINATE",
+            "THREAD_SUSPEND_RESUME",
+            "THREAD_GET_CONTEXT",
+            "THREAD_SET_CONTEXT",
+            "THREAD_SET_INFORMATION",
+            "THREAD_QUERY_INFORMATION",
+            "THREAD_SET_THREAD_TOKEN",
+            "THREAD_IMPERSONATE",
+            "THREAD_DIRECT_IMPERSONATION",
+            "THREAD_ALL_ACCESS",
+            "THREAD_QUERY_LIMITED_INFORMATION",
+            "THREAD_SET_LIMITED_INFORMATION"
+        ),
+        ntsecuritycon: (
+            "DELETE",
+            "READ_CONTROL",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            "SYNCHRONIZE",
+        )
+    },
+    'token': {
+        win32con: (
+            "TOKEN_ADJUST_DEFAULT",
+            "TOKEN_ADJUST_GROUPS",
+            "TOKEN_ADJUST_PRIVILEGES",
+            #"TOKEN_ADJUST_SESSIONID", TODO what's the number for this?
+            "TOKEN_ASSIGN_PRIMARY",
+            "TOKEN_DUPLICATE",
+            "TOKEN_EXECUTE",
+            "TOKEN_IMPERSONATE",
+            "TOKEN_QUERY",
+            "TOKEN_QUERY_SOURCE",
+            "TOKEN_READ",
+            "TOKEN_WRITE",
+            "TOKEN_ALL_ACCESS"
+        ),
+        ntsecuritycon: (
+            "DELETE",
+            "READ_CONTROL",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            #"SYNCHRONIZE",
+        )
+    },
 }
 
 # Used to store a data structure representing the issues we've found
@@ -577,7 +578,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-	
+    
     'WPC002': {
        'title': "Insecure Permissions on Files and Directories in Path (OBSELETE ISSUE)",
        'description': '''Some of the programs and directories in the %PATH% variable could be changed by non-administrative users.
@@ -596,7 +597,7 @@ This could allow certain users on the system to place malicious code into certai
           }
        }
     },
-	
+    
     'WPC003': {
        'title': "Insecure Permissions In Windows Registry",
        'description': '''Some registry keys that hold the names of programs run by other users were checked and found to have insecure permissions.  It would be possible for non-administrative users to modify the registry to cause a different programs to be run.  This weakness could be abused by low-privileged users to run commands of their choosing with higher privileges.''',
@@ -608,7 +609,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-	
+    
     'WPC005': {
        'title': "Insecure Permissions On Windows Service Registry Keys (NOT IMPLEMENTED YET)",
        'description': '''Some registry keys that hold the names of programs that are run when Windows Services start were found to have weak file permissions.  They could be changed by non-administrative users to cause malicious programs to be run instead of the intended Windows Service Executable.''',
@@ -621,7 +622,7 @@ This could allow certain users on the system to place malicious code into certai
        }
     },
 
-	'WPC007': {
+    'WPC007': {
        'title': "Insecure Permissions On Event Log File",
        'description': '''Some of the Event Log files could be changed by non-administrative users.  This may allow attackers to cover their tracks.''',
        'recommendation': '''Modify the permissions on the above files to allow only administrators write access.  Revoke write access from low-privileged users.''',
@@ -722,7 +723,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-	
+    
     'WPC015': {
        'title': "Insecure Permissions On Files / Directories In Users' PATHs (NEED TO CHECK THIS WORKS)",
        'description': '''Some programs/directories in the paths of users on this system have weak permissions.''',
@@ -787,7 +788,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-	
+    
     'WPC020': {
        'title': "Service Can Be Paused/Resumed By Non-Admin Users",
        'description': '''The service-level permissions on some Windows services allow them to be paused/resumed by non-administrative users.  This can often be desirable, in which case this issue can be ignored.  However, sometimes it can allow users to allow users to evade monitoring - e.g. from Anti-virus services.  The permission is not always dangerous on its own, but can sometimes aid a local attacker.''',
@@ -799,7 +800,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-	
+    
     'WPC021': {
        'title': "Service Can Be Reconfigured By Non-Admin Users",
        'description': '''The service-level permissions on some Windows services allow them to be reconfigured by non-administrative users.  This should not normally be required and is inherently insecure.  It could certain users alter the program which is run when this service start and to alter which user the service runs as.  The most likely attack would be to reconfigure the service to run as LocalSystem with no password and to select a malicious executable.  This would give the attacker administrator level access to the local system.''',
@@ -811,7 +812,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-	
+    
     'WPC022': {
        'title': "Service Can Be Deleted By Non-Admin Users",
        'description': '''The service-level permissions on some Windows services allow them to be deleted by non-administrative users.  This should not normally be required and is inherently insecure.  It could allow local users to delete the service.  This may allow them to evade monitor - e.g. from Anti-virus - or to disrupt normal business operations.  Note that the user would not be able to replace the service as administrator level rights are required to create new services.''',
@@ -824,7 +825,7 @@ This could allow certain users on the system to place malicious code into certai
        }
     },
 
-		
+        
     'WPC023': {
        'title': "Service Permissions Can Be Altered By Non-Admin Users",
        'description': '''The service-level permissions on some Windows services allow some non-administrative users to set any service-level permissions of their choosing.  This should not normally be required and is inherently insecure.  It has a similar effect to granting the user DELETE and SERVICE_CHANGE_CONFIG.  These powerful rights could allow the user to reconfigure a service to provide them with administrator level access, or simply to delete the service, disrupting normal business operations.''',
@@ -836,7 +837,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-	
+    
     'WPC024': {
        'title': "Non-Admin Users Can Take Ownership of Service",
        'description': '''The service-level permissions on some Windows services allow ownership to be claimed by some non-administrative users.  This should not normally be required and is inherently insecure.  It has a similar effect to granting the user WRITE_DAC (and thus DELETE and SERVICE_CHANGE_CONFIG).  These powerful rights could allow the user to reconfigure a service to provide them with administrator level access, or simply to delete the service, disrupting normal business operations.''',
@@ -848,7 +849,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-	
+    
     'WPC025': {
        'title': "Services Owned By Non-Admin Users",
        'description': '''The owner in the security descriptor for some services is set to a non-administrative user.  This should not normally be required and is inherently insecure.  It has a similar effect to granting the user WRITE_DAC (and thus DELETE and SERVICE_CHANGE_CONFIG).  These powerful rights could allow the user to reconfigure a service to provide them with administrator level access, or simply to delete the service, disrupting normal business operations.''',
@@ -860,7 +861,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-	
+    
     'WPC026': {
        'title': "Delete Permission Granted On Windows Service Executables",
        'description': '''Some of the programs that are run when Windows Services start were found to have weak file permissions.  It is possible for non-administrative local users to delete some of the Windows Service executables with malicious programs.  This could lead to disruption or denial of service.''',
@@ -872,7 +873,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-	
+    
     'WPC027': {
        'title': "Append Permission Granted Windows Service Executables",
        'description': '''Some of the programs that are run when Windows Services start were found to have weak file permissions.  It is possible for non-administrative local users to append to some of the Windows Service executables with malicious programs.  This is unlikely to be exploitable for .exe files, but is it bad security practise to allow more access than necessary to low-privileged users.''',
@@ -884,7 +885,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-	
+    
     'WPC028': {
        'title': "Untrusted Users Can Modify Windows Service Executables",
        'description': '''Some of the programs that are run when Windows Services start were found to have weak file permissions.  It is possible for non-administrative local users to replace some of the Windows Service executables with malicious programs.  This could be abused to execute programs with the privileges of the Windows services concerned.''',
@@ -896,7 +897,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-	
+    
     'WPC029': {
        'title': "Windows Service Executables Owned By Untrusted Users",
        'description': '''Some of the programs that are run when Windows Services start were found to be owned by untrusted users.  Consequently, these programs can be replace with malicious programs by low-privileged users.  This could result is users stealing the privileges of the services affected.''',
@@ -920,8 +921,8 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-	
-	
+    
+    
     'WPC031': {
        'title': "Parent Directories of Windows Service Executables Allow Untrusted Users DELETE Permissions And Can Be Replaced Because of FILE_ADD_SUBDIR Permission",
        'description': '''Some of the programs that are run when Windows Services start were found to have parent directories that had DELETE permission granted to untrusted users. Further the parent directories of the directories affected had FILE_ADD_SUBDIR granted for low-privileged users.  This combination of directory permissions allows entire portions of the parent directory structure can be deleted and replaced, allowing the service executable to be susbstituted with a malicoius one.  In this way low-privileged users could steal the privileges of the services affected.''',
@@ -933,7 +934,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-	
+    
     'WPC032': {
        'title': "Parent Directories of Windows Service Executables Can Have File Permissions Altered By Untrusted Users",
        'description': '''Some of the programs that are run when Windows Services start were found to have parent directories that had the permissions WRITE_OWNER or WRITE_DAC granted to untrusted users.  Consequently, low-privileged users could grant themselves any privilege they desired on these directories.  This could result in entire portions of the parent directory structure can be deleted and replaced, allowing the service executable to be susbstituted with a malicoius one.  In this way low-privileged users could steal the privileges of the services affected.''',
@@ -945,7 +946,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-	
+    
     'WPC033': {
        'title': "Parent Directories of Windows Service Executables Owned By Untrusted Users",
        'description': '''Some of the programs that are run when Windows Services start were found to have parent directories that were owned by untrusted users.  Consequently, entire portions of the parent directory structure can be deleted and replaced, allowing the service executable to be susbstituted with a malicoius one.  This could result is users stealing the privileges of the services affected.''',
@@ -957,7 +958,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-	
+    
     'WPC034': {
        'title': "Windows Service Executables Allow DELETE Permissions To Untrusted Users And Can Be Replaced Because of FILE_ADD_FILE Permission On Parent Directory",
        'description': '''Some of the programs that are run when Windows Services start were found to have DELETE permission granted to low-privileged users.  Furthermore, the parent directory allowed FILE_ADD_FILE permission to low-privileged users.  This combination of directory permissions allows the service executable to be deleted and replaced malicoius program.  In this way low-privileged users could steal the privileges of the services affected.''',
@@ -1017,7 +1018,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-	
+    
     'WPC039': {
        'title': "Windows Service Registry Keys Allow Untrusted Users To Create Subkeys",
        'description': '''Configuration information for Windows Service is stored in the registry.  Some of the keys were found to have the KEY_CREATE_SUB_KEY permission granted for non-administrative users.  It may be possible for low privileged users to manipulate service - though this would depend on how the service responded to the addition of new registry keys.''',
@@ -1041,7 +1042,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-	
+    
     'WPC041': {
        'title': "Windows Service Registry Keys Have Parent Keys Owned By Untrusted Users",
        'description': '''Configuration information for Windows Service is stored in the registry.  Some of the parent keys were found to be owned by non-administrative users.  This could allow low-privileged users to alter the permissions on the keys concerned, delete them, add subkeys and add/alter registry values for that key.  This probably constitutes a denial of service risk, but may also allow privilege escalation depending on how the service responds to registry keys being tampered with.''',
@@ -1053,7 +1054,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-	
+    
     'WPC042': {
        'title': "Permissions on Windows Service Registry Keys Can Be Changed By Untrusted Users",
        'description': '''Configuration information for Windows Service is stored in the registry.  TODO.''',
@@ -1065,7 +1066,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-	
+    
     'WPC043': {
        'title': "Windows Service Registry Keys Can Be Deleted And Replaced By Untrusted Users",
        'description': '''Configuration information for Windows Service is stored in the registry.  TODO.''',
@@ -1077,7 +1078,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-	
+    
     'WPC046': {
        'title': "Windows Registry Keys Containing Program Owned By Untrusted Users",
        'description': '''Some of the registry keys holding the names of programs run by other users could be changed by non-administrative users.  TODO''',
@@ -1089,7 +1090,7 @@ This could allow certain users on the system to place malicious code into certai
           },
        }
     },
-	
+    
     'WPC047': {
        'title': "Windows Registry Keys Containing Programs Can Have Permissions Changed By Untrusted Users",
        'description': '''Some of the registry keys holding the names of programs run by other users could be changed by non-administrative users.  TODO''',
@@ -1100,8 +1101,8 @@ This could allow certain users on the system to place malicious code into certai
              'preamble': "The registry keys below can be changed by non-administrative users:",
           },
        }
-    },	
-	
+    },     
+    
     'WPC048': {
        'title': "Windows Registry Keys Containing Program Names Can Be Changed By Untrusted Users",
        'description': '''Some of the registry keys holding the names of programs run by other users could be changed by non-administrative users.  It would be possible for an attacker to substitute the name of malicious program which then stole the privileges of other accounts.''',
@@ -1124,8 +1125,8 @@ This could allow certain users on the system to place malicious code into certai
              'preamble': "The registry keys below can be changed by non-administrative users:",
           },
        }
-    },	
-	
+    },     
+    
     'WPC050': {
        'title': "Windows Registry Keys Containing Programs Can Be Deleted",
        'description': '''Some of the registry keys holding the names of programs run by other users could be changed by non-administrative users.  TODO''',
@@ -1136,9 +1137,9 @@ This could allow certain users on the system to place malicious code into certai
              'preamble': "The registry keys below can be changed by non-administrative users:",
           },
        }
-    },	
-	
-	'WPC051': {
+    },     
+    
+    'WPC051': {
        'title': "Windows Service Has Insecurely Quoted Path",
        'description': '''The path to the executable for the service contains one or more spaces and quotes have not been correctly used around the path.  The path is therefore ambiguous which could result in the wrong program being executed when the service is started - e.g. "C:\\program.exe" instead of "C:\\program files\\foo\\bar.exe".  The issue is not necessarily exploitable unless a local attacker has permissions to add an alternative executable to the correct location on the filesystem.  The impact of the issue should be considered higher for services that run with high privileges.''',
        'recommendation': '''Use quotes around the path to executables if they contain spaces: C:\\program files\\foo\\bar.exe -> "C:\\program files\\foo\\bar.exe".''',
@@ -1148,9 +1149,9 @@ This could allow certain users on the system to place malicious code into certai
              'preamble': "The following services have insecurely quoted paths:",
           },
        }
-    },				
-				
-	'WPC052': {
+    },                 
+                
+    'WPC052': {
        'title': "Windows Service DLL Can Be Replaced",
        'description': '''Each windows service has a corresponding registry key in HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\services.  Some services have a "Parameters" subkey and a value called "ServiceDll" (e.g. HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\services\\someservice\\Parameters\\ServiceDll = c:\\dir\\foo.dll").  The DLL for some of the services on the system audited can be replaced by non-administrative users.  TODO how and by whom?  Users able to replace the service DLL could run code of their choosing with the privileges of the service.''',
        'recommendation': '''Set strong file permissions on the service DLLs and their partent directories.''',
@@ -1160,15 +1161,15 @@ This could allow certain users on the system to place malicious code into certai
              'preamble': "The following services have weak file permissions on the service DLLs:",
           },
        }
-    },				
-				
-	'WPC053': {
+    },                 
+                
+    'WPC053': {
        'title': "Context Handler Menus Use Poorly Protected Files",
        'description': '''Context Menus appear in Windows Explorer when files are right-clicked.  Each has a corresponding DLL or .EXE.  Some of the referenced DLLs or .EXE file can be replaced by non-administrative users.  As these context menus are used by all system users, there is a possibility that a user might run malicious code of an attacker's choosing if the DLLs or .EXEs are modified.  TODO how can the files be modified?
-	   
+       
 Context Menu Handlers are described here: http://msdn.microsoft.com/en-us/library/windows/desktop/cc144171(v=vs.85).aspx
 
-Shell Extenstion Handlers more generally are described here: http://msdn.microsoft.com/en-us/library/windows/desktop/cc144067(v=vs.85).aspx	   ''',
+Shell Extenstion Handlers more generally are described here: http://msdn.microsoft.com/en-us/library/windows/desktop/cc144067(v=vs.85).aspx       ''',
        'recommendation': '''Set strong file permissions on the service DLLs and their partent directories.''',
        'supporting_data': {
           'regkey_ref_replacable_file': {
@@ -1176,15 +1177,15 @@ Shell Extenstion Handlers more generally are described here: http://msdn.microso
              'preamble': "The following shell extension use DLLs or .EXE files with weak file permissions:",
           },
        }
-    },				
-				
-	'WPC054': {
+    },                 
+                
+    'WPC054': {
        'title': "Property Sheet Handlers Use Poorly Protected Files",
        'description': '''"Property Sheets" appear in Windows Explorer when files are right-clicked and the "Properties" context menu selected.  The DLLs or .EXEs used to generate these property sheets can be replaced by non-administrative users.  As these property sheets are used by all system users, there is a possibility that a user might run malicious code of an attacker's choosing if the DLLs or .EXEs are modified.  TODO how can the files be modified?  
-	   
+       
 Property Sheet Handlers are described here: http://msdn.microsoft.com/en-us/library/windows/desktop/cc144106(v=vs.85).aspx
 
-Shell Extenstion Handlers more generally are described here: http://msdn.microsoft.com/en-us/library/windows/desktop/cc144067(v=vs.85).aspx	   ''',
+Shell Extenstion Handlers more generally are described here: http://msdn.microsoft.com/en-us/library/windows/desktop/cc144067(v=vs.85).aspx       ''',
        'recommendation': '''Set strong file permissions on the service DLLs and their partent directories.''',
        'supporting_data': {
           'regkey_ref_replacable_file': {
@@ -1192,15 +1193,15 @@ Shell Extenstion Handlers more generally are described here: http://msdn.microso
              'preamble': "The following shell extension use DLLs or .EXE files with weak file permissions:",
           },
        }
-    },				
+    },                 
 
-	'WPC055': {
+    'WPC055': {
        'title': "Copy Hook Handlers Use Poorly Protected Files",
        'description': '''"Copy Hook Handlers" are a type of Windows Explorer shell extension that can control the copying, moving, deleting and renaming of files and folder.  Each as a corresponding DLL or .EXE.  Some of DLLs or .EXEs used can be replaced by non-administrative users.  As Copy Hooks are used by all system users, there is a possibility that a user might run malicious code of an attacker's choosing if the DLLs or .EXEs are modified.  TODO how can the files be modified?
-	   
+       
 Copy Hook Handlers are described here: http://msdn.microsoft.com/en-us/library/windows/desktop/cc144063(v=vs.85).aspx
 
-Shell Extenstion Handlers more generally are described here: http://msdn.microsoft.com/en-us/library/windows/desktop/cc144067(v=vs.85).aspx	   ''',
+Shell Extenstion Handlers more generally are described here: http://msdn.microsoft.com/en-us/library/windows/desktop/cc144067(v=vs.85).aspx       ''',
        'recommendation': '''Set strong file permissions on the service DLLs and their partent directories.''',
        'supporting_data': {
           'regkey_ref_replacable_file': {
@@ -1208,15 +1209,15 @@ Shell Extenstion Handlers more generally are described here: http://msdn.microso
              'preamble': "The following shell extension use DLLs or .EXE files with weak file permissions:",
           },
        }
-    },				
+    },                 
 
-	'WPC056': {
+    'WPC056': {
        'title': "DragDrop Handlers Use Poorly Protected Files",
        'description': '''"DragDrop Handlers" are a type of Windows Explorer shell extension that determine behaviour when files or folders are dragged and dropped.  Each as a corresponding DLL or .EXE.  Some of DLLs or .EXEs used can be replaced by non-administrative users.  As DragDrop Handlers are used by all system users, there is a possibility that a user might run malicious code of an attacker's choosing if the DLLs or .EXEs are modified.  TODO how can the files be modified?
-	   
+       
 DragDrop Handlers are described here: http://msdn.microsoft.com/en-us/library/windows/desktop/cc144171(v=vs.85).aspx
 
-Shell Extenstion Handlers more generally are described here: http://msdn.microsoft.com/en-us/library/windows/desktop/cc144067(v=vs.85).aspx	   ''',
+Shell Extenstion Handlers more generally are described here: http://msdn.microsoft.com/en-us/library/windows/desktop/cc144067(v=vs.85).aspx       ''',
        'recommendation': '''Set strong file permissions on the service DLLs and their partent directories.''',
        'supporting_data': {
           'regkey_ref_replacable_file': {
@@ -1224,15 +1225,15 @@ Shell Extenstion Handlers more generally are described here: http://msdn.microso
              'preamble': "The following shell extension use DLLs or .EXE files with weak file permissions:",
           },
        }
-    },				
+    },                 
 
-	'WPC057': {
+    'WPC057': {
        'title': "Column Handlers Use Poorly Protected Files",
        'description': '''"Column Handlers" are a type of Windows Explorer shell extension that determine behaviour the users tries to add or remove columns from the display.  Each as a corresponding DLL or .EXE.  Some of DLLs or .EXEs used can be replaced by non-administrative users.  As Column Handlers are used by all system users, there is a possibility that a user might run malicious code of an attacker's choosing if the DLLs or .EXEs are modified.  TODO how can the files be modified?
-	   
+       
 Column Handlers are described here: http://msdn.microsoft.com/en-us/library/windows/desktop/bb776831(v=vs.85).aspx
 
-Shell Extenstion Handlers more generally are described here: http://msdn.microsoft.com/en-us/library/windows/desktop/cc144067(v=vs.85).aspx	   ''',
+Shell Extenstion Handlers more generally are described here: http://msdn.microsoft.com/en-us/library/windows/desktop/cc144067(v=vs.85).aspx       ''',
        'recommendation': '''Set strong file permissions on the service DLLs and their partent directories.''',
        'supporting_data': {
           'regkey_ref_replacable_file': {
@@ -1240,14 +1241,14 @@ Shell Extenstion Handlers more generally are described here: http://msdn.microso
              'preamble': "The following shell extension use DLLs or .EXE files with weak file permissions:",
           },
        }
-    },				
+    },                 
 
-	# TODO checks for these:
-	# Icon Overlay Handlers http://msdn.microsoft.com/en-us/library/windows/desktop/cc144123(v=vs.85).aspx
-	# Search Handlers http://msdn.microsoft.com/en-us/library/windows/desktop/bb776834(v=vs.85).aspx
-	
-	# TODO add RunOnceEx keys to this issue + HKCU\run, runonce, runonceex
-	'WPC058': {
+    # TODO checks for these:
+    # Icon Overlay Handlers http://msdn.microsoft.com/en-us/library/windows/desktop/cc144123(v=vs.85).aspx
+    # Search Handlers http://msdn.microsoft.com/en-us/library/windows/desktop/bb776834(v=vs.85).aspx
+    
+    # TODO add RunOnceEx keys to this issue + HKCU\run, runonce, runonceex
+    'WPC058': {
        'title': "Registry \"Run\" Keys Reference Programs With Weak Permissions",
        'description': '''The Run and RunOnce keys under HKLM reference programs that are run when a user logs in with the privielges of that user.  Some of the programs referenced by the registry keys can be modified by non-administrative user.  This could allow a malcious user to run code of their choosing under the context of other user accounts.  Run and RunOnce are described here: http://msdn.microsoft.com/en-us/library/aa376977(v=vs.85).aspx''',
        'recommendation': '''Set strong file permissions on the executables their parent directories.''',
@@ -1257,9 +1258,9 @@ Shell Extenstion Handlers more generally are described here: http://msdn.microso
              'preamble': "The programs referenced from the registry can be modified by non-admin users:",
           },
        }
-    },				
+    },                 
 
-	'WPC059': {
+    'WPC059': {
        'title': "Registry \"RunServices\" Keys Reference Programs With Weak Permissions",
        'description': '''The RunServices and RunServicesOnce keys under HKLM reference programs that are run before the Login Dialog box appears.  Commands are run as SYSTEM.  Some of the programs referenced by the registry keys can be modified by non-administrative user.  This could allow a malcious user to run code of their choosing under the context of the SYSTEM account.  RunServices and RunServicesOnce are described here: http://support.microsoft.com/kb/179365''',
        'recommendation': '''Set strong file permissions on the executables their parent directories.''',
@@ -1269,9 +1270,9 @@ Shell Extenstion Handlers more generally are described here: http://msdn.microso
              'preamble': "The programs referenced from the registry can be modified by non-admin users:",
           },
        }
-    },				
+    },                 
 
-	'WPC060': {
+    'WPC060': {
        'title': "KnownDLLs Have Weak Permissions",
        'description': '''The KnownDLLs registry key holds the name and path of various DLLs.  Programs that rely on these DLLs will load them from the known location instead of searching the rest of the PATH.  More information on KnownDLLs can be found here: http://support.microsoft.com/kb/164501''',
        'recommendation': '''Set strong file permissions on the DLLs their parent directories.''',
@@ -1281,12 +1282,12 @@ Shell Extenstion Handlers more generally are described here: http://msdn.microso
              'preamble': "The programs referenced from the registry can be modified by non-admin users:",
           },
        }
-    },				
+    },                 
 
-	'WPC061': {
+    'WPC061': {
        'title': "CLSID Reference DLLs/EXEs With Weak File Permissions (experimental)",
        'description': '''Some of the CLSIDs reference files with insecure permissions.  This may indicate the presence of a vulnerability, but it depends what the CLSID is used for.  Try searching the registry for the CLSIDs below to determine how they are used and if this issue might be exploitable.
-	   
+       
 Further information about CLSIDs is available here: http://msdn.microsoft.com/en-us/library/windows/desktop/ms691424(v=vs.85).aspx''',
        'recommendation': '''Set strong file permissions on files referenced from CLSIDs.''',
        'supporting_data': {
@@ -1295,21 +1296,21 @@ Further information about CLSIDs is available here: http://msdn.microsoft.com/en
              'preamble': "The programs referenced from the registry can be modified by non-admin users:",
           },
        }
-    },				
+    },                 
 
-	'WPC062': {
+    'WPC062': {
        'title': "Windows Service Executable Is Missing",
        'description': '''Each Windows Service has a corresponding executable.  The executables for some services were missing at the time of the audit.  This can sometimes be caused programs being manually deleted instead of being properly uninstalled.  Although this configuration is unusual and probably undesirable, it is unlikely to be a security issue unless an attacker can recreate the executables in question - an issue that was NOT checked for (please check manually).  It may be an indication that an attacker has previously abused a Windows service and left it in a half-configured state, so investigating the cause of the problem is advised.''',
-	   'recommendation': '''Investigate why the service is broken and either fix or remove the service as appropriate.''',
+       'recommendation': '''Investigate why the service is broken and either fix or remove the service as appropriate.''',
        'supporting_data': {
           'service_no_exe': {
              'section': "description",
              'preamble': "The following Windows Services has missing executables:",
           },
        }
-    },				
+    },                 
 
-	'WPC063': {
+    'WPC063': {
        'title': "Windows Service Running Under Domain Account",
        'description': '''The configuration for each Windows Service specifies the user context under which the service runs.  Often services run as Built-in security pricipals such as LocalSystem, Network Service, Local Service, etc. or as a dedicated local user account.  In the case of the system audited, some of the Windows Services were found to run in the context of a Domain account.  It would therefore be possible for any attacker who gained local admin rights on the system to recover the cleartext password for the Domain accounts in question.  Depending on the priviliges of those accounts, it may be possible for an attacker to abuse the accounts to compromise further systems on the network.''',
        'recommendation': '''Ensure that Domain accounts are only used when absolutely necessary.  When they are used, ensure that the group memberships of the account are restricted to only those required - avoiding membership of Domain Admins.  Where possible also ensure that service accounts are only able to logon from a whitelist of named workstations.  These recommendations help to limit the potential abuse of domain accounts.''',
@@ -1319,19 +1320,19 @@ Further information about CLSIDs is available here: http://msdn.microsoft.com/en
              'preamble': "The following windows services run in the context of Domain accounts:",
           },
        }
-    },				
+    },                 
 
-	'WPC064': {
+    'WPC064': {
        'title': "Windows Service Running Under Named Local Account",
        'description': '''The configuration for each Windows Service specifies the user context under which the service runs.  Often services run as Built-in security pricipals such as LocalSystem, Network Service, Local Service, etc.  In the case of the system audited, some of the Windows Services were found to run in the context of a local account that wasn't a Built-in security principal.  This can be a secure configuration and indeed is recommended configuration for some services such as SQL Server.  However, if administrators have similar services running on other systems, they sometimes configure the Windows Service account to have the same password on each.  It would therefore be possible for any attacker who gained local admin rights on the system to recover the cleartext password for the local Windows Service accounts in question.  It passwords are reused, it may be possible for an attacker to abuse the accounts to compromise further systems on the network.''',
-	   'recommendation': '''Ensure that the group memberships of the account are restricted to only those required - avoiding membership of the Administrators group.  Where possible also ensure that service accounts are not able to log on interactively, as batch jobs or log in over the network.  These recommendations help to limit the potential abuse of windows service accounts.''',
+       'recommendation': '''Ensure that the group memberships of the account are restricted to only those required - avoiding membership of the Administrators group.  Where possible also ensure that service accounts are not able to log on interactively, as batch jobs or log in over the network.  These recommendations help to limit the potential abuse of windows service accounts.''',
        'supporting_data': {
           'service_domain_user': {
              'section': "description",
              'preamble': "The following windows services run in the context of local accounts:",
           },
        }
-    },				
+    },                 
 
 }
 
@@ -1361,7 +1362,7 @@ REPLACE_RECOMMENDATION_DATA
 </table>
 '''
 
-issue_list_html ='''
+issue_list_html = '''
 REPLACE_PREAMBLE
 <ul>
 REPLACE_ITEM
@@ -1468,5 +1469,4 @@ The following file/directory/registry permissions were considered to be potentia
 REPLACE_DANGEROUS_PERMS
 </ul>
 </html>
-'''	
-
+'''    
