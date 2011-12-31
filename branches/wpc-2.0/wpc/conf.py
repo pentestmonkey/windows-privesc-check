@@ -1,14 +1,15 @@
 # Not a class, just a bunch of constants
-import win32netcon
-import ntsecuritycon
 import _winreg
-import win32service
+import ntsecuritycon
 import win32con
+import win32netcon
+import win32service
 
 remote_server = None
 executable_file_extensions = ('exe', 'com', 'bat', 'dll', 'pl', 'rb', 'py', 'php', 'inc', 'asp', 'aspx', 'ocx', 'vbs')
 version = None
 cache = None
+on64bitwindows = None
 
 kb_nos = {
         '977165': 'MS10_015 Vulnerabilities in Windows Kernel Could Allow Elevation of Privilege (kitrap0d - meterpreter "getsystem")',

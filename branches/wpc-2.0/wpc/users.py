@@ -1,6 +1,6 @@
+from wpc.user import user
 import win32net
 import wpc.conf
-from wpc.user import user
 
 
 class users():

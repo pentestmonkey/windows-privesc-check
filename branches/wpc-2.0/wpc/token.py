@@ -1,8 +1,8 @@
-import win32security
-import ntsecuritycon
 from wpc.principal import principal
-import wpc.conf
 from wpc.sd import sd
+import ntsecuritycon
+import win32security
+import wpc.conf
 
 
 class token:

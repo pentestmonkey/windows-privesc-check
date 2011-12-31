@@ -1,7 +1,7 @@
-import win32security
-import ntsecuritycon
 from wpc.principal import principal
 from wpc.user import user
+import ntsecuritycon
+import win32security
 import wpc.conf
 
 

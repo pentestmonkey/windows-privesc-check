@@ -1,6 +1,6 @@
+from wpc.principal import principal
 import ntsecuritycon
 import wpc.conf
-from wpc.principal import principal
 
 
 class ace:

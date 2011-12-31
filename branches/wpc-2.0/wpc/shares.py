@@ -1,5 +1,5 @@
-import win32net
 from wpc.share import share
+import win32net
 import wpc.conf
 
 

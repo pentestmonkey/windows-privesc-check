@@ -1,7 +1,6 @@
-import wpc.utils
-from optparse import OptionParser
-from optparse import OptionGroup
+from optparse import OptionGroup, OptionParser
 import sys
+import wpc.utils
 
 
 def parseOptions():

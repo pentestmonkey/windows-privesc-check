@@ -1,9 +1,9 @@
 from wpc.sd import sd
-#from wpc.file import file as wpcfile
-import wpc.file
 import win32net
 import win32netcon
 import win32security
+import wpc.file
+#from wpc.file import file as wpcfile
 
 
 # Basically a huge hash of all lookups
