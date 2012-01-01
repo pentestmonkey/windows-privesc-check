@@ -579,15 +579,8 @@ wpc.utils.init(options)
 
 # Object to hold all the issues we find
 report = report()
+wpc.utils.populate_scaninfo(report)
 issues = report.get_issues()
-
-report.add_info_item('hostname', 'blahhostname')
-report.add_info_item('datetime', 'blahdatetime')
-report.add_info_item('version', 'blahversion')
-report.add_info_item('user', 'blahuser')
-report.add_info_item('domain', 'blahdomain')
-report.add_info_item('os', 'blahos')
-report.add_info_item('ipaddress', 'ipaddress')
 
 # Dump data if required
 if options.dump_mode:

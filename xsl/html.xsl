@@ -61,7 +61,7 @@
 			</xsl:for-each>
 			
 			<h2>Information about this Audit</h2>
-			<p>This report was generated on <xsl:value-of select="scaninfo/datetime"/> by <xsl:value-of select="scaninfo/version"/> of <a href="http://pentestmonkey.net/windows-privesc-check">windows-privesc-check</a>.</p>
+			<p>This report was generated on <xsl:value-of select="scaninfo/datetime"/> by version <xsl:value-of select="scaninfo/version"/> of <a href="http://pentestmonkey.net/windows-privesc-check">windows-privesc-check</a>.</p>
 			<p>The audit was run as the user <xsl:value-of select="scaninfo/user"/>.</p>
 			<p>The following table provides information about this audit:</p>
 			<table id="customers" border="1">
@@ -77,7 +77,7 @@
 
 				<tr>
 					<td>Operating System</td>
-					<td><xsl:value-of select="scaninfo/os"/></td>
+					<td><xsl:value-of select="scaninfo/os"/> (<xsl:value-of select="scaninfo/os_version"/>)</td>
 				</tr>
 
 				<tr class="alt">
