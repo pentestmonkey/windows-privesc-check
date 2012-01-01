@@ -9,7 +9,7 @@ from wpc.report.fileAcl import fileAcl
 from wpc.services import services
 from wpc.regkey import regkey
 from wpc.processes import processes
-from wpc.report.issues import issues
+from wpc.report.report import report
 import os
 import wpc.utils
 
@@ -578,7 +578,16 @@ options = parseOptions()
 wpc.utils.init(options)
 
 # Object to hold all the issues we find
-report = issues()
+report = report()
+issues = report.get_issues()
+
+report.add_info_item('hostname', 'blahhostname')
+report.add_info_item('datetime', 'blahdatetime')
+report.add_info_item('version', 'blahversion')
+report.add_info_item('user', 'blahuser')
+report.add_info_item('domain', 'blahdomain')
+report.add_info_item('os', 'blahos')
+report.add_info_item('ipaddress', 'ipaddress')
 
 # Dump data if required
 if options.dump_mode:
@@ -604,22 +613,22 @@ if options.dump_mode:
 # Check services
 if options.audit_mode:
     if options.do_services:
-        audit_services(report)
+        audit_services(issues)
 
     if options.do_drivers:
-        audit_drivers(report)
+        audit_drivers(issues)
 
     if options.do_processes:
-        audit_processes(report)
+        audit_processes(issues)
 
     if options.do_users:
-        audit_users(report)
+        audit_users(issues)
 
     if options.do_groups:
-        audit_groups(report)
+        audit_groups(issues)
 
     if options.do_registry:
-        audit_registry(report)
+        audit_registry(issues)
 
     if options.report_file_stem:
         filename = "%s.xml" % options.report_file_stem
@@ -627,17 +636,17 @@ if options.audit_mode:
         f = open(filename, 'w')
         f.write(report.as_xml_string())
         f.close()
-        
-        filename = "%s.txt" % options.report_file_stem
-        print "[+] Saving report file %s" % filename
-        f = open(filename, 'w')
-        f.write(report.as_text())
-        f.close()
 
         filename = "%s.html" % options.report_file_stem
         print "[+] Saving report file %s" % filename
         f = open(filename, 'w')
         f.write(report.as_html())
+        f.close()
+
+        filename = "%s.txt" % options.report_file_stem
+        print "[+] Saving report file %s" % filename
+        f = open(filename, 'w')
+        f.write(report.as_text())
         f.close()
 
     #wpc.conf.cache.print_stats()

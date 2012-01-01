@@ -4,7 +4,7 @@
 <xsl:output method="text" indent="no"/>
 
 <xsl:template match="report">
-	<xsl:for-each select="issue">
+	<xsl:for-each select="issues/issue">
 		<xsl:text>------------------------------------------------------------------
 </xsl:text>
     	<xsl:text>Title: </xsl:text><xsl:value-of select="normalize-space(title)" /><xsl:text>
