@@ -151,7 +151,7 @@ class issue:
                     d.append(self.render_supporting_data(data_name))
         return d
 
-    def as_text(self):
+    def as_xml(self):
         r = etree.Element('issue')
         etree.SubElement(r, 'title').text = wpc.conf.issue_template[self.get_id()]['title']
         s = etree.SubElement(r, 'section', type = 'description')
