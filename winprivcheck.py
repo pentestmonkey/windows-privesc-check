@@ -621,7 +621,23 @@ if options.audit_mode:
     if options.do_registry:
         audit_registry(report)
 
-    print report.as_text()
+    if options.report_file_stem:
+        filename = "%s.xml" % options.report_file_stem
+        print "[+] Saving report file %s" % filename
+        f = open(filename, 'w')
+        f.write(report.as_xml_string())
+        f.close()
+        
+        filename = "%s.txt" % options.report_file_stem
+        print "[+] Saving report file %s" % filename
+        f = open(filename, 'w')
+        f.write(report.as_text())
+        f.close()
+
+        filename = "%s.html" % options.report_file_stem
+        print "[+] Saving report file %s" % filename
+        f = open(filename, 'w')
+        f.write(report.as_html())
+        f.close()
 
     #wpc.conf.cache.print_stats()
-

@@ -1,6 +1,7 @@
 from wpc.report.issue import issue
 
 import xml.etree.cElementTree as etree
+from lxml import etree as letree
 
 # TODO should this class contain info about the scan?  or define a new class called report?
 # Version of script
@@ -32,9 +33,27 @@ class issues:
     def get_all(self):
         return self.issues
 
-    def as_text(self):
+    def as_xml_string(self):
+        return etree.tostring(self.as_xml())
+
+    def as_xml(self):
         r = etree.Element('report')
         for i in self.get_all():
-            r.append(i.as_text())
-        return etree.tostring(r)
+            r.append(i.as_xml())
+        return r
 
+    def as_text(self):
+        xslt_fh = open('xsl/text.xsl', 'r')  # TODO need to be able to run from other dirs too!
+        xslt_str  = xslt_fh.read()
+        xslt_fh.close()
+        xslt_root = letree.XML(xslt_str)
+        transform = letree.XSLT(xslt_root)
+        return str(transform(letree.XML(self.as_xml_string())))
+
+    def as_html(self):
+        xslt_fh = open('xsl/html.xsl', 'r')  # TODO need to be able to run from other dirs too!
+        xslt_str  = xslt_fh.read()
+        xslt_fh.close()
+        xslt_root = letree.XML(xslt_str)
+        transform = letree.XSLT(xslt_root)
+        return str(transform(letree.XML(self.as_xml_string())))
