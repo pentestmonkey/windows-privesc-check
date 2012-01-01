@@ -7,18 +7,106 @@
 
 <xsl:template match="report">
 	<html>
+		<style type="text/css">
+			body {color:black}
+			td
+			{
+			vertical-align:top;
+			}
+			h1 {font-size: 300%; text-align:center}
+			h2 {font-size: 200%; margin-top: 25px; margin-bottom: 0px; padding: 5px; background-color: #CCCCCC;}
+			h3 {font-size: 150%; font-weight: normal; padding: 5px; background-color: #EEEEEE; margin-top: 10px;}
+			#frontpage {height: 270px; background-color: #F3F3F3;}
+			p.ex {color:rgb(0,0,255)}
+
+			#customers
+			{
+			font-family:"Trebuchet MS", Arial, Helvetica, sans-serif;
+			/* width:100%; */
+			padding:10px 0px 0px 0px;
+			border-collapse:collapse;
+			}
+			#customers td, #customers th 
+			{
+			font-size:1em;
+			border:1px solid #989898;
+			padding:3px 7px 2px 7px;
+			}
+			#customers th 
+			{
+			font-size:1.1em;
+			text-align:left;
+			padding-top:5px;
+			padding-bottom:4px;
+			background-color:#A7C942;
+			color:#ffffff;
+			}
+			#customers tr.alt td 
+			{
+			color:#000000;
+			background-color:#EAF2D3;
+			}
+		</style>
 		<head>
-			<title>Windows Privilege Escalation Report</title>
+			<div id="frontpage">
+				<h1><p>Windows Privilege Escalation Report</p> <p>Audit of Host: </p><p>TODO_HOSTNAME</p></h1>
+			</div>
 		</head>
 		<body>
-		    <h1>Windows Privilege Escalation Report</h1>
+		
+			<h2>Contents</h2>	
+			<xsl:for-each select="issue">
+		    	<p><xsl:text disable-output-escaping="yes">&lt;a href=&quot;#</xsl:text><xsl:value-of select="normalize-space(title)"/><xsl:text disable-output-escaping="yes">&quot;&gt;</xsl:text><xsl:value-of select="normalize-space(title)"/><xsl:text disable-output-escaping="yes">&lt;/a&gt;</xsl:text></p>
+			</xsl:for-each>
+			
+			<h2>Information about this Audit</h2>
+			<p>This report was generated on TODO_DATETIME by TODO_VERSION of <a href="http://pentestmonkey.net/windows-privesc-check">windows-privesc-check</a>.</p>
+			<p>The audit was run as the user TODO_USER.</p>
+			<p>The following table provides information about this audit:</p>
+			<table id="customers" border="1">
+				<tr>
+					<td>Hostname</td>
+					<td>TODO_HOSTNAME</td>
+				</tr>
+				
+				<tr class="alt">
+					<td>Domain/Workgroup</td>
+					<td>TODO_DOMAIN</td>
+				</tr>
+
+				<tr>
+					<td>Operating System</td>
+					<td>TODO_OS</td>
+				</tr>
+
+				<tr class="alt">
+					<td>IP Addresses</td>
+					<td>
+						<ul>
+							<li>TODO_IPADDRESS</li>
+						</ul>
+					</td>
+				</tr>
+			</table> 
+		
+			<h2>Escalation Vectors</h2>
 			<xsl:for-each select="issue">
 				<hr/>
-		    	<h2><xsl:value-of select="normalize-space(title)" /></h2>
+		    	<h3><xsl:text disable-output-escaping="yes">&lt;a name=&quot;</xsl:text><xsl:value-of select="normalize-space(title)"/><xsl:text disable-output-escaping="yes">&quot;&gt;</xsl:text><xsl:value-of select="normalize-space(title)"/><xsl:text disable-output-escaping="yes">&lt;/a&gt;</xsl:text></h3>
 				<xsl:for-each select="section">
-					<h3><xsl:value-of select="@type" /></h3>
-					<p><xsl:value-of select="normalize-space(body)"/></p>
-					<xsl:apply-templates select="details"/> 
+					<table>
+						<tr>
+							<td>
+								<b><xsl:value-of select="@type" /></b>
+							</td>
+							<td>
+								<p><xsl:value-of select="normalize-space(body)"/></p>
+								<xsl:apply-templates select="details"/> 
+							</td>
+						</tr>
+						
+					</table>
+					
 				</xsl:for-each>
 			</xsl:for-each>
 		</body>
@@ -28,11 +116,11 @@
 <xsl:template match="details">
     <p><xsl:value-of select="preamble"/></p>
     <xsl:if test="supporting_data/*">
-        <table border="1" width="80%">
+		<ul>
 	    <xsl:for-each select="supporting_data/data">
-	    	<tr><td><xsl:value-of select="normalize-space(.)"/></td></tr>
+			<li><xsl:value-of select="normalize-space(.)"/></li>
 	    </xsl:for-each>
-	    </table>
+		</ul>
     </xsl:if>
 </xsl:template>
 
