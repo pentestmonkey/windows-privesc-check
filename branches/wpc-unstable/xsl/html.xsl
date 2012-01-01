@@ -47,50 +47,52 @@
 			background-color:#EAF2D3;
 			}
 		</style>
+		
 		<head>
 			<div id="frontpage">
-				<h1><p>Windows Privilege Escalation Report</p> <p>Audit of Host: </p><p>TODO_HOSTNAME</p></h1>
+				<h1><p>Windows Privilege Escalation Report</p> <p>Audit of Host: </p><p><xsl:value-of select="scaninfo/hostname"/></p></h1>
 			</div>
 		</head>
-		<body>
 		
+		<body>
 			<h2>Contents</h2>	
-			<xsl:for-each select="issue">
+			<xsl:for-each select="issues/issue">
 		    	<p><xsl:text disable-output-escaping="yes">&lt;a href=&quot;#</xsl:text><xsl:value-of select="normalize-space(title)"/><xsl:text disable-output-escaping="yes">&quot;&gt;</xsl:text><xsl:value-of select="normalize-space(title)"/><xsl:text disable-output-escaping="yes">&lt;/a&gt;</xsl:text></p>
 			</xsl:for-each>
 			
 			<h2>Information about this Audit</h2>
-			<p>This report was generated on TODO_DATETIME by TODO_VERSION of <a href="http://pentestmonkey.net/windows-privesc-check">windows-privesc-check</a>.</p>
-			<p>The audit was run as the user TODO_USER.</p>
+			<p>This report was generated on <xsl:value-of select="scaninfo/datetime"/> by <xsl:value-of select="scaninfo/version"/> of <a href="http://pentestmonkey.net/windows-privesc-check">windows-privesc-check</a>.</p>
+			<p>The audit was run as the user <xsl:value-of select="scaninfo/user"/>.</p>
 			<p>The following table provides information about this audit:</p>
 			<table id="customers" border="1">
 				<tr>
 					<td>Hostname</td>
-					<td>TODO_HOSTNAME</td>
+					<td><xsl:value-of select="scaninfo/hostname"/></td>
 				</tr>
 				
 				<tr class="alt">
 					<td>Domain/Workgroup</td>
-					<td>TODO_DOMAIN</td>
+					<td><xsl:value-of select="scaninfo/domain"/></td>
 				</tr>
 
 				<tr>
 					<td>Operating System</td>
-					<td>TODO_OS</td>
+					<td><xsl:value-of select="scaninfo/os"/></td>
 				</tr>
 
 				<tr class="alt">
 					<td>IP Addresses</td>
 					<td>
 						<ul>
-							<li>TODO_IPADDRESS</li>
+							<li><xsl:value-of select="scaninfo/ipaddress"/></li>
 						</ul>
 					</td>
 				</tr>
 			</table> 
-		
+			
+			
 			<h2>Escalation Vectors</h2>
-			<xsl:for-each select="issue">
+			<xsl:for-each select="issues/issue">
 				<hr/>
 		    	<h3><xsl:text disable-output-escaping="yes">&lt;a name=&quot;</xsl:text><xsl:value-of select="normalize-space(title)"/><xsl:text disable-output-escaping="yes">&quot;&gt;</xsl:text><xsl:value-of select="normalize-space(title)"/><xsl:text disable-output-escaping="yes">&lt;/a&gt;</xsl:text></h3>
 				<xsl:for-each select="section">

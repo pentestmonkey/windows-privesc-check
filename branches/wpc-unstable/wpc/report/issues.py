@@ -37,7 +37,7 @@ class issues:
         return etree.tostring(self.as_xml())
 
     def as_xml(self):
-        r = etree.Element('report')
+        r = etree.Element('issues')
         for i in self.get_all():
             r.append(i.as_xml())
         return r
