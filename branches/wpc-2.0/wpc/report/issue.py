@@ -136,6 +136,16 @@ class issue:
                 f = data[2]
                 d += " %s references %s which has weak permissions.  TODO weak how?\n" % (r.get_name() + "\\" + v, f.get_name())
 
+        elif data_name == 'sectool_services':
+            for data in self.get_supporting_data(data_name):
+                s = data[0]
+                d += " %s (%s) runs '%s' as %s\n" % (s.get_description(), s.get_name(), s.get_exe_path(), s.get_run_as()) 
+
+        elif data_name == 'sectool_files':
+            for data in self.get_supporting_data(data_name):
+                f = data[0]
+                d += " %s\n" % (f.get_name())
+
         elif data_name == 'writeable_dirs' or data_name == 'files_write_perms':
             for o in self.get_supporting_data(data_name):
                 d += o.as_text() + "\n"
