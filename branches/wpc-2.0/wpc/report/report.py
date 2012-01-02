@@ -1,6 +1,9 @@
 from wpc.report.issues import issues
 import xml.etree.cElementTree as etree
 from lxml import etree as letree
+import os.path
+import sys
+
 
 # A list of issues with some information about the scan
 class report():
@@ -40,21 +43,26 @@ class report():
         return etree.tostring(self.as_xml())
 
     def as_text(self):
-        xslt_fh = open('xsl/text.xsl', 'r')  # TODO need to be able to run from other dirs too!
+        if hasattr(sys, 'frozen'):
+            datafile = os.path.join(os.environ['_MEIPASS2'], 'text.xsl')
+        elif __file__:
+            datafile = os.path.join(os.path.dirname(__file__), '..', '..', 'xsl', 'text.xsl')
+        xslt_fh = open(datafile, 'r')
         xslt_str  = xslt_fh.read()
         xslt_fh.close()
         xslt_root = letree.XML(xslt_str)
         transform = letree.XSLT(xslt_root)
         return str(transform(letree.XML(self.as_xml_string())))
 
+    # TODO duplicated lots of code from as_text
     def as_html(self):
-        xslt_fh = open('xsl/html.xsl', 'r')  # TODO need to be able to run from other dirs too!
+        if hasattr(sys, 'frozen'):
+            datafile = os.path.join(os.environ['_MEIPASS2'], 'html.xsl')
+        elif __file__:
+            datafile = os.path.join(os.path.dirname(__file__), '..', '..', 'xsl', 'html.xsl')
+        xslt_fh = open(datafile, 'r')
         xslt_str  = xslt_fh.read()
         xslt_fh.close()
         xslt_root = letree.XML(xslt_str)
         transform = letree.XSLT(xslt_root)
         return str(transform(letree.XML(self.as_xml_string())))
-
-#        r = etree.Element('issue')
-#        etree.SubElement(r, 'title').text = wpc.conf.issue_template[self.get_id()]['title']
-#        s = etree.SubElement(r, 'section', type = 'description')
