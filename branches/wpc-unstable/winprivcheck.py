@@ -624,11 +624,12 @@ if options.audit_mode:
         audit_registry(issues)
 
     if options.report_file_stem:
-        filename = "%s.xml" % options.report_file_stem
-        print "[+] Saving report file %s" % filename
-        f = open(filename, 'w')
-        f.write(report.as_xml_string())
-        f.close()
+        # Don't expose XML to users as format will change shortly
+        #filename = "%s.xml" % options.report_file_stem
+        #print "[+] Saving report file %s" % filename
+        #f = open(filename, 'w')
+        #f.write(report.as_xml_string())
+        #f.close()
 
         filename = "%s.html" % options.report_file_stem
         print "[+] Saving report file %s" % filename
