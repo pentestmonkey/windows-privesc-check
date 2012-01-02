@@ -1335,6 +1335,31 @@ Further information about CLSIDs is available here: http://msdn.microsoft.com/en
        }
     },                 
 
+    'WPC065': {
+       'title': "Windows Services for Pentesting/Auditing Tools Found",
+       'description': '''Some of the Windows service running appear to correspond to tools that are commons used for pentesting or auditing.  These may or may not present a security problem.  The main purpose of this issue is to advise the auditor to check if they accidentally added any Windows services.''',
+       'recommendation': '''Check each of the Windows services below and remove them if they have been added during the pentest/audit.''',
+       'supporting_data': {
+          'sectool_services': {
+             'section': "description",
+             'preamble': "The following windows services appear to be pentesting/auditing tools:",
+          },
+       }
+    },
+
+    'WPC066': {
+       'title': "Files for Pentesting/Auditing Tools Found (TODO)",
+       'description': '''Some of the files found during the audit have the same name as tools used during pentesting and security auditing.  These may or may not present a security problem.  The main purpose of this issue is to advise the auditor to check if they forgot to remove any tools.''',
+       'recommendation': '''Check each of the files below and remove them if they have been added during the pentest/audit.''',
+       'supporting_data': {
+          'sectool_files': {
+             'section': "description",
+             'preamble': "The following files appear to be pentesting/auditing tools:",
+          },
+       }
+    },
+
+
 }
 
 issue_template_html = '''

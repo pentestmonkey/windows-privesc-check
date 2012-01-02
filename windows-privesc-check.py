@@ -131,7 +131,31 @@ def audit_services(report):
                     # Domain account - TODO better way to tell if acct is a domain acct?
                     report.get_by_id("WPC063").add_supporting_data('service_domain_user', [s])
 
+        if s.get_name() in ("PSEXESVC", "Abel", "fgexec"):
+            report.get_by_id("WPC065").add_supporting_data('sectool_services', [s])
+        elif s.get_description() in ("PsExec", "Abel", "fgexec"):
+            report.get_by_id("WPC065").add_supporting_data('sectool_services', [s])
+           
+        # TODO check for the presence of files - but not from here 
         #
+        # Check if pentest/audit tools have accidentally been left running
+        #
+        # TODO: psexec
+        # disp name = PsExec
+        # Desc = blank
+        # svc name = PSEXESVC
+        # image = C:\WINDOWS\PSEXESVC.EXE
+        #
+        # TODO: abel
+        # disp name = Abel
+        # desc = blank
+        # svc name = Abel
+        # image = C:\WINDOWS\system32\spool\drivers\Abel.exe
+        #
+        # TODO: fgdump
+        # image = %temp%\pwdump.exe
+        # %temp%\lsremora.dll fgexec.exe cachedump.exe pstgdump.exe servpw64.exe cachedump64.exe 
+        # lsremora64.dll servpw.exe
         # Examine registry key for service
         #
         if s.get_reg_key() and s.get_reg_key().get_sd():
