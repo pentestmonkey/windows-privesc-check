@@ -8,7 +8,7 @@ def parseOptions():
     usage = "%s (--dump [ dump opts] |--audit) [examine opts] [host opts] -o report-file-stem" % (sys.argv[0])
 
     parser  = OptionParser(usage = usage, version = wpc.utils.get_version())
-    examine = OptionGroup(parser, "examine opts", "At least one of these to indicate what to examine")
+    examine = OptionGroup(parser, "examine opts", "At least one of these to indicate what to examine (*=not implemented)")
     host    = OptionGroup(parser, "host opts", "Optional details about a remote host (experimental).  Default is current host.")
     dump    = OptionGroup(parser, "dump opts", "Options to modify the behaviour of dump mode")
     report  = OptionGroup(parser, "report opts", "Reporting options")
@@ -16,17 +16,25 @@ def parseOptions():
     parser.add_option("--dump",  dest = "dump_mode", default = False, action = "store_true", help = "Dumps info for you to analyse manually")
     parser.add_option("--audit", dest = "audit_mode", default = False, action = "store_true", help = "Identify and report security weaknesses")
 
-    examine.add_option("-s", "--services",  dest = "do_services", default = False, action = "store_true", help = "Windows Services")
-    examine.add_option("-d", "--drivers",   dest = "do_drivers", default = False, action = "store_true", help = "Kernel Drivers")
-    examine.add_option("-P", "--processes", dest = "do_processes", default = False, action = "store_true", help = "Processes")
-    examine.add_option("-r", "--registry",  dest = "do_registry", default = False, action = "store_true", help = "Registry Settings + Permissions")
-    examine.add_option("-U", "--users"    , dest = "do_users", default = False, action = "store_true", help = "Users")
-    examine.add_option("-G", "--groups"   , dest = "do_groups", default = False, action = "store_true", help = "Groups")
+    examine.add_option("-a", "--all",       dest = "do_all",           default = False, action = "store_true", help = "All Checks")
+    examine.add_option("-t", "--paths",     dest = "do_paths",         default = False, action = "store_true", help = "PATH")
+    examine.add_option("-D", "--drives",    dest = "do_drives",        default = False, action = "store_true", help = "Drives*")
+    examine.add_option("-E", "--eventlogs", dest = "do_eventlogs",     default = False, action = "store_true", help = "Event Log*")
+    examine.add_option("-H", "--shares",    dest = "do_shares",        default = False, action = "store_true", help = "Shares*")
+    examine.add_option("-T", "--patches",   dest = "do_patches",       default = False, action = "store_true", help = "Patchs*")
+    examine.add_option("-L", "--loggedin",  dest = "do_loggedin",      default = False, action = "store_true", help = "Logged In*")
+    examine.add_option("-S", "--services",  dest = "do_services",      default = False, action = "store_true", help = "Windows Services")
+    examine.add_option("-k", "--drivers",   dest = "do_drivers",       default = False, action = "store_true", help = "Kernel Drivers")
+    examine.add_option("-R", "--processes", dest = "do_processes",     default = False, action = "store_true", help = "Processes")
+    examine.add_option("-P", "--progfiles", dest = "do_program_files", default = False, action = "store_true", help = "Program Files Directory Tree")
+    examine.add_option("-r", "--registry",  dest = "do_registry",      default = False, action = "store_true", help = "Registry Settings + Permissions")
+    examine.add_option("-U", "--users",     dest = "do_users",         default = False, action = "store_true", help = "Users")
+    examine.add_option("-G", "--groups",    dest = "do_groups",        default = False, action = "store_true", help = "Groups")
 
-    host.add_option("-t", "--target", dest = "remote_host",   help = "Remote host or IP")
+    host.add_option("-s", "--server", dest = "remote_host",   help = "Remote host or IP")
     host.add_option("-u", "--user",   dest = "remote_user",   help = "Remote username")
     host.add_option("-p", "--pass",   dest = "remote_pass",   help = "Remote password")
-    host.add_option("-D", "--domain", dest = "remote_domain", help = "Remote domain")
+    host.add_option("-d", "--domain", dest = "remote_domain", help = "Remote domain")
 
     dump.add_option("-i", "--ignore_trusted", dest = "ignore_trusted", default = False, action = "store_true", help = "Ignore ACEs for Trusted Users")
     dump.add_option("-m", "--get_members",    dest = "get_members",    default = False, action = "store_true", help = "Dump group members (use with -G)")
@@ -41,20 +49,20 @@ def parseOptions():
 
     (options, args) = parser.parse_args()
 
-    if not options.report_file_stem:
+    if options.audit_mode and not options.report_file_stem:
         print "[E] Specify report filename stem, e.g. '-o report-myhost'.  -h for help."
         sys.exit()
-        
+
     # TODO check file is writable.
-        
+
     if not options.dump_mode and not options.audit_mode:
         print "[E] Specify either --dump or --audit.  -h for help."
         sys.exit()
 
     # TODO can't use -m without -G
 
-    if not (options.do_services or options.do_drivers or options.do_processes or options.do_registry or options.do_users or options.do_groups):
-        print "[E] Specify something to look at.  At least one of: -s, -d, -P, -r, -U, -G"
+    if not (options.do_all or options.do_services or options.do_drivers or options.do_processes or options.do_registry or options.do_users or options.do_groups or options.do_program_files or options.do_paths or options.do_drives or options.do_eventlogs or options.do_shares or options.do_loggedin or options.do_users or options.do_groups):
+        print "[E] Specify something to look at.  At least one of: -a, -t, -D, -E, -H, -T, -L -U, -s, -d, -P, -r, -R, -U, -G.  -h for help."
         sys.exit()
 
     return options

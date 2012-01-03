@@ -31,6 +31,18 @@ class issue:
                 p = data[1]
                 etree.SubElement(d, 'data').text = "    %s (%s) which runs as %s is owned by %s\n" % (s.get_description(), s.get_name(), s.get_run_as(), p.get_fq_name())
 
+        elif data_name == 'writable_dirs':
+            for data in self.get_supporting_data(data_name):
+                f = data[0]
+                a = data[1]
+                etree.SubElement(d, 'data').text = "    File %s has weak permissions: %s\n" % (f.get_name(), a.as_text())
+
+        elif data_name == 'writable_progs':
+            for data in self.get_supporting_data(data_name):
+                f = data[0]
+                a = data[1]
+                etree.SubElement(d, 'data').text = "    File %s has weak permissions: %s\n" % (f.get_name(), a.as_text())
+
         elif data_name == 'service_exe_write_perms':
             for data in self.get_supporting_data(data_name):
                 s = data[0]
@@ -137,6 +149,31 @@ class issue:
             for data in self.get_supporting_data(data_name):
                 f = data[0]
                 etree.SubElement(d, 'data').text = " %s\n" % (f.get_name())
+
+        elif data_name == 'process_exe':
+            for data in self.get_supporting_data(data_name):
+                p = data[0]
+                etree.SubElement(d, 'data').text = " Process ID %s (%s) as weak permissions.  TODO: Weak how?\n" % (p.get_pid(), p.get_exe().get_name())
+
+        elif data_name == 'process_dll':
+            for data in self.get_supporting_data(data_name):
+                p = data[0]
+                dll = data[1]
+                if p.get_exe():
+                    exe = p.get_exe().get_name()
+                else:
+                    exe = "[unknown]"
+                etree.SubElement(d, 'data').text = " Process ID %s (%s) uses DLL %s.  DLL has weak permissions.  TODO: Weak how?\n" % (p.get_pid(), p.get_exe().get_name(), dll.get_name())
+
+        elif data_name == 'process_perms':
+            for data in self.get_supporting_data(data_name):
+                p = data[0]
+                perms = data[1]
+                if p.get_exe():
+                    exe = p.get_exe().get_name()
+                else:
+                    exe = "[unknown]"
+                etree.SubElement(d, 'data').text = " Process ID %s (%s) has weak process-level permissions: %s\n" % (p.get_pid(), exe, perms.as_text())
 
         elif data_name == 'writeable_dirs' or data_name == 'files_write_perms':
             for o in self.get_supporting_data(data_name):

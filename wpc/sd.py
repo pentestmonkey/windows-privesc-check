@@ -21,9 +21,10 @@ class sd(acelist):
         if self.acelist == None:
             self.acelist = acelist()
             dacl = self.get_dacl()
-            for ace_no in range(0, self.dacl.GetAceCount()):
-                #print "[D] ACE #%d" % ace_no
-                self.acelist.add(ace(self.get_type(), dacl.GetAce(ace_no)))
+            if dacl:  # Some files will have no DACL - e.g. on HGFS file systems
+                for ace_no in range(0, self.dacl.GetAceCount()):
+                    #print "[D] ACE #%d" % ace_no
+                    self.acelist.add(ace(self.get_type(), dacl.GetAce(ace_no)))
         return self.acelist.get_aces()
 
     def get_acelist(self):

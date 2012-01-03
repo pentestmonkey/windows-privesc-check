@@ -12,9 +12,27 @@ import ctypes
 import os
 import wpc.conf
 import wpc.utils
-
+import glob
 
 # ---------------------- Define Subs ---------------------------
+def dump_paths(report):
+    print "[E] dump_paths not implemented yet.  Sorry."
+
+def dump_eventlogs(report):
+    print "[E] dump_eventlogs not implemented yet.  Sorry."
+
+def dump_shares(report):
+    print "[E] dump_shares not implemented yet.  Sorry."
+
+def dump_patches(report):
+    print "[E] dump_patches not implemented yet.  Sorry."
+
+def dump_loggedin(report):
+    print "[E] dump_loggedin not implemented yet.  Sorry."
+
+def dump_program_files(report):
+    print "[E] dump_program_files not implemented yet.  Sorry."
+
 def dump_services(opts):
     for s in services().get_services():
         if opts.ignore_trusted:
@@ -87,16 +105,59 @@ def dump_groups(opts):
 def dump_registry(opts):
     print "[!] Registry dump option not implemented yet.  Sorry." # TODO
 
-def audit_drivers(opts):
+def audit_eventlogs(report):
+    print "[E] audit_eventlogs not implemented yet.  Sorry."
+
+def audit_shares(report):
+    print "[E] audit_shares not implemented yet.  Sorry."
+
+def audit_patches(report):
+    print "[E] audit_patches not implemented yet.  Sorry."
+
+def audit_loggedin(report):
+    print "[E] audit_loggedin not implemented yet.  Sorry."
+
+def audit_drivers(report):
     print "[!] Driver audit option not implemented yet.  Sorry." # TODO
 
-def audit_processes(opts):
-    print "[!] Process audit option not implemented yet.  Sorry." # TODO
+def audit_processes(report):
+    for p in processes().get_all():
+        print p.as_text()
 
-def audit_users(opts):
+        print "[D] Dangerous process perms"
+        # TODO check the dangerous perms aren't held by the process owner
+        if p.get_sd():
+            perms = p.get_sd().get_acelist().get_untrusted().get_dangerous_perms().get_aces()
+            for perm in perms:
+                    report.get_by_id("WPC069").add_supporting_data('process_perms', [p, perm])
+        print "[D] End"
+
+        # When listing DLLs for a process we need to see the filesystem like they do
+        if p.is_wow64():
+            k32.Wow64EnableWow64FsRedirection(ctypes.byref(wow64))
+
+        if p.get_exe():
+            if p.get_exe().is_replaceable():
+                report.get_by_id("WPC067").add_supporting_data('process_exe', [p])
+                print "[D] Security Descriptor for replaceable Exe File %s" % p.get_exe().get_name()
+                if p.get_exe().get_sd():
+                    print p.get_exe().get_sd().as_text()
+                else:
+                    print "[unknown]"
+
+                for dll in p.get_dlls():
+                    if dll.is_replaceable():
+                        report.get_by_id("WPC068").add_supporting_data('process_dll', [p, dll])
+                        print "\nSecurity Descriptor for replaceable DLL File %s" % dll.get_name()
+                        print dll.get_sd().as_text()
+
+        if p.is_wow64():
+            k32.Wow64DisableWow64FsRedirection(ctypes.byref(wow64))
+
+def audit_users(report):
     print "[!] User audit option not implemented yet.  Sorry." # TODO
 
-def audit_groups(opts):
+def audit_groups(report):
     print "[!] Group audit option not implemented yet.  Sorry." # TODO
 
 def audit_services(report):
@@ -461,7 +522,7 @@ def audit_registry(report):
 
     r = regkey("HKEY_LOCAL_MACHINE\\SOFTWARE\\Classes\\CLSID")
     for clsid_key in r.get_subkeys():
-        print "[D] Processing clsid %s" % clsid_key.get_name()
+        # print "[D] Processing clsid %s" % clsid_key.get_name()
         for v in ("InprocServer", "InprocServer32", "LocalServer", "LocalServer32"):
             s = regkey(clsid_key.get_name() + "\\" + v)
             if r.is_present:
@@ -473,7 +534,8 @@ def audit_registry(report):
                         f = wpc.utils.find_in_path(f)
 
                     if f and f.exists():
-                        print "[D] checking security of %s" % f.get_name()
+                        #print "[D] checking security of %s" % f.get_name()
+                        pass
                     else:
 
                         f_str2 = wpc.utils.get_exe_path_clean(f_str_expanded)
@@ -530,66 +592,59 @@ def audit_registry(report):
                 report.get_by_id("WPC050").add_supporting_data('regkey_perms', [r, acl])
 
 # Gather info about files and directories
-def gather_file_info(file_info):
+def audit_program_files(report):
     # Record info about all directories
     include_dirs = 1
 
-    # TODO how to set this automatically?
-    prog_dirs = (r'C:\Program Files', r'C:\Program Files (x86)') # TODO why can't i have just one entry here?
-    #prog_dirs = (r'C:\Program Files (x86)\adobe', r'C:\Program Files (x86)\adobe')
+    prog_dirs = []
+    if os.getenv('ProgramFiles'):
+        prog_dirs.append(os.environ['ProgramFiles'])
+
+    if os.getenv('ProgramFiles(x86)'):
+        prog_dirs.append(os.environ['ProgramFiles(x86)'])
 
     for dir in prog_dirs:
         # Walk program files directories looking for executables
-        # TODO allow wpc.conf.executable_file_extensions to be changed from command line
         for filename in wpc.utils.dirwalk(dir, wpc.conf.executable_file_extensions, include_dirs):
-            #print "[D] Processing: " + filename
-            file_info.add_by_name(filename)
-            # TODO would it be helpful to add tags to files - e.g. executable, executable_dir, program_files, etc.?
-            #      we might be able to do clever queries later
-
-def analyse_file_info(file_info, report):
-    for f in file_info.get_files():
-        #print "[D] Analysing: " + f.get_name()
-        a = f.get_dangerous_aces()
-
-        if not a == []:
-            if f.is_dir():
-                report.get_by_id("WPC001").add_supporting_data('writable_dirs', fileAcl(f.get_name(), a))
-            elif f.is_file():
-                report.get_by_id("WPC001").add_supporting_data('writable_progs', fileAcl(f.get_name(), a))    
-            else:
-                print "[E] Ignoring thing that isn't file or directory: " + f.get_name()
-
-def program_files(report):
-    # Record info about all directories
-    include_dirs = 1
-
-    # TODO how to set this automatically?
-    prog_dirs = (r'C:\Program Files', r'C:\Program Files (x86)') # TODO why can't i have just one entry here?
-    #prog_dirs = (r'C:\Program Files (x86)\adobe', r'C:\Program Files (x86)\adobe')
-
-    for dir in prog_dirs:
-        # Walk program files directories looking for executables
-        # TODO allow wpc.conf.executable_file_extensions to be changed from command line
-        for filename in wpc.utils.dirwalk(dir, wpc.conf.executable_file_extensions, include_dirs):
-            #print "[D] Processing: " + filename
             f = File(filename)
-            # TODO would it be helpful to add tags to files - e.g. executable, executable_dir, program_files, etc.?
-            #      we might be able to do clever queries later
-            if f.is_replaceable():
-                print "[D]: Replaceable: " + f.get_name()
+            # TODO check file owner, parent paths, etc.  Maybe use is_replaceable instead?
+            aces = f.get_dangerous_aces()
 
-            continue
-            #print "[D] Analysing: " + f.get_name()
-            a = f.get_dangerous_aces()
-
-            if not a == []:
+            for ace in aces:
                 if f.is_dir():
-                    report.get_by_id("WPC001").add_supporting_data('writable_dirs', fileAcl(f.get_name(), a))
+                    report.get_by_id("WPC001").add_supporting_data('writable_dirs', [f, ace])
                 elif f.is_file():
-                    report.get_by_id("WPC001").add_supporting_data('writable_progs', fileAcl(f.get_name(), a))    
+                    report.get_by_id("WPC001").add_supporting_data('writable_progs', [f, ace])    
                 else:
                     print "[E] Ignoring thing that isn't file or directory: " + f.get_name()
+
+def audit_paths(report):
+    # WPC013 - system path
+    #audit_path_for_issue(report, p, "WPC013")
+    # WPC014 - current user's path
+    audit_path_for_issue(report, os.environ["PATH"], "WPC014")
+    # WPC015 - users' path
+    #audit_path_for_issue(report, p, "WPC015")
+    
+def audit_path_for_issue(report, mypath, issueid):
+    dirs = set(mypath.split(';'))
+    exts = wpc.conf.executable_file_extensions
+    for dir in dirs:
+        weak_flag = 0
+        d = File(dir)
+        aces = d.get_dangerous_aces()
+        for ace in aces:
+            report.get_by_id(issueid).add_supporting_data('writable_dirs', [d, ace])
+
+        for ext in exts:
+            for myfile in glob.glob(dir + '\*.' + ext):
+                f = File(myfile)
+                aces = f.get_dangerous_aces()
+                for ace in aces:
+                    report.get_by_id(issueid).add_supporting_data('writable_progs', [f, ace])
+                    
+        # TODO properly check perms with is_replaceable
+
 
 # ------------------------ Main Code Starts Here ---------------------
 
@@ -605,54 +660,91 @@ report = report()
 wpc.utils.populate_scaninfo(report)
 issues = report.get_issues()
 
-# Dump data if required
+# Dump raw data if required
 if options.dump_mode:
 
-    if options.do_services:
-        dump_services(options)
+    if options.do_all or options.do_paths:
+        dump_paths(issues)
 
-    if options.do_drivers:
-        dump_drivers(options)
+    if options.do_all or options.do_eventlogs:
+        dump_eventlogs(issues)
 
-    if options.do_processes:
-        dump_processes(options)
+    if options.do_all or options.do_shares:
+        dump_shares(issues)
 
-    if options.do_users:
-        dump_users(options)
+    if options.do_all or options.do_patches:
+        dump_patches(issues)
 
-    if options.do_groups:
-        dump_groups(options)
+    if options.do_all or options.do_loggedin:
+        dump_loggedin(issues)
 
-    if options.do_registry:
-        dump_registry(options)
+    if options.do_all or options.do_services:
+        dump_services(issues)
 
-# Check services
+    if options.do_all or options.do_drivers:
+        dump_drivers(issues)
+
+    if options.do_all or options.do_processes:
+        dump_processes(issues)
+
+    if options.do_all or options.do_program_files:
+        dump_program_files(issues)
+
+    if options.do_all or options.do_registry:
+        dump_registry(issues)
+
+    if options.do_all or options.do_users:
+        dump_users(issues)
+
+    if options.do_all or options.do_groups:
+        dump_groups(issues)
+
+# Identify security issues
 if options.audit_mode:
-    if options.do_services:
+
+    if options.do_all or options.do_paths:
+        audit_paths(issues)
+
+    if options.do_all or options.do_eventlogs:
+        audit_eventlogs(issues)
+
+    if options.do_all or options.do_shares:
+        audit_shares(issues)
+
+    if options.do_all or options.do_patches:
+        audit_patches(issues)
+
+    if options.do_all or options.do_loggedin:
+        audit_loggedin(issues)
+
+    if options.do_all or options.do_services:
         audit_services(issues)
 
-    if options.do_drivers:
+    if options.do_all or options.do_drivers:
         audit_drivers(issues)
 
-    if options.do_processes:
+    if options.do_all or options.do_processes:
         audit_processes(issues)
 
-    if options.do_users:
+    if options.do_all or options.do_program_files:
+        audit_program_files(issues)
+
+    if options.do_all or options.do_registry:
+        audit_registry(issues)
+
+    if options.do_all or options.do_users:
         audit_users(issues)
 
-    if options.do_groups:
+    if options.do_all or options.do_groups:
         audit_groups(issues)
-
-    if options.do_registry:
-        audit_registry(issues)
 
     if options.report_file_stem:
         # Don't expose XML to users as format will change shortly
-        #filename = "%s.xml" % options.report_file_stem
+        filename = "%s.xml" % options.report_file_stem
         #print "[+] Saving report file %s" % filename
-        #f = open(filename, 'w')
-        #f.write(report.as_xml_string())
-        #f.close()
+        f = open(filename, 'w')
+        f.write(report.as_xml_string())
+        f.close()
 
         filename = "%s.html" % options.report_file_stem
         print "[+] Saving report file %s" % filename
