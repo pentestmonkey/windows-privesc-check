@@ -7,15 +7,21 @@ import wpc.conf
 
 # These have properties such as active, workstations that groups don't have
 class user(principal):
+
+    def __init__(self, *args, **kwargs):
+        principal.__init__(self, *args, **kwargs)
+        self.info = None
+        self.member_of = None
+
     def get_groups(self):
         if self.member_of:
             return self.member_of
 
         from wpc.group import group as Group # we have to import here to avoid circular import
-        
+
         g1 = []
         g2 = []
-        
+
         try:
             g1 = win32net.NetUserGetLocalGroups(wpc.conf.remote_server, self.get_name(), 0)
         except:
@@ -29,7 +35,7 @@ class user(principal):
         for group in g1:
             gsid, s, i = wpc.conf.cache.LookupAccountName(wpc.conf.remote_server, group)
             self.member_of.append(Group(gsid))
-            
+
         return self.member_of
 
     def get_info(self, key):

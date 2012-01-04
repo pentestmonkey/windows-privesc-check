@@ -21,6 +21,7 @@ class token:
         self.token_integrity_level = None
         self.token_mandatory_policy = None
         self.token_restricted_sids = []
+        self.token_impersonation_level = None
         self.token_restricted = None
         self.token_user = None
         self.token_primary_group = None
@@ -226,7 +227,7 @@ class token:
                     if attr & 4:
                         attr_str_a.append("REMOVED")
 
-                    self.token_privileges.append((win32security.LookupPrivilegeName(wpc.conf.remote_server, priv_val), attr_str_a)) 
+                    self.token_privileges.append((win32security.LookupPrivilegeName(wpc.conf.remote_server, priv_val), attr_str_a))
 
             #except:
             #    pass
@@ -262,7 +263,7 @@ class token:
             t += "Token User: " + str(self.get_token_user().get_fq_name()) + "\n"
         if self.get_token_primary_group():
             t += "Token Group: " + str(self.get_token_primary_group().get_fq_name()) + "\n"
-        t += "Token Type: " + str(self.get_token_type()) + "\n" 
+        t += "Token Type: " + str(self.get_token_type()) + "\n"
         t += "Token Origin: " + str(self.get_token_origin()) + "\n"
         t += "Token Source: " + str(self.get_token_source()) + "\n"
         t += "TokenHasRestrictions: " + str(self.get_token_restrictions()) + "\n"
@@ -294,7 +295,7 @@ class token:
             t += "Token User: " + str(self.get_token_user().get_fq_name()) + "\n"
         if self.get_token_primary_group():
             t += "Token Group: " + str(self.get_token_primary_group().get_fq_name()) + "\n"
-        t += "Token Type: " + str(self.get_token_type()) + "\n" 
+        t += "Token Type: " + str(self.get_token_type()) + "\n"
         t += "Token Origin: " + str(self.get_token_origin()) + "\n"
         t += "Token Source: " + str(self.get_token_source()) + "\n"
         t += "TokenHasRestrictions: " + str(self.get_token_restrictions()) + "\n"
@@ -326,7 +327,7 @@ class token:
             t += "Token User: " + str(self.get_token_user().get_fq_name()) + "\n"
         if self.get_token_primary_group():
             t += "Token Group: " + str(self.get_token_primary_group().get_fq_name()) + "\n"
-        t += "Token Type: " + str(self.get_token_type()) + "\n" 
+        t += "Token Type: " + str(self.get_token_type()) + "\n"
         t += "Token Origin: " + str(self.get_token_origin()) + "\n"
         t += "Token Source: " + str(self.get_token_source()) + "\n"
         t += "TokenHasRestrictions: " + str(self.get_token_restrictions()) + "\n"
@@ -358,7 +359,7 @@ class token:
             t += "Token User: " + str(self.get_token_user().get_fq_name()) + "\n"
         if self.get_token_primary_group():
             t += "Token Group: " + str(self.get_token_primary_group().get_fq_name()) + "\n"
-        t += "Token Type: " + str(self.get_token_type()) + "\n" 
+        t += "Token Type: " + str(self.get_token_type()) + "\n"
         t += "Token Origin: " + str(self.get_token_origin()) + "\n"
         t += "Token Source: " + str(self.get_token_source()) + "\n"
         t += "TokenHasRestrictions: " + str(self.get_token_restrictions()) + "\n"
