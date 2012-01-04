@@ -235,7 +235,7 @@ def dirwalk(directory, extensions, include_dirs):
 
 # arg s contains windows-style env vars like: %windir%\foo
 def env_expand(s):
-    re_env = re.compile(r'%\w+%') 
+    re_env = re.compile(r'%\w+%')
     return re_env.sub(expander, s)
 
 
@@ -339,7 +339,6 @@ def impersonate(username, password, domain):
 
 def populate_scaninfo(report):
     import socket
-    import win32api
     import datetime
     report.add_info_item('hostname', socket.gethostname())
     report.add_info_item('datetime', datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
