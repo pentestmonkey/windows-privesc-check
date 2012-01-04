@@ -14,24 +14,37 @@ import wpc.conf
 import wpc.utils
 import glob
 
+
 # ---------------------- Define Subs ---------------------------
 def dump_paths(report):
+    # TODO
     print "[E] dump_paths not implemented yet.  Sorry."
 
+
 def dump_eventlogs(report):
+    # TODO
     print "[E] dump_eventlogs not implemented yet.  Sorry."
 
+
 def dump_shares(report):
+    # TODO
     print "[E] dump_shares not implemented yet.  Sorry."
 
+
 def dump_patches(report):
+    # TODO
     print "[E] dump_patches not implemented yet.  Sorry."
 
+
 def dump_loggedin(report):
+    # TODO
     print "[E] dump_loggedin not implemented yet.  Sorry."
 
+
 def dump_program_files(report):
+    # TODO
     print "[E] dump_program_files not implemented yet.  Sorry."
+
 
 def dump_services(opts):
     for s in services().get_services():
@@ -40,14 +53,16 @@ def dump_services(opts):
         else:
             print s.as_text()
 
-def dump_drivers(opts):        
+
+def dump_drivers(opts):
     for d in drivers().get_services():
         if opts.ignore_trusted:
             print d.untrusted_as_text()
         else:
             print d.as_text()
 
-def dump_processes(opts):    
+
+def dump_processes(opts):
     for p in processes().get_all():
         print p.as_text()
 
@@ -69,6 +84,7 @@ def dump_processes(opts):
         if p.is_wow64():
             k32.Wow64DisableWow64FsRedirection(ctypes.byref(wow64))
 
+
 def dump_users(opts):
     print "[+] Dumping user list:"
     userlist = users()
@@ -82,6 +98,7 @@ def dump_users(opts):
 
             print "\n\t[+] Privileges of this user + the groups it is in:"
             print "\t[!] Not implemented yet"
+
 
 def dump_groups(opts):
     print "[+] Dumping group list:"
@@ -102,35 +119,48 @@ def dump_groups(opts):
             print "\n\t[+] Privileges of this group + the groups it is in:"
             print "\t[!] Not implemented yet"
 
+
 def dump_registry(opts):
-    print "[!] Registry dump option not implemented yet.  Sorry." # TODO
+    # TODO
+    print "[!] Registry dump option not implemented yet.  Sorry."
+
 
 def audit_eventlogs(report):
+    # TODO
     print "[E] audit_eventlogs not implemented yet.  Sorry."
 
+
 def audit_shares(report):
+    # TODO
     print "[E] audit_shares not implemented yet.  Sorry."
 
+
 def audit_patches(report):
+    # TODO
     print "[E] audit_patches not implemented yet.  Sorry."
 
+
 def audit_loggedin(report):
+    # TODO
     print "[E] audit_loggedin not implemented yet.  Sorry."
 
+
 def audit_drivers(report):
-    print "[!] Driver audit option not implemented yet.  Sorry." # TODO
+    # TODO
+    print "[!] Driver audit option not implemented yet.  Sorry."
+
 
 def audit_processes(report):
     for p in processes().get_all():
-        print p.as_text()
+        #print p.as_text()
 
-        print "[D] Dangerous process perms"
+        #print "[D] Dangerous process perms"
         # TODO check the dangerous perms aren't held by the process owner
         if p.get_sd():
             perms = p.get_sd().get_acelist().get_untrusted().get_dangerous_perms().get_aces()
             for perm in perms:
                     report.get_by_id("WPC069").add_supporting_data('process_perms', [p, perm])
-        print "[D] End"
+        #print "[D] End"
 
         # When listing DLLs for a process we need to see the filesystem like they do
         if p.is_wow64():
@@ -139,26 +169,31 @@ def audit_processes(report):
         if p.get_exe():
             if p.get_exe().is_replaceable():
                 report.get_by_id("WPC067").add_supporting_data('process_exe', [p])
-                print "[D] Security Descriptor for replaceable Exe File %s" % p.get_exe().get_name()
-                if p.get_exe().get_sd():
-                    print p.get_exe().get_sd().as_text()
-                else:
-                    print "[unknown]"
+                #print "[D] Security Descriptor for replaceable Exe File %s" % p.get_exe().get_name()
+                #if p.get_exe().get_sd():
+                #    print p.get_exe().get_sd().as_text()
+                #else:
+                #    print "[unknown]"
 
                 for dll in p.get_dlls():
                     if dll.is_replaceable():
                         report.get_by_id("WPC068").add_supporting_data('process_dll', [p, dll])
-                        print "\nSecurity Descriptor for replaceable DLL File %s" % dll.get_name()
-                        print dll.get_sd().as_text()
+                        #print "\nSecurity Descriptor for replaceable DLL File %s" % dll.get_name()
+                        #print dll.get_sd().as_text()
 
         if p.is_wow64():
             k32.Wow64DisableWow64FsRedirection(ctypes.byref(wow64))
 
+
 def audit_users(report):
-    print "[!] User audit option not implemented yet.  Sorry." # TODO
+    # TODO
+    print "[!] User audit option not implemented yet.  Sorry."
+
 
 def audit_groups(report):
-    print "[!] Group audit option not implemented yet.  Sorry." # TODO
+    # TODO
+    print "[!] Group audit option not implemented yet.  Sorry."
+
 
 def audit_services(report):
     for s in services().get_services():
@@ -381,6 +416,7 @@ def audit_services(report):
             for a in s.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["WRITE_OWNER"]).get_aces():
                 report.get_by_id("WPC024").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
 
+
 def audit_registry(report):
 
     #
@@ -550,10 +586,11 @@ def audit_registry(report):
                             if not f or not f.exists():
                                 f_str2 = f_str2.split(" ")[0]
                                 f = wpc.utils.find_in_path(File(f_str2))
-                                if f:
-                                    print "[D] how about %s" % f.get_name()
+                                # if f:
+                                    # print "[D] how about %s" % f.get_name()
                     if not f:
-                        print "[D] can't find %s" % f_str
+                        # print "[D] can't find %s" % f_str
+                        pass
 
                     if f and f.is_replaceable():
                         report.get_by_id("WPC061").add_supporting_data('regkey_ref_file', [s, v, f])
@@ -591,6 +628,7 @@ def audit_registry(report):
             if acl:
                 report.get_by_id("WPC050").add_supporting_data('regkey_perms', [r, acl])
 
+
 # Gather info about files and directories
 def audit_program_files(report):
     # Record info about all directories
@@ -618,14 +656,17 @@ def audit_program_files(report):
                 else:
                     print "[E] Ignoring thing that isn't file or directory: " + f.get_name()
 
+
 def audit_paths(report):
+    # TODO other paths too
     # WPC013 - system path
     #audit_path_for_issue(report, p, "WPC013")
     # WPC014 - current user's path
     audit_path_for_issue(report, os.environ["PATH"], "WPC014")
     # WPC015 - users' path
     #audit_path_for_issue(report, p, "WPC015")
-    
+
+
 def audit_path_for_issue(report, mypath, issueid):
     dirs = set(mypath.split(';'))
     exts = wpc.conf.executable_file_extensions
@@ -642,10 +683,12 @@ def audit_path_for_issue(report, mypath, issueid):
                 aces = f.get_dangerous_aces()
                 for ace in aces:
                     report.get_by_id(issueid).add_supporting_data('writable_progs', [f, ace])
-                    
+
         # TODO properly check perms with is_replaceable
 
 
+def section(message):
+    print "\n[+] Running: %s" % message
 # ------------------------ Main Code Starts Here ---------------------
 
 # Parse command line arguments
@@ -664,87 +707,111 @@ issues = report.get_issues()
 if options.dump_mode:
 
     if options.do_all or options.do_paths:
+        section("dump_paths")
         dump_paths(issues)
 
     if options.do_all or options.do_eventlogs:
+        section("dump_eventlogs")
         dump_eventlogs(issues)
 
     if options.do_all or options.do_shares:
+        section("dump_shares")
         dump_shares(issues)
 
     if options.do_all or options.do_patches:
+        section("dump_patches")
         dump_patches(issues)
 
     if options.do_all or options.do_loggedin:
+        section("dump_loggedin")
         dump_loggedin(issues)
 
     if options.do_all or options.do_services:
+        section("dump_services")
         dump_services(issues)
 
     if options.do_all or options.do_drivers:
+        section("dump_drivers")
         dump_drivers(issues)
 
     if options.do_all or options.do_processes:
+        section("dump_processes")
         dump_processes(issues)
 
     if options.do_all or options.do_program_files:
+        section("dump_program_files")
         dump_program_files(issues)
 
     if options.do_all or options.do_registry:
+        section("dump_registry")
         dump_registry(issues)
 
     if options.do_all or options.do_users:
+        section("dump_users")
         dump_users(issues)
 
     if options.do_all or options.do_groups:
+        section("dump_groups")
         dump_groups(issues)
 
 # Identify security issues
 if options.audit_mode:
 
     if options.do_all or options.do_paths:
+        section("audit_paths")
         audit_paths(issues)
 
     if options.do_all or options.do_eventlogs:
+        section("audit_eventlogs")
         audit_eventlogs(issues)
 
     if options.do_all or options.do_shares:
+        section("audit_shares")
         audit_shares(issues)
 
     if options.do_all or options.do_patches:
+        section("audit_patches")
         audit_patches(issues)
 
     if options.do_all or options.do_loggedin:
+        section("audit_loggedin")
         audit_loggedin(issues)
 
     if options.do_all or options.do_services:
+        section("audit_services")
         audit_services(issues)
 
     if options.do_all or options.do_drivers:
+        section("audit_drivers")
         audit_drivers(issues)
 
     if options.do_all or options.do_processes:
+        section("audit_processes")
         audit_processes(issues)
 
     if options.do_all or options.do_program_files:
+        section("audit_program_files")
         audit_program_files(issues)
 
     if options.do_all or options.do_registry:
+        section("audit_registry")
         audit_registry(issues)
 
     if options.do_all or options.do_users:
+        section("audit_users")
         audit_users(issues)
 
     if options.do_all or options.do_groups:
+        section("audit_groups")
         audit_groups(issues)
 
     if options.report_file_stem:
         # Don't expose XML to users as format will change shortly
-        filename = "%s.xml" % options.report_file_stem
-        #print "[+] Saving report file %s" % filename
-        f = open(filename, 'w')
-        f.write(report.as_xml_string())
-        f.close()
+        # filename = "%s.xml" % options.report_file_stem
+        # print "[+] Saving report file %s" % filename
+        # f = open(filename, 'w')
+        # f.write(report.as_xml_string())
+        # f.close()
 
         filename = "%s.html" % options.report_file_stem
         print "[+] Saving report file %s" % filename
