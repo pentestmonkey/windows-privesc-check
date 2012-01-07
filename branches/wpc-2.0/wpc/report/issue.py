@@ -155,6 +155,16 @@ class issue:
                 p = data[0]
                 etree.SubElement(d, 'data').text = " Process ID %s (%s) as weak permissions.  TODO: Weak how?\n" % (p.get_pid(), p.get_exe().get_name())
 
+        elif data_name == 'user_powerful_priv':
+            for data in self.get_supporting_data(data_name):
+                u = data[0]
+                etree.SubElement(d, 'data').text = " %s\n" % (u.get_fq_name())
+
+        elif data_name == 'group_powerful_priv':
+            for data in self.get_supporting_data(data_name):
+                u = data[0]
+                etree.SubElement(d, 'data').text = " %s\n" % (u.get_fq_name())
+
         elif data_name == 'process_dll':
             for data in self.get_supporting_data(data_name):
                 p = data[0]

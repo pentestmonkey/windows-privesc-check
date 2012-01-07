@@ -25,6 +25,9 @@ class cache:
         self.regkeys = {}
         self.misses = {}
         self.hits = {}
+        self.policyhandlefromserverrights = {}
+        self.rightsfromhandlesid = {}
+        self.namefromserveruser = {}
         self.hits['files'] = 0
         self.misses['files'] = 0
         self.hits['regkeys'] = 0
@@ -71,6 +74,22 @@ class cache:
             self.regkeys[name] = f
         return f
 
+    def LsaOpenPolicy(self, server, rights):
+        keystring = "%s%%%s" %(server, rights)
+        if not keystring in self.policyhandlefromserverrights.keys():
+            self.policyhandlefromserverrights[keystring] = win32security.LsaOpenPolicy(wpc.conf.remote_server, win32security.POLICY_VIEW_LOCAL_INFORMATION | win32security.POLICY_LOOKUP_NAMES)
+        return self.policyhandlefromserverrights[keystring]
+            
+    def LsaEnumerateAccountRights(self, handle, sid):
+        keystring = "%s%%%s" %(handle, sid)
+        if not keystring in self.rightsfromhandlesid.keys():
+            try:
+                self.rightsfromhandlesid[keystring] = win32security.LsaEnumerateAccountRights(handle, sid)
+            except:
+                self.rightsfromhandlesid[keystring] = ""
+                
+        return self.rightsfromhandlesid[keystring]
+        
     def LookupAccountSid(self, server, s):
         sid = win32security.ConvertSidToStringSid(s)
         if not server in self.namefromsid.keys():

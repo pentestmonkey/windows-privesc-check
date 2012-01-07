@@ -30,8 +30,8 @@ class share:
                 self.max_uses = shareinfo['max_uses']
 
                 if shareinfo['path']:
-                    self.path = File(shareinfo['path'])
-                else:
+                #    self.path = File(shareinfo['path'])
+                #else:
                     self.path = shareinfo['path']
 
                 self.type = shareinfo['type']
@@ -98,7 +98,7 @@ class share:
         t += 'Share Name: ' + str(self.get_name()) + '\n'
         t += 'Description: ' + str(self.get_description()) + '\n'
         if self.get_path():
-            t += 'Path: ' + str(self.get_path().get_name()) + '\n'
+            t += 'Path: ' + str(self.get_path()) + '\n'
         else:
             t += 'Path: None\n'
         t += 'Passwd: ' + str(self.get_passwd()) + '\n'
@@ -106,11 +106,18 @@ class share:
         t += 'Max Uses: ' + str(self.get_max_uses()) + '\n'
         t += 'Permissions: ' + str(self.get_permissions()) + '\n'
 
-        if self.get_path() and self.get_path().get_sd():
-            t += 'Directory Security Descriptor:\n'
-            t += self.get_path().get_sd().as_text() + '\n'
+        if self.get_path():
+            f = File(self.get_path())
+            if f.exists():
+                if f.get_sd():
+                    t += 'Directory Security Descriptor:\n'
+                    t += f.get_sd().as_text() + '\n'
+                else:
+                    t += 'Directory Security Descriptor: None (can\'t read sd)\n'
+            else:
+                t += 'Directory Security Descriptor: None (path doesn\'t exist)\n'
         else:
-            t += 'Directory Security Descriptor: None\n'
+            t += 'Directory Security Descriptor: None (no path)\n'
 
         if self.get_sd():
             t += 'Share Security Descriptor:\n'

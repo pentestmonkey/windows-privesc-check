@@ -1370,4 +1370,247 @@ Further information about CLSIDs is available here: http://msdn.microsoft.com/en
           },
        }
     },
+    'WPC070': {
+       'title': "Windows Users/Groups Hold Powerful Privilege: SeAssignPrimaryTokenPrivilege",
+       'description': '''TODO SE_ASSIGNPRIMARYTOKEN_NAME TEXT("SeAssignPrimaryTokenPrivilege") Required to assign the primary token of a process.''',
+       'recommendation': '''Review the list of users below who hold this privilege.  Revoke it where it is not required - e.g. under 'Replace a process-level token'  in secpol.msc.''',
+       'supporting_data': {
+          'user_powerful_priv': {
+             'section': "description",
+             'preamble': "The following users hold the privilege:",
+          },
+          'group_powerful_priv': {
+             'section': "description",
+             'preamble': "The following groups hold the privilege:",
+          },
+       }
+    },
+    'WPC071': {
+       'title': "Windows Users/Groups Hold Powerful Privilege: SeBackupPrivilege",
+       'description': '''TODO SE_BACKUP_NAME TEXT("SeBackupPrivilege") Required to perform backup operations. This privilege causes the system to grant all read access control to any file, regardless of the access control list (ACL) specified for the file. Any access request other than read is still evaluated with the ACL. This privilege is required by the RegSaveKey and RegSaveKeyExfunctions. The following access rights are granted if this privilege is held: READ_CONTROL ACCESS_SYSTEM_SECURITY FILE_GENERIC_READ FILE_TRAVERSE''',
+       'recommendation': '''Review the list of users below who hold this privilege.  Revoke it where it is not required - e.g. under 'Back up files and directories'  in secpol.msc.''',
+       'supporting_data': {
+          'user_powerful_priv': {
+             'section': "description",
+             'preamble': "The following users hold the privilege:",
+          },
+          'group_powerful_priv': {
+             'section': "description",
+             'preamble': "The following groups hold the privilege:",
+          },
+       }
+    },
+    'WPC072': {
+       'title': "Windows Users/Groups Hold Powerful Privilege: SeCreatePagefilePrivilege",
+       'description': '''TODO SE_CREATE_PAGEFILE_NAME TEXT("SeCreatePagefilePrivilege") Required to create a paging file. .''',
+       'recommendation': '''Review the list of users below who hold this privilege.  Revoke it where it is not required - e.g. under 'Create a pagefile'  in secpol.msc.''',
+       'supporting_data': {
+          'user_powerful_priv': {
+             'section': "description",
+             'preamble': "The following users hold the privilege:",
+          },
+          'group_powerful_priv': {
+             'section': "description",
+             'preamble': "The following groups hold the privilege:",
+          },
+       }
+    },
+    'WPC073': {
+       'title': "Windows Users/Groups Hold Powerful Privilege: SeCreateTokenPrivilege",
+       'description': '''TODO SE_CREATE_TOKEN_NAME TEXT("SeCreateTokenPrivilege") Required to create a primary token.''',
+       'recommendation': '''Review the list of users below who hold this privilege.  Revoke it where it is not required - e.g. under 'Create a token object'  in secpol.msc.''',
+       'supporting_data': {
+          'user_powerful_priv': {
+             'section': "description",
+             'preamble': "The following users hold the privilege:",
+          },
+          'group_powerful_priv': {
+             'section': "description",
+             'preamble': "The following groups hold the privilege:",
+          },
+       }
+    },
+    'WPC074': {
+       'title': "Windows Users/Groups Hold Powerful Privilege: SeDebugPrivilege",
+       'description': '''TODO SE_DEBUG_NAME TEXT("SeDebugPrivilege") Required to debug and adjust the memory of a process owned by another account.''',
+       'recommendation': '''Review the list of users below who hold this privilege.  Revoke it where it is not required - e.g. under 'Debug programs'  in secpol.msc.''',
+       'supporting_data': {
+          'user_powerful_priv': {
+             'section': "description",
+             'preamble': "The following users hold the privilege:",
+          },
+          'group_powerful_priv': {
+             'section': "description",
+             'preamble': "The following groups hold the privilege:",
+          },
+       }
+    },
+    'WPC075': {
+       'title': "Windows Users/Groups Hold Powerful Privilege: SeEnableDelegationPrivilege",
+       'description': '''TODO SE_ENABLE_DELEGATION_NAME TEXT("SeEnableDelegationPrivilege") Required to mark user and computer accounts as trusted for delegation.''',
+       'recommendation': '''Review the list of users below who hold this privilege.  Revoke it where it is not required - e.g. under 'Enable computer and user accounts to be trusted for delegation'  in secpol.msc.''',
+       'supporting_data': {
+          'user_powerful_priv': {
+             'section': "description",
+             'preamble': "The following users hold the privilege:",
+          },
+          'group_powerful_priv': {
+             'section': "description",
+             'preamble': "The following groups hold the privilege:",
+          },
+       }
+    },
+    'WPC076': {
+       'title': "Windows Users/Groups Hold Powerful Privilege: SeLoadDriverPrivilege",
+       'description': '''TODO SE_LOAD_DRIVER_NAME TEXT("SeLoadDriverPrivilege") Required to load or unload a device driver.''',
+       'recommendation': '''Review the list of users below who hold this privilege.  Revoke it where it is not required - e.g. under 'Load and unload device drivers'  in secpol.msc.''',
+       'supporting_data': {
+          'user_powerful_priv': {
+             'section': "description",
+             'preamble': "The following users hold the privilege:",
+          },
+          'group_powerful_priv': {
+             'section': "description",
+             'preamble': "The following groups hold the privilege:",
+          },
+       }
+    },
+    'WPC077': {
+       'title': "Windows Users/Groups Hold Powerful Privilege: SeMachineAccountPrivilege",
+       'description': '''TODO SE_MACHINE_ACCOUNT_NAME TEXT("SeMachineAccountPrivilege") Required to create a computer account.''',
+       'recommendation': '''Review the list of users below who hold this privilege.  Revoke it where it is not required - e.g. under 'Add workstations to domain'  in secpol.msc.''',
+       'supporting_data': {
+          'user_powerful_priv': {
+             'section': "description",
+             'preamble': "The following users hold the privilege:",
+          },
+          'group_powerful_priv': {
+             'section': "description",
+             'preamble': "The following groups hold the privilege:",
+          },
+       }
+    },
+    'WPC078': {
+       'title': "Windows Users/Groups Hold Powerful Privilege: SeManageVolumePrivilege",
+       'description': '''Microsoft warns that "Use caution when assigning this user right. Users with this user right can explore disks and extend files in to memory that contains other data. When the extended files are opened, the user might be able to read and modify the acquired data."''',
+       'recommendation': '''Review the list of users below who hold this privilege.  Revoke it where it is not required - e.g. under 'Manage the files on a volume / Perform volume maintenance tasks'  in secpol.msc.''',
+       'supporting_data': {
+          'user_powerful_priv': {
+             'section': "description",
+             'preamble': "The following users hold the privilege:",
+          },
+          'group_powerful_priv': {
+             'section': "description",
+             'preamble': "The following groups hold the privilege:",
+          },
+       }
+    },
+    'WPC079': {
+       'title': "Windows Users/Groups Hold Powerful Privilege: SeRelabelPrivilege",
+       'description': '''TODO SE_RELABEL_NAME TEXT("SeRelabelPrivilege") Required to modify the mandatory integrity level of an object.''',
+       'recommendation': '''Review the list of users below who hold this privilege.  Revoke it where it is not required - e.g. under 'Modify an object label'  in secpol.msc.''',
+       'supporting_data': {
+          'user_powerful_priv': {
+             'section': "description",
+             'preamble': "The following users hold the privilege:",
+          },
+          'group_powerful_priv': {
+             'section': "description",
+             'preamble': "The following groups hold the privilege:",
+          },
+       }
+    },
+    'WPC080': {
+       'title': "Windows Users/Groups Hold Powerful Privilege: SeRestorePrivilege",
+       'description': '''Some users have been granted the ability to write to any file or directory, even if object permissions don't allow it.  Specifically, check for the following permissions can be bypassed by the affected users: WRITE_DAC WRITE_OWNER ACCESS_SYSTEM_SECURITY FILE_GENERIC_WRITE FILE_ADD_FILE FILE_ADD_SUBDIRECTORY DELETE.  Note that it is therefore possible to change the owner or the DACL, meaning that read access is also possible.  This allows the affected users to take full control of any file or directory (but not services?).  This privilege is one of the prerequisites for users to be able to load backups of registry hives into the registry (RegLoadKey).  Note that this privilege is normally granted to members of the local administrators group and this does not infer a security weakness as the users have administration rights already.''',
+       'recommendation': '''Review the list of users below who hold this privilege.  Revoke it where it is not required - e.g. under 'Restore files and directories'  in secpol.msc.''',
+       'supporting_data': {
+          'user_powerful_priv': {
+             'section': "description",
+             'preamble': "The following users hold the privilege:",
+          },
+          'group_powerful_priv': {
+             'section': "description",
+             'preamble': "The following groups hold the privilege:",
+          },
+       }
+    },
+    'WPC081': {
+       'title': "Windows Users/Groups Hold Powerful Privilege: SeShutdownPrivilege",
+       'description': '''Some users are allowed to shut down the computer.  This may aid an attacker in exploiting a pre-existing vulnerability - e.g. after replacig a program that run at boot time.  Alone, it probably doesn't constitute a privilege escalation vector.  It could lead to desruption of the system, though.''',
+       'recommendation': '''Review the list of users below who hold this privilege.  Revoke it where it is not required - e.g. under 'Shut down the system'  in secpol.msc.''',
+       'supporting_data': {
+          'user_powerful_priv': {
+             'section': "description",
+             'preamble': "The following users hold the privilege:",
+          },
+          'group_powerful_priv': {
+             'section': "description",
+             'preamble': "The following groups hold the privilege:",
+          },
+       }
+    },
+    'WPC082': {
+       'title': "Windows Users/Groups Hold Powerful Privilege: SeSyncAgentPrivilege",
+       'description': '''TODO SE_SYNC_AGENT_NAME TEXT("SeSyncAgentPrivilege") Required for a domain controller to use the LDAP directory synchronization services. This privilege enables the holder to read all objects and properties in the directory, regardless of the protection on the objects and properties. By default, it is assigned to the Administrator and LocalSystem accounts on domain controllers.''',
+       'recommendation': '''Review the list of users below who hold this privilege.  Revoke it where it is not required - e.g. under 'Synchronize directory service data'  in secpol.msc.''',
+       'supporting_data': {
+          'user_powerful_priv': {
+             'section': "description",
+             'preamble': "The following users hold the privilege:",
+          },
+          'group_powerful_priv': {
+             'section': "description",
+             'preamble': "The following groups hold the privilege:",
+          },
+       }
+    },
+    'WPC083': {
+       'title': "Windows Users/Groups Hold Powerful Privilege: SeTakeOwnershipPrivilege",
+       'description': '''Some users have been granted the ability to take ownership of any object, even if object permissions don't grant them "Take Ownership" rights.  This allows the affected users to take full control of any object (file, directory, service, etc.).  This could trivially lead to the user escallating rights to local administrator.  Note that this privilege is normally granted to members of the local administrators group and this does not infer a security weakness as the users have administration rights already.''',
+       'recommendation': '''Review the list of users below who hold this privilege.  Revoke it where it is not required - e.g. under 'Take ownership of files or other objects'  in secpol.msc.''',
+       'supporting_data': {
+          'user_powerful_priv': {
+             'section': "description",
+             'preamble': "The following users hold the privilege:",
+          },
+          'group_powerful_priv': {
+             'section': "description",
+             'preamble': "The following groups hold the privilege:",
+          },
+       }
+    },
+    'WPC084': {
+       'title': "Windows Users/Groups Hold Powerful Privilege: SeTcbPrivilege",
+       'description': '''TODO SE_TCB_NAME TEXT("SeTcbPrivilege") This privilege identifies its holder as part of the trusted computer base. Some trusted protected subsystems are granted this privilege.''',
+       'recommendation': '''Review the list of users below who hold this privilege.  Revoke it where it is not required - e.g. under 'Act as part of the operating system'  in secpol.msc.''',
+       'supporting_data': {
+          'user_powerful_priv': {
+             'section': "description",
+             'preamble': "The following users hold the privilege:",
+          },
+          'group_powerful_priv': {
+             'section': "description",
+             'preamble': "The following groups hold the privilege:",
+          },
+       }
+    },
+    'WPC085': {
+       'title': "Windows Users/Groups Hold Powerful Privilege: SeTrustedCredManAccessPrivilege",
+       'description': '''TODO SE_TRUSTED_CREDMAN_ACCESS_NAME TEXT("SeTrustedCredManAccessPrivilege") Required to access Credential Manager as a trusted caller.''',
+       'recommendation': '''Review the list of users below who hold this privilege.  Revoke it where it is not required - e.g. under 'Access Credential Manager as a trusted caller'  in secpol.msc.''',
+       'supporting_data': {
+          'user_powerful_priv': {
+             'section': "description",
+             'preamble': "The following users hold the privilege:",
+          },
+          'group_powerful_priv': {
+             'section': "description",
+             'preamble': "The following groups hold the privilege:",
+          },
+       }
+    },
 }
+
+# TODO: Manage auditing and security log - view and clear security log.  Disable per-object auditing.
+# TODO: Log on locally - low priv users can exec commands if they have physical access.  Not required for service accounts.  Too voluminous?
