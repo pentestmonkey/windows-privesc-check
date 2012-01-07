@@ -370,3 +370,44 @@ def populate_scaninfo(report):
 
     report.add_info_item('os', os_str)
     report.add_info_item('os_version', str(ver_list[0]) + "." + str(ver_list[1]) + "." + str(ver_list[2]) + " SP" + str(ver_list[5]))
+
+def get_system_path():
+    key_string = 'SYSTEM\CurrentControlSet\Control\Session Manager\Environment'
+    try:
+        keyh = win32api.RegOpenKeyEx(win32con.HKEY_LOCAL_MACHINE, key_string , 0, win32con.KEY_ENUMERATE_SUB_KEYS | win32con.KEY_QUERY_VALUE | win32con.KEY_READ)
+    except:
+        return None
+
+    try:
+        path, type = win32api.RegQueryValueEx(keyh, "PATH")
+    except:
+        return None
+
+    return wpc.utils.env_expand(path)
+
+
+def get_user_paths():
+    try:
+        keyh = win32api.RegOpenKeyEx(win32con.HKEY_USERS, None , 0, win32con.KEY_ENUMERATE_SUB_KEYS | win32con.KEY_QUERY_VALUE | win32con.KEY_READ)
+    except:
+        return 0
+    paths = []
+    subkeys = win32api.RegEnumKeyEx(keyh)
+    for subkey in subkeys:
+        try:
+            subkeyh = win32api.RegOpenKeyEx(keyh, subkey[0] + "\\Environment" , 0, win32con.KEY_ENUMERATE_SUB_KEYS | win32con.KEY_QUERY_VALUE | win32con.KEY_READ)
+        except:
+            pass
+        else:
+            try:
+                path, type = win32api.RegQueryValueEx(subkeyh, "PATH")
+                try:
+                    user_sid  = win32security.ConvertStringSidToSid(subkey[0])
+                except:
+                    print "WARNING: Can't convert sid %s to name.  Skipping." % subkey[0]
+                    continue
+
+                paths.append(user(user_sid), path)
+            except:
+                pass
+    return paths
