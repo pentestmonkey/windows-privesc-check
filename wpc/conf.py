@@ -635,7 +635,7 @@ This could allow certain users on the system to place malicious code into certai
        }
     },
     'WPC003': {
-       'title': "Insecure Permissions In Windows Registry",
+       'title': "Insecure Permissions In Windows Registry (TODO)",
        'description': '''Some registry keys that hold the names of programs run by other users were checked and found to have insecure permissions.  It would be possible for non-administrative users to modify the registry to cause a different programs to be run.  This weakness could be abused by low-privileged users to run commands of their choosing with higher privileges.''',
        'recommendation': '''Modify the permissions on the above registry keys to allow only administrators write access.  Revoke write access from low-privileged users.''',
        'supporting_data': {
@@ -646,7 +646,7 @@ This could allow certain users on the system to place malicious code into certai
        }
     },
     'WPC005': {
-       'title': "Insecure Permissions On Windows Service Registry Keys (NOT IMPLEMENTED YET)",
+       'title': "Insecure Permissions On Windows Service Registry Keys (TODO)",
        'description': '''Some registry keys that hold the names of programs that are run when Windows Services start were found to have weak file permissions.  They could be changed by non-administrative users to cause malicious programs to be run instead of the intended Windows Service Executable.''',
        'recommendation': '''Modify the permissions on the above programs to allow only administrators write access.  Revoke write access from low-privileged users.''',
        'supporting_data': {
@@ -657,7 +657,7 @@ This could allow certain users on the system to place malicious code into certai
        }
     },
     'WPC007': {
-       'title': "Insecure Permissions On Event Log File",
+       'title': "Insecure Permissions On Event Log File (TODO)",
        'description': '''Some of the Event Log files could be changed by non-administrative users.  This may allow attackers to cover their tracks.''',
        'recommendation': '''Modify the permissions on the above files to allow only administrators write access.  Revoke write access from low-privileged users.''',
        'supporting_data': {
@@ -668,7 +668,7 @@ This could allow certain users on the system to place malicious code into certai
        }
     },
     'WPC008': {
-       'title': "Insecure Permissions On Event Log DLL",
+       'title': "Insecure Permissions On Event Log DLL (TODO)",
        'description': '''Some DLL files used by Event Viewer to display logs could be changed by non-administrative users.  It may be possible to replace these with a view to having code run when an administrative user next views log files.''',
        'recommendation': '''Modify the permissions on the above DLLs to allow only administrators write access.  Revoke write access from low-privileged users.''',
        'supporting_data': {
@@ -679,7 +679,7 @@ This could allow certain users on the system to place malicious code into certai
        }
     },
     'WPC009': {
-       'title': "Insecure Permissions On Event Log Registry Key (NOT IMPLMENTED YET)",
+       'title': "Insecure Permissions On Event Log Registry Key (TODO)",
        'description': '''Some registry keys that hold the names of DLLs used by Event Viewer and the location of Log Files are writable by non-administrative users.  It may be possible to maliciouly alter the registry to change the location of log files or run malicious code.''',
        'recommendation': '''Modify the permissions on the above programs to allow only administrators write access.  Revoke write access from low-privileged users.''',
        'supporting_data': {
@@ -690,8 +690,8 @@ This could allow certain users on the system to place malicious code into certai
        }
     },
     'WPC010': {
-       'title': "Insecure Permissions On Drive Root",
-       'description': '''Some of the local drive roots allow non-administrative users to create files and folders.  This could allow malicious files to be placed in on the server in the hope that they'll allow a local user to escalate privileges (e.g. create program.exe which might get accidentally launched by another user).''',
+       'title': "File Creation Allowed On Drive Root (TODO)",
+       'description': '''Some of the local drive roots allow non-administrative users to create files.  This could allow malicious files to be placed in on the server in the hope that they'll allow a local user to escalate privileges (e.g. create program.exe which might get accidentally launched by another user).''',
        'recommendation': '''Modify the permissions on the drive roots to only allow administrators write access.  Revoke write access from low-privileged users.''',
        'supporting_data': {
           'writable_drive_root': {
@@ -701,7 +701,7 @@ This could allow certain users on the system to place malicious code into certai
        }
     },
     'WPC011': {
-       'title': "Insecure (Non-NTFS) File System Used",
+       'title': "Insecure (Non-NTFS) File System Used (TODO)",
        'description': '''Some local drives use Non-NTFS file systems.  These drive therefore don't allow secure file permissions to be used.  Any local user can change any data on these drives.''',
        'recommendation': '''Use NTFS filesystems instead of FAT.  Ensure that strong file permissions are set - NTFS file permissions are insecure by default after FAT file systems are converted.''',
        'supporting_data': {
@@ -712,7 +712,7 @@ This could allow certain users on the system to place malicious code into certai
        }
     },
     'WPC012': {
-       'title': "Insecure Permissions On Windows Services",
+       'title': "Insecure Permissions On Windows Services (OBSELETE)",
        'description': '''Some of the Windows Services installed have weak permissions.  This could allow non-administrators to manipulate services to their own advantage.  The impact depends on the permissions granted, but can include starting services, stopping service or even reconfiguring them to run a different program.  This can lead to denial of service or even privilege escalation if the service is running as a user with more privilege than a malicious local user.''',
        'recommendation': '''Review the permissions that have been granted to non-administrative users and revoke access where possible.''',
        'supporting_data': {
@@ -753,7 +753,7 @@ This could allow certain users on the system to place malicious code into certai
        }
     },
     'WPC015': {
-       'title': "Insecure Permissions On Files / Directories In Users' PATHs (NEED TO CHECK THIS WORKS)",
+       'title': "Insecure Permissions On Files / Directories In Users' PATHs (TODO)",
        'description': '''Some programs/directories in the paths of users on this system have weak permissions.''',
        'recommendation': '''Review the permissions that have been granted to non-administrative users and revoke access where possible.''',
        'supporting_data': {
@@ -768,7 +768,7 @@ This could allow certain users on the system to place malicious code into certai
        }
     },
     'WPC016': {
-       'title': "Insecure Permissions On Running Programs",
+       'title': "Insecure Permissions On Running Programs (OBSELETED by WPC067)",
        'description': '''Some programs running at the time of the audit have weak file permissions.  The corresponding programs could be altered by non-administrator users.''',
        'recommendation': '''Review the permissions that have been granted to non-administrative users and revoke access where possible.''',
        'supporting_data': {
@@ -779,17 +779,6 @@ This could allow certain users on the system to place malicious code into certai
           'weak_perms_dlls': {
              'section': "description",
              'preamble': "The following DLLs are used by program which were running at the time of the audit.  These DLLs can be changed on-disk by non-administrator users:",
-          },
-       }
-    },
-    'WPC017': {
-       'title': "Shares Accessible By Non-Admin Users",
-       'description': '''The share-level permissions on some Windows file shares allows access by non-administrative users.  This can often be desirable, in which case this issue can be ignored.  However, sometimes it can allow data to be stolen or programs to be malciously modified.  NB: Setting strong NTFS permissions can sometimes mean that data which seems to be exposed on a share actually isn't accessible.''',
-       'recommendation': '''Review the share-level permissions that have been granted to non-administrative users and revoke access where possible.  Share-level permissions can be viewed in Windows Explorer: Right-click folder | Sharing and Security | "Sharing" tab | "Permissions" button (for XP - other OSs may vary slightly).''',
-       'supporting_data': {
-          'non_admin_shares': {
-             'section': "description",
-             'preamble': "The following shares are accessible by non-administrative users:",
           },
        }
     },
@@ -1612,10 +1601,10 @@ Further information about CLSIDs is available here: http://msdn.microsoft.com/en
     },
     'WPC086': {
        'title': "Share Level Permissions Allow Access By Non-Admin Users",
-       'description': '''The system has some Windows Shares that are accessible (readable) by non-admin users.  This can be normal and desirable, but has been raised as a point for manual investigation.''',
-       'recommendation': '''Check that the share needs to be exposed to the network and that it does not contain any sensitive information such as usernames or password that could be used to escalate privileges.''',
+       'description': '''The share-level permissions on some Windows file shares allows access by non-administrative users.  This can often be desirable, in which case this issue can be ignored.  However, sometimes it can allow data to be stolen or programs to be maliciously modified.  NB: Setting strong NTFS permissions can sometimes mean that data which seems to be exposed on a share actually isn't accessible.''',
+       'recommendation': '''Review the share-level permissions that have been granted to non-administrative users and revoke access where possible.  Share-level permissions can be viewed in Windows Explorer: Right-click folder | Sharing and Security | "Sharing" tab | "Permissions" button (for XP - other OSs may vary slightly).''',
        'supporting_data': {
-          'share_perms': {
+          'non_admin_shares': {
              'section': "description",
              'preamble': "The following non-admin users have been granted FILE_READ_DATA permission on shares:",
           },
