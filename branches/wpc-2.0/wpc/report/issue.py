@@ -165,6 +165,12 @@ class issue:
                 u = data[0]
                 etree.SubElement(d, 'data').text = " %s\n" % (u.get_fq_name())
 
+        elif data_name == 'share_perms':
+            for data in self.get_supporting_data(data_name):
+                s = data[0]
+                u = data[1]
+                etree.SubElement(d, 'data').text = " Share %s (%s) is accessible by %s\n" % (s.get_name(), s.get_description(), u.get_fq_name())
+
         elif data_name == 'process_dll':
             for data in self.get_supporting_data(data_name):
                 p = data[0]

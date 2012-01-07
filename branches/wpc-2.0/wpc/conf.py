@@ -1610,6 +1610,17 @@ Further information about CLSIDs is available here: http://msdn.microsoft.com/en
           },
        }
     },
+    'WPC086': {
+       'title': "Share Level Permissions Allow Access By Non-Admin Users",
+       'description': '''The system has some Windows Shares that are accessible (readable) by non-admin users.  This can be normal and desirable, but has been raised as a point for manual investigation.''',
+       'recommendation': '''Check that the share needs to be exposed to the network and that it does not contain any sensitive information such as usernames or password that could be used to escalate privileges.''',
+       'supporting_data': {
+          'share_perms': {
+             'section': "description",
+             'preamble': "The following non-admin users have been granted FILE_READ_DATA permission on shares:",
+          },
+       }
+    },
 }
 
 # TODO: Manage auditing and security log - view and clear security log.  Disable per-object auditing.
