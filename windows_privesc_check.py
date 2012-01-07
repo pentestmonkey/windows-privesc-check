@@ -136,8 +136,12 @@ def audit_eventlogs(report):
 
 
 def audit_shares(report):
-    # TODO
-    print "[E] audit_shares not implemented yet.  Sorry."
+    for s in shares().get_all():
+        #print s.as_text()
+
+        if s.get_sd():
+            for a in s.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["FILE_READ_DATA"]).get_aces():
+                report.get_by_id("WPC086").add_supporting_data('share_perms', [s, a.get_principal()])
 
 
 def audit_patches(report):
@@ -770,7 +774,9 @@ def audit_path_for_issue(report, mypath, issueid):
 
         # TODO properly check perms with is_replaceable
 
-
+def printline(message):
+    print "\n============ %s ============" % message
+    
 def section(message):
     print "\n[+] Running: %s" % message
 # ------------------------ Main Code Starts Here ---------------------
@@ -786,6 +792,8 @@ wpc.utils.init(options)
 report = report()
 wpc.utils.populate_scaninfo(report)
 issues = report.get_issues()
+
+printline("Starting Audit")
 
 # Dump raw data if required
 if options.dump_mode:
@@ -890,6 +898,8 @@ if options.audit_mode:
         audit_groups(issues)
 
     if options.report_file_stem:
+        printline("Audit Complete")
+        print
         # Don't expose XML to users as format will change shortly
         # filename = "%s.xml" % options.report_file_stem
         # print "[+] Saving report file %s" % filename
