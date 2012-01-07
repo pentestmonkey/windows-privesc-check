@@ -171,6 +171,12 @@ class issue:
                 u = data[1]
                 etree.SubElement(d, 'data').text = " Share %s (%s) is accessible by %s\n" % (s.get_name(), s.get_description(), u.get_fq_name())
 
+        elif data_name == 'writable_eventlog_dll' or data_name == 'writable_eventlog_file':
+            for data in self.get_supporting_data(data_name):
+                s = data[0]
+                f = data[1]
+                etree.SubElement(d, 'data').text = " Registry key %s refers to replaceable file %s TODO print file perms?\n" % (s.get_name(), f.get_name())
+
         elif data_name == 'process_dll':
             for data in self.get_supporting_data(data_name):
                 p = data[0]

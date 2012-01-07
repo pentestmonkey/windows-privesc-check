@@ -131,8 +131,23 @@ def dump_registry(opts):
 
 
 def audit_eventlogs(report):
-    # TODO
-    print "[E] audit_eventlogs not implemented yet.  Sorry."
+    # TODO WPC009 Insecure Permissions On Event Log Registry Key
+    key_string = "HKEY_LOCAL_MACHINE\\" + wpc.conf.eventlog_key_hklm
+    eventlogkey = regkey(key_string)
+    if eventlogkey.is_present():
+        for subkey in eventlogkey.get_subkeys():
+            # WPC008 Insecure Permissions On Event Log DLL
+            filename = subkey.get_value("DisplayNameFile")
+            f = File(wpc.utils.env_expand(filename))
+            if f.is_replaceable():
+                report.get_by_id("WPC008").add_supporting_data('writable_eventlog_dll', [subkey, f])
+
+            # WPC007 Insecure Permissions On Event Log File
+            # TODO should check for read access too
+            filename = subkey.get_value("File")
+            f = File(wpc.utils.env_expand(filename))
+            if f.is_replaceable():
+                report.get_by_id("WPC007").add_supporting_data('writable_eventlog_file', [subkey, f])
 
 
 def audit_shares(report):
