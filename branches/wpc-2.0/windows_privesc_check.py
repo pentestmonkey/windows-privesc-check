@@ -746,13 +746,22 @@ def audit_program_files(report):
 
 
 def audit_paths(report):
-    # TODO other paths too
-    # WPC013 - system path
-    #audit_path_for_issue(report, p, "WPC013")
-    # WPC014 - current user's path
+# TODO this will be too slow.  Need some clever caching.
+#    print "[-] Checking every user's path"
+#    for user_path in wpc.utils.get_user_paths():
+#        u = user_path[0]
+#        p = user_path[1]
+#        print "[D] Checking path of %s" % u.get_fq_name()
+#        # global tmp_trusted_principles_fq
+#        # tmp_trusted_principles_fq = (u.get_fq_name())  # TODO
+#        audit_path_for_issue(report, p, "WPC015")
+#        # tmp_trusted_principles_fq = ()  # TODO
+
+    print "[-] Checking system path"
+    audit_path_for_issue(report, wpc.utils.get_system_path(), "WPC013")
+
+    print "[-] Checking current user's path"
     audit_path_for_issue(report, os.environ["PATH"], "WPC014")
-    # WPC015 - users' path
-    #audit_path_for_issue(report, p, "WPC015")
 
 
 def audit_path_for_issue(report, mypath, issueid):
@@ -773,6 +782,7 @@ def audit_path_for_issue(report, mypath, issueid):
                     report.get_by_id(issueid).add_supporting_data('writable_progs', [f, ace])
 
         # TODO properly check perms with is_replaceable
+
 
 def printline(message):
     print "\n============ %s ============" % message
@@ -900,6 +910,7 @@ if options.audit_mode:
     if options.report_file_stem:
         printline("Audit Complete")
         print
+        
         # Don't expose XML to users as format will change shortly
         # filename = "%s.xml" % options.report_file_stem
         # print "[+] Saving report file %s" % filename
