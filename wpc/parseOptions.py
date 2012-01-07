@@ -62,7 +62,7 @@ def parseOptions():
     # TODO can't use -m without -G
 
     if not (options.do_all or options.do_services or options.do_drivers or options.do_processes or options.do_registry or options.do_users or options.do_groups or options.do_program_files or options.do_paths or options.do_drives or options.do_eventlogs or options.do_shares or options.do_loggedin or options.do_users or options.do_groups):
-        print "[E] Specify something to look at.  At least one of: -a, -t, -D, -E, -H, -T, -L -U, -s, -d, -P, -r, -R, -U, -G.  -h for help."
+        print "[E] Specify something to look at.  At least one of: -a, -t, -D, -E, -H, -T, -L , -S, -k, -I, -U, -s, -d, -P, -r, -R, -U, -G.  -h for help."
         sys.exit()
 
     return options

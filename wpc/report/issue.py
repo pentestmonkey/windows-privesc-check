@@ -177,6 +177,11 @@ class issue:
                 f = data[1]
                 etree.SubElement(d, 'data').text = " Registry key %s refers to replaceable file %s TODO print file perms?\n" % (s.get_name(), f.get_name())
 
+        elif data_name == 'drive_and_fs_list':
+            for data in self.get_supporting_data(data_name):
+                drive = data[0]
+                etree.SubElement(d, 'data').text = " Drive %s: has %s filesystem\n" % (drive.get_name(), drive.get_fs())
+
         elif data_name == 'process_dll':
             for data in self.get_supporting_data(data_name):
                 p = data[0]

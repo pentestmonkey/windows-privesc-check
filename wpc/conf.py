@@ -668,7 +668,7 @@ This could allow certain users on the system to place malicious code into certai
        }
     },
     'WPC008': {
-       'title': "Insecure Permissions On Event Log DLL (TODO)",
+       'title': "Insecure Permissions On Event Log DLL",
        'description': '''Some DLL files used by Event Viewer to display logs could be changed by non-administrative users.  It may be possible to replace these with a view to having code run when an administrative user next views log files.''',
        'recommendation': '''Modify the permissions on the above DLLs to allow only administrators write access.  Revoke write access from low-privileged users.''',
        'supporting_data': {
@@ -679,7 +679,7 @@ This could allow certain users on the system to place malicious code into certai
        }
     },
     'WPC009': {
-       'title': "Insecure Permissions On Event Log Registry Key (TODO)",
+       'title': "Insecure Permissions On Event Log Registry Key",
        'description': '''Some registry keys that hold the names of DLLs used by Event Viewer and the location of Log Files are writable by non-administrative users.  It may be possible to maliciouly alter the registry to change the location of log files or run malicious code.''',
        'recommendation': '''Modify the permissions on the above programs to allow only administrators write access.  Revoke write access from low-privileged users.''',
        'supporting_data': {
@@ -705,7 +705,7 @@ This could allow certain users on the system to place malicious code into certai
        'description': '''Some local drives use Non-NTFS file systems.  These drive therefore don't allow secure file permissions to be used.  Any local user can change any data on these drives.''',
        'recommendation': '''Use NTFS filesystems instead of FAT.  Ensure that strong file permissions are set - NTFS file permissions are insecure by default after FAT file systems are converted.''',
        'supporting_data': {
-          'fat_fs_drives': {
+          'drive_and_fs_list': {
              'section': "description",
              'preamble': "The following drives use Non-NTFS file systems:",
           },
