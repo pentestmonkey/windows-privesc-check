@@ -7,6 +7,7 @@ from wpc.report.fileAcl import fileAcl
 from wpc.report.report import report
 from wpc.services import drivers, services
 from wpc.users import users
+from wpc.shares import shares
 from wpc.utils import k32, wow64
 import ctypes
 import os
@@ -27,8 +28,8 @@ def dump_eventlogs(report):
 
 
 def dump_shares(report):
-    # TODO
-    print "[E] dump_shares not implemented yet.  Sorry."
+    for s in shares().get_all():
+        print s.as_text()
 
 
 def dump_patches(report):
@@ -91,13 +92,15 @@ def dump_users(opts):
     for u in userlist.get_all():
         print u.get_fq_name()
 
-        if opts.get_privs:
-            print "\n\t[+] Privileges of this user:"
-            for priv in u.get_privs():
-                print "\t%s" % priv
+#        if opts.get_privs:
+        print "\n\t[+] Privileges of this user:"
+        for priv in u.get_privileges():
+            print "\t%s" % priv
 
-            print "\n\t[+] Privileges of this user + the groups it is in:"
-            print "\t[!] Not implemented yet"
+        print "\n\t[+] Privileges of this user + the groups it is in:"
+        for p in u.get_effective_privileges():
+            print "\t%s" % p
+        print
 
 
 def dump_groups(opts):
@@ -106,18 +109,20 @@ def dump_groups(opts):
     for g in grouplist.get_all():
         print g.get_fq_name()
 
-        if opts.get_members:
-            print "\n\t[+] Members:"
-            for m in g.get_members():
-                print "\t%s" % m.get_fq_name()
+        #if opts.get_members:
+        print "\n\t[+] Members:"
+        for m in g.get_members():
+            print "\t%s" % m.get_fq_name()
 
-        if opts.get_privs:
-            print "\n\t[+] Privileges of this group:"
-            for priv in g.get_privs():
-                print "\t%s" % priv
+        #if opts.get_privs:
+        print "\n\t[+] Privileges of this group:"
+        for priv in g.get_privileges():
+            print "\t%s" % priv
 
-            print "\n\t[+] Privileges of this group + the groups it is in:"
-            print "\t[!] Not implemented yet"
+        # TODO
+        # print "\n\t[+] Privileges of this group + the groups it is in:"
+        # for p in g.get_effective_privileges():
+        #    print "\t%s" % p
 
 
 def dump_registry(opts):
@@ -186,13 +191,92 @@ def audit_processes(report):
 
 
 def audit_users(report):
-    # TODO
-    print "[!] User audit option not implemented yet.  Sorry."
+    userlist = users()
+    for u in userlist.get_all():
+        # print u.get_fq_name()
+
+        # TODO consider other privs too
+        # TODO remove useless privs
+        # TODO More efficient method that doesn't involve looping through all users?  What does secpol.msc do?
+        for p in u.get_effective_privileges():
+            # print "\t%s" % p
+            if p == "SeAssignPrimaryTokenPrivilege":
+                report.get_by_id("WPC070").add_supporting_data('user_powerful_priv', [u])
+            if p == "SeBackupPrivilege":
+                report.get_by_id("WPC071").add_supporting_data('user_powerful_priv', [u])
+            if p == "SeCreatePagefilePrivilege":
+                report.get_by_id("WPC072").add_supporting_data('user_powerful_priv', [u])
+            if p == "SeCreateTokenPrivilege":
+                report.get_by_id("WPC073").add_supporting_data('user_powerful_priv', [u])
+            if p == "SeDebugPrivilege":
+                report.get_by_id("WPC074").add_supporting_data('user_powerful_priv', [u])
+            if p == "SeEnableDelegationPrivilege":
+                report.get_by_id("WPC075").add_supporting_data('user_powerful_priv', [u])
+            if p == "SeLoadDriverPrivilege":
+                report.get_by_id("WPC076").add_supporting_data('user_powerful_priv', [u])
+            if p == "SeMachineAccountPrivilege":
+                report.get_by_id("WPC077").add_supporting_data('user_powerful_priv', [u])
+            if p == "SeManageVolumePrivilege":
+                report.get_by_id("WPC078").add_supporting_data('user_powerful_priv', [u])
+            if p == "SeRelabelPrivilege":
+                report.get_by_id("WPC079").add_supporting_data('user_powerful_priv', [u])
+            if p == "SeRestorePrivilege":
+                report.get_by_id("WPC080").add_supporting_data('user_powerful_priv', [u])
+            if p == "SeShutdownPrivilege":
+                report.get_by_id("WPC081").add_supporting_data('user_powerful_priv', [u])
+            if p == "SeSyncAgentPrivilege":
+                report.get_by_id("WPC082").add_supporting_data('user_powerful_priv', [u])
+            if p == "SeTakeOwnershipPrivilege":
+                report.get_by_id("WPC083").add_supporting_data('user_powerful_priv', [u])
+            if p == "SeTcbPrivilege":
+                report.get_by_id("WPC084").add_supporting_data('user_powerful_priv', [u])
+            if p == "SeTrustedCredManAccessPrivilege":
+                report.get_by_id("WPC085").add_supporting_data('user_powerful_priv', [u])
 
 
 def audit_groups(report):
-    # TODO
-    print "[!] Group audit option not implemented yet.  Sorry."
+    grouplist = groups()
+    for u in grouplist.get_all():
+        #print u.get_fq_name()
+
+        # TODO ignore empty groups
+        # TODO consider other privs too
+        # TODO remove useless privs
+        # TODO More efficient method that doesn't involve looping through all users?  What does secpol.msc do?
+        for p in u.get_privileges():
+            # print "\t%s" % p
+            if p == "SeAssignPrimaryTokenPrivilege":
+                report.get_by_id("WPC070").add_supporting_data('group_powerful_priv', [u])
+            if p == "SeBackupPrivilege":
+                report.get_by_id("WPC071").add_supporting_data('group_powerful_priv', [u])
+            if p == "SeCreatePagefilePrivilege":
+                report.get_by_id("WPC072").add_supporting_data('group_powerful_priv', [u])
+            if p == "SeCreateTokenPrivilege":
+                report.get_by_id("WPC073").add_supporting_data('group_powerful_priv', [u])
+            if p == "SeDebugPrivilege":
+                report.get_by_id("WPC074").add_supporting_data('group_powerful_priv', [u])
+            if p == "SeEnableDelegationPrivilege":
+                report.get_by_id("WPC075").add_supporting_data('group_powerful_priv', [u])
+            if p == "SeLoadDriverPrivilege":
+                report.get_by_id("WPC076").add_supporting_data('group_powerful_priv', [u])
+            if p == "SeMachineAccountPrivilege":
+                report.get_by_id("WPC077").add_supporting_data('group_powerful_priv', [u])
+            if p == "SeManageVolumePrivilege":
+                report.get_by_id("WPC078").add_supporting_data('group_powerful_priv', [u])
+            if p == "SeRelabelPrivilege":
+                report.get_by_id("WPC079").add_supporting_data('group_powerful_priv', [u])
+            if p == "SeRestorePrivilege":
+                report.get_by_id("WPC080").add_supporting_data('group_powerful_priv', [u])
+            if p == "SeShutdownPrivilege":
+                report.get_by_id("WPC081").add_supporting_data('group_powerful_priv', [u])
+            if p == "SeSyncAgentPrivilege":
+                report.get_by_id("WPC082").add_supporting_data('group_powerful_priv', [u])
+            if p == "SeTakeOwnershipPrivilege":
+                report.get_by_id("WPC083").add_supporting_data('group_powerful_priv', [u])
+            if p == "SeTcbPrivilege":
+                report.get_by_id("WPC084").add_supporting_data('group_powerful_priv', [u])
+            if p == "SeTrustedCredManAccessPrivilege":
+                report.get_by_id("WPC085").add_supporting_data('group_powerful_priv', [u])
 
 
 def audit_services(report):

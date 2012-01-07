@@ -37,8 +37,19 @@ class sd(acelist):
 
     def dangerous_as_text(self):
         s = ""
-        s += "Owner:    " + self.get_owner().get_fq_name() + "\n"
-        s += "Group:    " + self.get_group().get_fq_name() + "\n"
+
+        o = self.get_owner()
+        if o:
+            s += "Owner:    " + self.get_owner().get_fq_name() + "\n"
+        else:
+            s += "Owner:   [none] \n"
+
+        g = self.get_group()
+        if g:
+            s += "Group:    " + self.get_group().get_fq_name() + "\n"
+        else:
+            s += "Group:   [none] \n"
+
         for a in self.get_aces_dangerous():
             s += a.as_text() + "\n"
         return s
@@ -72,12 +83,20 @@ class sd(acelist):
 
     def get_owner(self):
         if not self.owner:
-            self.owner = principal(self.get_owner_sid()) 
+            owner_sid = self.get_owner_sid()
+            if owner_sid:
+                self.owner = principal(self.get_owner_sid())
+            else:
+                self.owner = None
         return self.owner
 
     def get_group(self):
         if not self.group:
-            self.group = principal(self.get_group_sid()) 
+            group_sid = self.get_group_sid()
+            if group_sid:
+                self.group = principal(self.get_group_sid())
+            else:
+                self.group = None
         return self.group
 
     def get_group_sid(self):
@@ -127,8 +146,17 @@ class sd(acelist):
 
     def _as_text(self, flag):
         s = "--- start %s security descriptor ---\n" % self.get_type()
-        s += "Owner:    " + self.get_owner().get_fq_name() + "\n"
-        s += "Group:    " + self.get_group().get_fq_name() + "\n"
+        o = self.get_owner()
+        if o:
+            s += "Owner:    " + self.get_owner().get_fq_name() + "\n"
+        else:
+            s += "Owner:   [none] \n"
+
+        g = self.get_group()
+        if g:
+            s += "Group:    " + self.get_group().get_fq_name() + "\n"
+        else:
+            s += "Group:   [none] \n"
         for a in self.get_aces():
             if flag:
                 if not a.get_principal().is_trusted():
