@@ -180,7 +180,19 @@ class issue:
         elif data_name == 'drive_and_fs_list':
             for data in self.get_supporting_data(data_name):
                 drive = data[0]
-                etree.SubElement(d, 'data').text = " Drive %s: has %s filesystem\n" % (drive.get_name(), drive.get_fs())
+                etree.SubElement(d, 'data').text = " Drive %s has %s filesystem\n" % (drive.get_name(), drive.get_fs())
+
+        elif data_name == 'dir_add_file':
+            for data in self.get_supporting_data(data_name):
+                drive = data[0]
+                a = data[1]
+                etree.SubElement(d, 'data').text = " Drive %s allows %s to add files\n" % (drive.get_name(), a.get_principal().get_fq_name())
+
+        elif data_name == 'dir_add_dir':
+            for data in self.get_supporting_data(data_name):
+                drive = data[0]
+                a = data[1]
+                etree.SubElement(d, 'data').text = " Drive %s allows %s to add directories\n" % (drive.get_name(), a.get_principal().get_fq_name())
 
         elif data_name == 'process_dll':
             for data in self.get_supporting_data(data_name):

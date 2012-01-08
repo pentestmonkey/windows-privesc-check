@@ -690,18 +690,18 @@ This could allow certain users on the system to place malicious code into certai
        }
     },
     'WPC010': {
-       'title': "File Creation Allowed On Drive Root (TODO)",
+       'title': "File Creation Allowed On Drive Root",
        'description': '''Some of the local drive roots allow non-administrative users to create files.  This could allow malicious files to be placed in on the server in the hope that they'll allow a local user to escalate privileges (e.g. create program.exe which might get accidentally launched by another user).''',
        'recommendation': '''Modify the permissions on the drive roots to only allow administrators write access.  Revoke write access from low-privileged users.''',
        'supporting_data': {
-          'writable_drive_root': {
+          'dir_add_file': {
              'section': "description",
              'preamble': "The following drives allow non-administrative users to write to their root directory:",
           },
        }
     },
     'WPC011': {
-       'title': "Insecure (Non-NTFS) File System Used (TODO)",
+       'title': "Insecure (Non-NTFS) File System Used",
        'description': '''Some local drives use Non-NTFS file systems.  These drive therefore don't allow secure file permissions to be used.  Any local user can change any data on these drives.''',
        'recommendation': '''Use NTFS filesystems instead of FAT.  Ensure that strong file permissions are set - NTFS file permissions are insecure by default after FAT file systems are converted.''',
        'supporting_data': {
@@ -1607,6 +1607,17 @@ Further information about CLSIDs is available here: http://msdn.microsoft.com/en
           'non_admin_shares': {
              'section': "description",
              'preamble': "The following non-admin users have been granted FILE_READ_DATA permission on shares:",
+          },
+       }
+    },
+    'WPC087': {
+       'title': "Directory Creation Allowed On Drive Root",
+       'description': '''Some of the local drive roots allow non-administrative users to create directories.  This could provide attackers with a place to stash hacking tools, or proive legitimacy to malware they are seeking to get other users to run.  It is relatively common to allow the creation of directories in the drive root, but it probably isn't required for normal operation.''',
+       'recommendation': '''Modify the permissions on the drive roots to only allow administrators to create directories.  Revoke this permission from low-privileged users.''',
+       'supporting_data': {
+          'dir_add_dir': {
+             'section': "description",
+             'preamble': "The following drives allow non-administrative users to create directories in to their root:",
           },
        }
     },
