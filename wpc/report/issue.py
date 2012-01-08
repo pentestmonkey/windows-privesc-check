@@ -150,6 +150,12 @@ class issue:
                 f = data[0]
                 etree.SubElement(d, 'data').text = " %s\n" % (f.get_name())
 
+        elif data_name == 'file_read':
+            for data in self.get_supporting_data(data_name):
+                f = data[0]
+                u = data[1]
+                etree.SubElement(d, 'data').text = " %s can be read by %s\n" % (f.get_name(), u.get_fq_name())
+
         elif data_name == 'process_exe':
             for data in self.get_supporting_data(data_name):
                 p = data[0]

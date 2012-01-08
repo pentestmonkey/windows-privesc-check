@@ -634,9 +634,10 @@ This could allow certain users on the system to place malicious code into certai
           }
        }
     },
+    # TODO walk the whole registry looking for .exe and .dll in data?
     'WPC003': {
        'title': "Insecure Permissions In Windows Registry (TODO)",
-       'description': '''Some registry keys that hold the names of programs run by other users were checked and found to have insecure permissions.  It would be possible for non-administrative users to modify the registry to cause a different programs to be run.  This weakness could be abused by low-privileged users to run commands of their choosing with higher privileges.''',
+       'description': '''Some registry keys that hold the names of programs run by other users were checked and found to have insecure permissions.  It would be possible for non-administrative users to modify the registry to cause different programs to be run.  This weakness could be abused by low-privileged users to run commands of their choosing with higher privileges.''',
        'recommendation': '''Modify the permissions on the above registry keys to allow only administrators write access.  Revoke write access from low-privileged users.''',
        'supporting_data': {
           'writable_reg_paths': {
@@ -646,7 +647,7 @@ This could allow certain users on the system to place malicious code into certai
        }
     },
     'WPC005': {
-       'title': "Insecure Permissions On Windows Service Registry Keys (TODO)",
+       'title': "Insecure Permissions On Windows Service Registry Keys (OBSELETED by WPC038 and others)",
        'description': '''Some registry keys that hold the names of programs that are run when Windows Services start were found to have weak file permissions.  They could be changed by non-administrative users to cause malicious programs to be run instead of the intended Windows Service Executable.''',
        'recommendation': '''Modify the permissions on the above programs to allow only administrators write access.  Revoke write access from low-privileged users.''',
        'supporting_data': {
@@ -657,7 +658,7 @@ This could allow certain users on the system to place malicious code into certai
        }
     },
     'WPC007': {
-       'title': "Insecure Permissions On Event Log File (TODO)",
+       'title': "Write Permissions Allowed On Event Log File",
        'description': '''Some of the Event Log files could be changed by non-administrative users.  This may allow attackers to cover their tracks.''',
        'recommendation': '''Modify the permissions on the above files to allow only administrators write access.  Revoke write access from low-privileged users.''',
        'supporting_data': {
@@ -1612,12 +1613,25 @@ Further information about CLSIDs is available here: http://msdn.microsoft.com/en
     },
     'WPC087': {
        'title': "Directory Creation Allowed On Drive Root",
-       'description': '''Some of the local drive roots allow non-administrative users to create directories.  This could provide attackers with a place to stash hacking tools, or proive legitimacy to malware they are seeking to get other users to run.  It is relatively common to allow the creation of directories in the drive root, but it probably isn't required for normal operation.''',
+       'description': '''Some of the local drive roots allow non-administrative users to create directories.  This could provide attackers with a place to stash hacking tools, or proive legitimacy to malware they are seeking to get other users to run.  It is relatively common to allow the creation of directories in the drive root, but it probably isn't required for normal operation.
+
+NB: This issue has only been reported for NTFS filesystems.  Other non-NTFS file system may also allow this behaviour.  A separate issue is reported for non-NTFS filesystems.''',
        'recommendation': '''Modify the permissions on the drive roots to only allow administrators to create directories.  Revoke this permission from low-privileged users.''',
        'supporting_data': {
           'dir_add_dir': {
              'section': "description",
              'preamble': "The following drives allow non-administrative users to create directories in to their root:",
+          },
+       }
+    },
+    'WPC088': {
+       'title': "Read Permissions Allowed On Event Log File",
+       'description': '''Some of the Event Log files could be read by non-administrative users.  This may allow attackers to view log information they weren't intended to see.  This can help them to determine if they are being monitored or to access information which may help in other attacks.''',
+       'recommendation': '''Modify the permissions on the above files to allow only administrators read access.  Revoke read access from low-privileged users.''',
+       'supporting_data': {
+          'file_read': {
+             'section': "description",
+             'preamble': "The files below could be changed by non-administrative users:",
           },
        }
     },
