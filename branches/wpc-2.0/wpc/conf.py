@@ -740,7 +740,7 @@ This could allow certain users on the system to place malicious code into certai
     },
     'WPC014': {
        'title': "Insecure Permissions On Files / Directories In Current User's PATH",
-       'description': '''Some programs/directories in the path of the user used to perform this audit have weak permissions.  TODO which user was used to perform this audit?''',
+       'description': '''Some programs/directories in the path of the user used to perform this audit have weak permissions.''',
        'recommendation': '''Review the permissions that have been granted to non-administrative users and revoke access where possible.''',
        'supporting_data': {
           'writable_progs': {
@@ -1260,7 +1260,7 @@ Shell Extenstion Handlers more generally are described here: http://msdn.microso
        }
     },
     'WPC061': {
-       'title': "CLSID Reference DLLs/EXEs With Weak File Permissions (experimental)",
+       'title': "CLSID References DLLs/EXEs With Weak File Permissions (experimental)",
        'description': '''Some of the CLSIDs reference files with insecure permissions.  This may indicate the presence of a vulnerability, but it depends what the CLSID is used for.  Try searching the registry for the CLSIDs below to determine how they are used and if this issue might be exploitable.
 
 Further information about CLSIDs is available here: http://msdn.microsoft.com/en-us/library/windows/desktop/ms691424(v=vs.85).aspx''',

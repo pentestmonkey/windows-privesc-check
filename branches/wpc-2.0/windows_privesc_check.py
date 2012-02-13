@@ -8,6 +8,7 @@ from wpc.report.report import report
 from wpc.services import drivers, services
 from wpc.users import users
 from wpc.shares import shares
+from wpc.drives import drives
 from wpc.utils import k32, wow64
 import ctypes
 import os
@@ -57,10 +58,11 @@ def dump_services(opts):
 
 def dump_drivers(opts):
     for d in drivers().get_services():
-        if opts.ignore_trusted:
-            print d.untrusted_as_text()
-        else:
-            print d.as_text()
+        print d.as_text()
+
+
+def dump_drives(opts):
+    print "[E] dump_drives not implemented yet.  Sorry."
 
 
 def dump_processes(opts):
@@ -146,8 +148,13 @@ def audit_eventlogs(report):
             # TODO should check for read access too
             filename = subkey.get_value("File")
             f = File(wpc.utils.env_expand(filename))
+            # Check for write access
             if f.is_replaceable():
                 report.get_by_id("WPC007").add_supporting_data('writable_eventlog_file', [subkey, f])
+                
+            # Check for read access
+            for a in f.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["FILE_READ_DATA"]).get_aces():
+                report.get_by_id("WPC088").add_supporting_data('file_read', [f, a.get_principal()])
 
 
 def audit_shares(report):
@@ -172,6 +179,22 @@ def audit_loggedin(report):
 def audit_drivers(report):
     # TODO
     print "[!] Driver audit option not implemented yet.  Sorry."
+
+
+def audit_drives(report):
+    for d in drives().get_fixed_drives():
+        if d.get_fs() == 'NTFS':
+#            for a in s.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["FILE_WRITE_DATA"]).get_aces():
+
+            directory = File(d.get_name())
+
+            for a in directory.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["FILE_ADD_FILE"]).get_aces():
+                report.get_by_id("WPC010").add_supporting_data('dir_add_file', [directory, a])
+
+            for a in directory.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["FILE_ADD_SUBDIRECTORY"]).get_aces():
+                report.get_by_id("WPC087").add_supporting_data('dir_add_dir', [directory, a])
+        else:
+            report.get_by_id("WPC011").add_supporting_data('drive_and_fs_list', [d])
 
 
 def audit_processes(report):
@@ -319,7 +342,7 @@ def audit_services(report):
             report.get_by_id("WPC065").add_supporting_data('sectool_services', [s])
         elif s.get_description() in ("PsExec", "Abel", "fgexec"):
             report.get_by_id("WPC065").add_supporting_data('sectool_services', [s])
-           
+
         # TODO check for the presence of files - but not from here 
         #
         # Check if pentest/audit tools have accidentally been left running
@@ -851,6 +874,10 @@ if options.dump_mode:
         section("dump_drivers")
         dump_drivers(issues)
 
+    if options.do_all or options.do_drives:
+        section("dump_drives")
+        dump_drives(issues)
+
     if options.do_all or options.do_processes:
         section("dump_processes")
         dump_processes(issues)
@@ -901,6 +928,10 @@ if options.audit_mode:
     if options.do_all or options.do_drivers:
         section("audit_drivers")
         audit_drivers(issues)
+
+    if options.do_all or options.do_drives:
+        section("audit_drives")
+        audit_drives(issues)
 
     if options.do_all or options.do_processes:
         section("audit_processes")
