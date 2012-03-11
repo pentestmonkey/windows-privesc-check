@@ -133,7 +133,6 @@ class cache:
 
     def is_in_group(self, p, group):
         #sid = win32security.ConvertSidToStringSid(s)
-        #print "cache.is_in_group called"
         sid = p.get_sid_string()
         if not sid in self.sidingroup.keys():
             self.sidingroup[sid] = {}
