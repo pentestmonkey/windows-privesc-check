@@ -140,21 +140,22 @@ def audit_eventlogs(report):
         for subkey in eventlogkey.get_subkeys():
             # WPC008 Insecure Permissions On Event Log DLL
             filename = subkey.get_value("DisplayNameFile")
-            f = File(wpc.utils.env_expand(filename))
-            if f.is_replaceable():
-                report.get_by_id("WPC008").add_supporting_data('writable_eventlog_dll', [subkey, f])
-
-            # WPC007 Insecure Permissions On Event Log File
-            # TODO should check for read access too
-            filename = subkey.get_value("File")
-            f = File(wpc.utils.env_expand(filename))
-            # Check for write access
-            if f.is_replaceable():
-                report.get_by_id("WPC007").add_supporting_data('writable_eventlog_file', [subkey, f])
-                
-            # Check for read access
-            for a in f.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["FILE_READ_DATA"]).get_aces():
-                report.get_by_id("WPC088").add_supporting_data('file_read', [f, a.get_principal()])
+            if filename:
+                f = File(wpc.utils.env_expand(filename))
+                if f.is_replaceable():
+                    report.get_by_id("WPC008").add_supporting_data('writable_eventlog_dll', [subkey, f])
+    
+                # WPC007 Insecure Permissions On Event Log File
+                # TODO should check for read access too
+                filename = subkey.get_value("File")
+                f = File(wpc.utils.env_expand(filename))
+                # Check for write access
+                if f.is_replaceable():
+                    report.get_by_id("WPC007").add_supporting_data('writable_eventlog_file', [subkey, f])
+                    
+                # Check for read access
+                for a in f.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["FILE_READ_DATA"]).get_aces():
+                    report.get_by_id("WPC088").add_supporting_data('file_read', [f, a.get_principal()])
 
 
 def audit_shares(report):
@@ -475,7 +476,7 @@ def audit_services(report):
 
             # Untrusted user owns exe
             if not s.get_exe_file().get_sd().get_owner().is_trusted():
-                report.get_by_id("WPC029").add_supporting_data('service_exe_write_perms', [s])
+                report.get_by_id("WPC029").add_supporting_data('service_exe_owner', [s])
 
             # Check if exe can be appended to
             fa = s.get_exe_file().get_file_acl_for_perms(["FILE_APPEND_DATA"])
@@ -964,16 +965,16 @@ if options.audit_mode:
         # f.write(report.as_xml_string())
         # f.close()
 
-        filename = "%s.html" % options.report_file_stem
-        print "[+] Saving report file %s" % filename
-        f = open(filename, 'w')
-        f.write(report.as_html())
-        f.close()
-
         filename = "%s.txt" % options.report_file_stem
         print "[+] Saving report file %s" % filename
         f = open(filename, 'w')
         f.write(report.as_text())
+        f.close()
+
+        filename = "%s.html" % options.report_file_stem
+        print "[+] Saving report file %s" % filename
+        f = open(filename, 'w')
+        f.write(report.as_html())
         f.close()
 
     #wpc.conf.cache.print_stats()

@@ -50,6 +50,11 @@ class issue:
                 etree.SubElement(d, 'data').text = " %s (%s) runs the following program as %s:\n" % (s.get_description(), s.get_name(), s.get_run_as())
                 etree.SubElement(d, 'data').text = "  %s\n" % (f.as_text())
 
+        elif data_name == 'service_exe_owner':
+            for data in self.get_supporting_data(data_name):
+                s = data[0]
+                etree.SubElement(d, 'data').text = " %s (%s) runs the following program '%s' as %s.  Program is owned by untrusted user %s:\n" % (s.get_description(), s.get_name(), s.get_exe_file().get_name(), s.get_run_as(), s.get_exe_file().get_sd().get_owner().get_fq_name())
+
         elif data_name == 'file_untrusted_ownership':
             for data in self.get_supporting_data(data_name):
                 s = data[0]

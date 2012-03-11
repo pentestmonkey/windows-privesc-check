@@ -174,6 +174,7 @@ def define_trusted_principals():
             if sid:
                 p = principal(sid)
                 #print "Trusted: %s (%s) [%s]" % (p.get_fq_name(), p.get_type_string(), p.is_group_type())
+                #print "[D] Added trusted principal %s.  is group? %s" % (p.get_fq_name(), p.is_group_type())
                 if p.is_group_type():
                     p = Group(p.get_sid())
                 #    for m in p.get_members():
@@ -191,9 +192,19 @@ def define_trusted_principals():
 
     # TODO we only want to ignore this if it doesn't resolve
     try:
+        # Server Operators group
         #print "[D] converting string sid"
         #print "%s" % win32security.ConvertStringSidToSid("S-1-5-32-549")
-        p = user(win32security.ConvertStringSidToSid("S-1-5-32-549"))
+        p = Group(win32security.ConvertStringSidToSid("S-1-5-32-549"))
+        
+    except:
+        wpc.conf.trusted_principals.append(p)
+        
+        
+    # TODO this always ignored power users.  not what we want.
+    # only want to ignore when group doesn't exist.
+    try:
+        p = Group(win32security.ConvertStringSidToSid("S-1-5-32-547"))
         wpc.conf.trusted_principals.append(p)
     except:
         pass

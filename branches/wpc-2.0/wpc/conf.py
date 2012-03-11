@@ -909,7 +909,7 @@ This could allow certain users on the system to place malicious code into certai
        'description': '''Some of the programs that are run when Windows Services start were found to be owned by untrusted users.  Consequently, these programs can be replace with malicious programs by low-privileged users.  This could result is users stealing the privileges of the services affected.''',
        'recommendation': '''Change the ownership of the affected programs.  They should be owned by administrators.''',
        'supporting_data': {
-          'service_exe_write_perms': {
+          'service_exe_owner': {
              'section': "description",
              'preamble': "The programs below were owned by non-administrative users:",
           },
