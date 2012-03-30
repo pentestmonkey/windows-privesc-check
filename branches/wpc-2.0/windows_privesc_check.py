@@ -50,10 +50,7 @@ def dump_program_files(report):
 
 def dump_services(opts):
     for s in services().get_services():
-        if opts.ignore_trusted:
-            print s.untrusted_as_text()
-        else:
-            print s.as_text()
+        print s.as_text()
 
 
 def dump_drivers(opts):
@@ -179,7 +176,7 @@ def audit_loggedin(report):
 
 def audit_drivers(report):
     # TODO
-    print "[!] Driver audit option not implemented yet.  Sorry."
+    print "[E] Driver audit option not implemented yet.  Sorry."
 
 
 def audit_drives(report):
