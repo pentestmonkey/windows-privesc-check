@@ -9,7 +9,7 @@ import wpc.conf
 class file:
     def __init__(self, name):
         # print "[D] Created file obj for " + name
-        self.name = name
+        self.name = str(name).replace("\x00", "")
         self.type = None
         self.parent_dir = None
         self.replaceable_set = None
@@ -36,7 +36,10 @@ class file:
 
     def exists(self):
         if not self.existsset:
-            self.exist = os.path.exists(self.get_name())
+            try:
+                self.exist = os.path.exists(self.get_name())
+            except:
+                self.exist = 0
             self.existsset = 1
         return self.exist
 
