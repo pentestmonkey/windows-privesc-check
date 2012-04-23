@@ -10,11 +10,16 @@ from wpc.users import users
 from wpc.shares import shares
 from wpc.drives import drives
 from wpc.utils import k32, wow64
+from wpc.patchdata import patchdata
+from wpc.mspatchdb import mspatchdb
+from wpc.exploit import exploit as exploit2
+import urllib2
 import ctypes
 import os
 import wpc.conf
 import wpc.utils
 import glob
+import re
 
 
 # ---------------------- Define Subs ---------------------------
@@ -165,8 +170,70 @@ def audit_shares(report):
 
 
 def audit_patches(report):
-    # TODO
-    print "[E] audit_patches not implemented yet.  Sorry."
+    patchfile = options.patchfile
+
+    if patchfile == 'auto':
+        print "[-] Attempting to download patch info from Microsoft..."
+        patchfile = 'ms-patch-info.xlsx'
+        f = open(patchfile, 'wb')
+        response = urllib2.urlopen('http://go.microsoft.com/fwlink/?LinkID=245778')
+        html = response.read()
+        f.write(html)
+        f.close()
+        print "[-] Download complete"
+
+    try:
+        f=open(patchfile, 'r')
+        if f:
+            f.close()
+    except:
+        print "[E] Can't open patch data file: %s" % patchfile
+        return 0
+
+    db = mspatchdb(patchfile)
+    p = patchdata({'patchdb': db})
+    
+
+    print "[-] Gathering installed patches"
+    print "[-] %s patches are installed" % len(p.get_installed_patches())
+    os_string = p.get_os_string_for_ms_spreadsheet() 
+    print "[-] OS string for Microsoft spreadsheet is: %s" % os_string
+
+    # Populate list of known exploits
+    exploit_list = []
+    for line in wpc.conf.msexploitstring.split("\n"):
+        m = re.search("([Mm][Ss]\d\d[_-]\d\d\d)", line)
+        if m and m.group(1):
+            e = exploit2()
+            patch = m.group(1).upper()
+            patch = patch.replace("_", "-")
+            m = re.search("^\s*(\S+)\s+(\S+)\s+(\S+)\s+(.*)", line)
+            if m:
+                e.set_title(m.group(4))
+                e.add_refno("MS Bulletin", patch)
+                e.set_info("Metasploit Exploit Name", m.group(1))
+                e.set_info("Reliability", m.group(3))
+                e.set_info("Date", m.group(2))
+                exploit_list.append(e)
+
+    exploit_count = 0
+    for e in exploit_list:
+        if e.get_msno():
+            if options.verbose:
+                print "[-] ---"
+                print "[-] There is a public exploit for %s.  Checking if patch has been applied..." % e.get_msno()
+            if db.is_applicable(e.get_msno(), os_string):
+                if options.verbose:
+                    print "[-] %s was applicable to %s" % (e.get_msno(), os_string)
+                if not p.msno_or_superseded_applied(e.get_msno(), os_string, 0):
+                    exploit_count = exploit_count + 1
+                    if options.verbose:
+                        print e.as_string()
+                    report.get_by_id("WPC089").add_supporting_data('exploit_list', [e])
+            else:
+                if options.verbose:
+                    print "[-] Not vulnerable.  %s did not affect '%s'" % (e.get_msno(), os_string)
+    print "[-] Found %s exploits potentially affecting this system" % exploit_count
 
 
 def audit_loggedin(report):
@@ -780,7 +847,6 @@ def audit_program_files(report):
                 else:
                     print "[E] Ignoring thing that isn't file or directory: " + f.get_name()
 
-
 def audit_paths(report):
 # TODO this will be too slow.  Need some clever caching.
 #    print "[-] Checking every user's path"
@@ -822,7 +888,7 @@ def audit_path_for_issue(report, mypath, issueid):
 
 def printline(message):
     print "\n============ %s ============" % message
-    
+
 def section(message):
     print "\n[+] Running: %s" % message
 # ------------------------ Main Code Starts Here ---------------------
@@ -856,7 +922,7 @@ if options.dump_mode:
         section("dump_shares")
         dump_shares(issues)
 
-    if options.do_all or options.do_patches:
+    if options.do_all or options.patchfile:
         section("dump_patches")
         dump_patches(issues)
 
@@ -911,7 +977,7 @@ if options.audit_mode:
         section("audit_shares")
         audit_shares(issues)
 
-    if options.do_all or options.do_patches:
+    if options.do_all or options.patchfile:
         section("audit_patches")
         audit_patches(issues)
 
@@ -954,7 +1020,7 @@ if options.audit_mode:
     if options.report_file_stem:
         printline("Audit Complete")
         print
-        
+
         # Don't expose XML to users as format will change shortly
         # filename = "%s.xml" % options.report_file_stem
         # print "[+] Saving report file %s" % filename

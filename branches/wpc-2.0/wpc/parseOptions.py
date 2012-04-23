@@ -21,7 +21,7 @@ def parseOptions():
     examine.add_option("-D", "--drives",    dest = "do_drives",        default = False, action = "store_true", help = "Drives*")
     examine.add_option("-E", "--eventlogs", dest = "do_eventlogs",     default = False, action = "store_true", help = "Event Log*")
     examine.add_option("-H", "--shares",    dest = "do_shares",        default = False, action = "store_true", help = "Shares*")
-    examine.add_option("-T", "--patches",   dest = "do_patches",       default = False, action = "store_true", help = "Patchs*")
+    examine.add_option("-T", "--patches",   dest = "patchfile",                                                help = "Patches.  Arg is filename of xlsx patch info.  Download from http://go.microsoft.com/fwlink/?LinkID=245778 or pass 'auto' to fetch automatically")
     examine.add_option("-L", "--loggedin",  dest = "do_loggedin",      default = False, action = "store_true", help = "Logged In*")
     examine.add_option("-S", "--services",  dest = "do_services",      default = False, action = "store_true", help = "Windows Services")
     examine.add_option("-k", "--drivers",   dest = "do_drivers",       default = False, action = "store_true", help = "Kernel Drivers")
@@ -30,6 +30,7 @@ def parseOptions():
     examine.add_option("-r", "--registry",  dest = "do_registry",      default = False, action = "store_true", help = "Registry Settings + Permissions")
     examine.add_option("-U", "--users",     dest = "do_users",         default = False, action = "store_true", help = "Users")
     examine.add_option("-G", "--groups",    dest = "do_groups",        default = False, action = "store_true", help = "Groups")
+    examine.add_option("-v", "--verbose",   dest = "verbose",          default = False, action = "store_true", help = "More verbose output on console")
 
     host.add_option("-s", "--server", dest = "remote_host",   help = "Remote host or IP")
     host.add_option("-u", "--user",   dest = "remote_user",   help = "Remote username")
@@ -61,7 +62,7 @@ def parseOptions():
 
     # TODO can't use -m without -G
 
-    if not (options.do_all or options.do_services or options.do_drivers or options.do_processes or options.do_registry or options.do_users or options.do_groups or options.do_program_files or options.do_paths or options.do_drives or options.do_eventlogs or options.do_shares or options.do_loggedin or options.do_users or options.do_groups):
+    if not (options.do_all or options.do_services or options.do_drivers or options.do_processes or options.patchfile or options.do_registry or options.do_users or options.do_groups or options.do_program_files or options.do_paths or options.do_drives or options.do_eventlogs or options.do_shares or options.do_loggedin or options.do_users or options.do_groups):
         print "[E] Specify something to look at.  At least one of: -a, -t, -D, -E, -H, -T, -L , -S, -k, -I, -U, -s, -d, -P, -r, -R, -U, -G.  -h for help."
         sys.exit()
 
