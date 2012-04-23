@@ -17,6 +17,7 @@ class issue:
         return self.id
 
     def render_supporting_data(self, data_name):
+        # TODO: Also stash raw data in the report object.  XSLTs could then present differently.
         # expect an array of issue.fileAcl type for now
         d = etree.Element('supporting_data')
         if data_name == 'principals_with_service_perm':
@@ -30,6 +31,11 @@ class issue:
                 s = data[0]
                 p = data[1]
                 etree.SubElement(d, 'data').text = "    %s (%s) which runs as %s is owned by %s\n" % (s.get_description(), s.get_name(), s.get_run_as(), p.get_fq_name())
+
+        elif data_name == 'exploit_list':
+            for data in self.get_supporting_data(data_name):
+                e = data[0]
+                etree.SubElement(d, 'data').text = "Missing patch %s: Metasploit exploit \"%s\" (%s)" % (e.get_msno(), e.get_title(), e.get_info("Metasploit Exploit Name"))
 
         elif data_name == 'writable_dirs':
             for data in self.get_supporting_data(data_name):
