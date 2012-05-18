@@ -133,7 +133,7 @@ def disable_wow64():
     # WOW64 is now disabled, so we can read file permissions without Windows redirecting us from system32 to syswow64
 
 
-def enabled_wow64():
+def enable_wow64():
     # When we interrogate a 32-bit process we need to see the filesystem
     # the same we it does.  In this case we'll need to enable wow64
     try:
@@ -358,8 +358,11 @@ def populate_scaninfo(report):
     report.add_info_item('domain', win32api.GetDomainName())
     ver_list = win32api.GetVersionEx(1)
 
-    report.add_info_item('ipaddress', ",".join(socket.gethostbyname_ex(socket.gethostname())[2]))  # have to do this before Wow64DisableWow64FsRedirection
-
+    try:
+        report.add_info_item('ipaddress', ",".join(socket.gethostbyname_ex(socket.gethostname())[2]))  # have to do this before Wow64DisableWow64FsRedirection
+    except:
+        report.add_info_item('ipaddress', "<unknown>")  # have to do this before Wow64DisableWow64FsRedirection
+        
     os_ver = str(ver_list[0]) + "." + str(ver_list[1])
     # version numbers from http://msdn.microsoft.com/en-us/library/ms724832(VS.85).aspx
     if os_ver == "4.0":

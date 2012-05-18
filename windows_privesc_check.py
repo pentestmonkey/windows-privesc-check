@@ -73,7 +73,8 @@ def dump_processes(opts):
 
         # When listing DLLs for a process we need to see the filesystem like they do
         if p.is_wow64():
-            k32.Wow64EnableWow64FsRedirection(ctypes.byref(wow64))
+            wpc.utils.enable_wow64()
+            # k32.Wow64EnableWow64FsRedirection(ctypes.byref(wow64))
 
         if p.get_exe():
             print "Security Descriptor for Exe File %s" % p.get_exe().get_name()
@@ -87,7 +88,8 @@ def dump_processes(opts):
                 print dll.get_sd().as_text()
 
         if p.is_wow64():
-            k32.Wow64DisableWow64FsRedirection(ctypes.byref(wow64))
+            wpc.utils.disable_wow64()
+            # k32.Wow64DisableWow64FsRedirection(ctypes.byref(wow64))
 
 
 def dump_users(opts):
