@@ -148,18 +148,21 @@ def audit_eventlogs(report):
                 f = File(wpc.utils.env_expand(filename))
                 if f.is_replaceable():
                     report.get_by_id("WPC008").add_supporting_data('writable_eventlog_dll', [subkey, f])
-    
+
                 # WPC007 Insecure Permissions On Event Log File
                 # TODO should check for read access too
                 filename = subkey.get_value("File")
-                f = File(wpc.utils.env_expand(filename))
-                # Check for write access
-                if f.is_replaceable():
-                    report.get_by_id("WPC007").add_supporting_data('writable_eventlog_file', [subkey, f])
-                    
-                # Check for read access
-                for a in f.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["FILE_READ_DATA"]).get_aces():
-                    report.get_by_id("WPC088").add_supporting_data('file_read', [f, a.get_principal()])
+                if filename:
+                    f = File(wpc.utils.env_expand(filename))
+                    # Check for write access
+                    if f.is_replaceable():
+                        report.get_by_id("WPC007").add_supporting_data('writable_eventlog_file', [subkey, f])
+
+                    # Check for read access
+                    sd = f.get_sd()
+                    if sd:
+                        for a in sd.get_acelist().get_untrusted().get_aces_with_perms(["FILE_READ_DATA"]).get_aces():
+                            report.get_by_id("WPC088").add_supporting_data('file_read', [f, a.get_principal()])
 
 
 def audit_shares(report):
