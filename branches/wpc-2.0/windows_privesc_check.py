@@ -38,6 +38,18 @@ def dump_shares(report):
         print s.as_text()
 
 
+def dump_reg_keys(report):
+    for check, key in wpc.conf.reg_keys.items():
+        #print "Checking %s => %s" % (check, key)
+        key_a = key.split('\\')
+        value = key_a.pop()
+        key_s = '\\'.join(key_a)
+        rk = regkey(key_s)
+        if rk.is_present:
+            v = rk.get_value(value) # This value appears as "(Default)" in regedit
+            print "Check: \"%s\", Key: %s, Value: %s, Data: %s" % (check, key_s, value, v)
+
+
 def dump_patches(report):
     # TODO
     print "[E] dump_patches not implemented yet.  Sorry."
@@ -613,6 +625,10 @@ def audit_services(report):
                 report.get_by_id("WPC024").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
 
 
+def audit_reg_keys(report):
+    print "audit_reg_keys: no implemented yet"
+
+
 def audit_registry(report):
 
     #
@@ -959,6 +975,10 @@ if options.dump_mode:
         section("dump_registry")
         dump_registry(issues)
 
+    if options.do_all or options.do_reg_keys:
+        section("dump_reg_keys")
+        dump_reg_keys(issues)
+
     if options.do_all or options.do_users:
         section("dump_users")
         dump_users(issues)
@@ -1013,6 +1033,10 @@ if options.audit_mode:
     if options.do_all or options.do_registry:
         section("audit_registry")
         audit_registry(issues)
+
+    if options.do_all or options.do_reg_keys:
+        section("audit_reg_keys")
+        audit_reg_keys(issues)
 
     if options.do_all or options.do_users:
         section("audit_users")
