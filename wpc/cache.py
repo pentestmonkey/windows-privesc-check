@@ -96,7 +96,7 @@ class cache:
             self.namefromsid[server] = {}
         if not sid in self.namefromsid[server].keys():
             try:
-                self.namefromsid[server][sid] = win32security.LookupAccountSid(server, s)        
+                self.namefromsid[server][sid] = win32security.LookupAccountSid(server, s)
             except:
                 self.namefromsid[server][sid] = (win32security.ConvertSidToStringSid(s), "[unknown]", 8)
             self.miss('LookupAccountSid')
@@ -110,7 +110,7 @@ class cache:
             self.sidfromname[server] = {}
         if not name in self.sidfromname[server].keys():
             try:
-                self.sidfromname[server][name] = win32security.LookupAccountName(server, name)        
+                self.sidfromname[server][name] = win32security.LookupAccountName(server, name)
             except:
                 self.sidfromname[server][name] = None
             self.miss('LookupAccountName')

@@ -29,6 +29,24 @@ def dump_paths(report):
     print "[E] dump_paths not implemented yet.  Sorry."
 
 
+def dump_misc_checks(report):
+    # Check if host is in a domain
+    in_domain = 0
+    dc_info = None
+    try:
+        dc_info = win32security.DsGetDcName(None, None, None, None, 0)
+        in_domain = 1
+    except:
+        pass
+
+    if in_domain:
+        print "[+] Host is in domain"
+        for k in dc_info.keys():
+            print "[-]   %s => %s" % (k, dc_info[k])
+    else:
+        print "[+] Host is not in domain"
+
+
 def dump_eventlogs(report):
     # TODO
     print "[E] dump_eventlogs not implemented yet.  Sorry."
@@ -147,6 +165,20 @@ def dump_groups(opts):
 def dump_registry(opts):
     # TODO
     print "[!] Registry dump option not implemented yet.  Sorry."
+
+
+def audit_misc_checks(report):
+    # Check if host is in a domain
+    in_domain = 0
+    dc_info = None
+    try:
+        dc_info = win32security.DsGetDcName(None, None, None, None, 0)
+        in_domain = 1
+    except:
+        pass
+
+    if in_domain:
+        report.get_by_id("WPC092").add_supporting_data('dc_info', [dc_info])
 
 
 def audit_eventlogs(report):
@@ -954,6 +986,8 @@ printline("Starting Audit")
 
 # Dump raw data if required
 if options.dump_mode:
+    section("dump_misc_checks")
+    dump_misc_checks(issues)
 
     if options.do_all or options.do_paths:
         section("dump_paths")
@@ -1013,6 +1047,8 @@ if options.dump_mode:
 
 # Identify security issues
 if options.audit_mode:
+    section("audit_misc_checks")
+    audit_misc_checks(issues)
 
     if options.do_all or options.do_paths:
         section("audit_paths")
