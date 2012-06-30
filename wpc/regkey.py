@@ -29,6 +29,8 @@ class regkey:
         return self.hive
 
     def set_path(self, path):
+        if path == '\\':
+            path = ''
         self.path = path
 
     def get_path(self):
@@ -114,6 +116,8 @@ class regkey:
             return []
 
     def get_name(self):
+        if self.path == '':
+            return self.hive 
         return self.hive + "\\" + self.path
 
     def get_keyh(self):

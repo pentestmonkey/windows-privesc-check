@@ -7,6 +7,7 @@ from wpc.report.fileAcl import fileAcl
 from wpc.report.report import report
 from wpc.services import drivers, services
 from wpc.users import users
+from wpc.user import user
 from wpc.shares import shares
 from wpc.drives import drives
 from wpc.utils import k32, wow64
@@ -20,7 +21,7 @@ import wpc.conf
 import wpc.utils
 import glob
 import re
-
+import win32security
 
 # ---------------------- Define Subs ---------------------------
 def dump_paths(report):
@@ -184,6 +185,33 @@ def audit_shares(report):
         if s.get_sd():
             for a in s.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["FILE_READ_DATA"]).get_aces():
                 report.get_by_id("WPC086").add_supporting_data('share_perms', [s, a.get_principal()])
+
+
+def audit_reg_keys(report):
+    r_root = regkey('HKEY_USERS')
+    for r_user in r_root.get_subkeys():
+        r = regkey(r_user.get_name() + '\\Control Panel\\Desktop')
+        ss_active  = r.get_value("ScreenSaveActive")
+        ss_exe     = r.get_value("SCRNSAVE.EXE")
+        ss_secure  = r.get_value("ScreenSaverIsSecure")
+        ss_timeout = r.get_value("ScreenSaveTimeout")
+
+        if ss_exe and int(ss_active) > 0:
+            # Lookup username for this registry branch
+            m = re.search('HKEY_USERS.(S-[\d-]+)', r.get_name())
+            u = None
+            if m and m.group(1):
+                string_sid = m.group(1)
+                binary_sid = win32security.GetBinarySid(string_sid)
+                u = user(binary_sid)
+
+            if int(ss_secure) > 0:
+                # should have low timeout
+                if int(ss_timeout) > int(wpc.conf.screensaver_max_timeout_secs):
+                    report.get_by_id("WPC091").add_supporting_data('user_reg_keys', [u, r, "ScreenSaveTimeout", ss_timeout])
+            else:
+                # should ask for password
+                report.get_by_id("WPC090").add_supporting_data('user_reg_keys', [u, r, "ScreenSaverIsSecure", ss_secure])
 
 
 def audit_patches(report):
@@ -623,10 +651,6 @@ def audit_services(report):
             # WRITE_OWNER
             for a in s.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["WRITE_OWNER"]).get_aces():
                 report.get_by_id("WPC024").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
-
-
-def audit_reg_keys(report):
-    print "audit_reg_keys: no implemented yet"
 
 
 def audit_registry(report):
