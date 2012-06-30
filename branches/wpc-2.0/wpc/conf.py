@@ -11,6 +11,8 @@ version = None
 cache = None
 on64bitwindows = None
 
+screensaver_max_timeout_secs = 600
+
 reg_keys = {
     'Devices: Unsigned driver installation behavior': 'HKEY_LOCAL_MACHINE\Software\Microsoft\Driver Signing\Policy',
     'Recovery console: Allow automatic administrative logon ': 'HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Setup\RecoveryConsole\SecurityLevel',
@@ -2586,6 +2588,28 @@ NB: This issue has only been reported for NTFS filesystems.  Other non-NTFS file
           'exploit_list': {
              'section': "description",
              'preamble': "The following public exploits are believed to be effective against the system:",
+          },
+       }
+    },
+    'WPC090': {
+       'title': "Screen Saver Is Not Password Protected",
+       'description': '''Some system users were found to not use password protected screen savers.  This may leave unattended systems open to abuse.''',
+       'recommendation': '''Ensure that all accounts that are logged into interactively use a password protected screen saver.''',
+       'supporting_data': {
+          'user_reg_keys': {
+             'section': "description",
+             'preamble': "The following registry keys indicate the absence of a password-protected screen saver for some users:",
+          },
+       }
+    },
+    'WPC091': {
+       'title': "Screen Saver Timeout Is Too Long",
+       'description': '''The elapsed time before the password-protected screen saver activates is longer than 10 mins for some users.  This may leave unattended systems open to abuse for longer than necessary.''',
+       'recommendation': '''For user accounts that are logged into interactively, configure a suitable screen saver timeout to protect idle systems.  The precise timeout required may vary depending on the environment.''',
+       'supporting_data': {
+          'user_reg_keys': {
+             'section': "description",
+             'preamble': "The registy keys below show the timeout in seconds:",
           },
        }
     },

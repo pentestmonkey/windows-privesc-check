@@ -32,6 +32,17 @@ class issue:
                 p = data[1]
                 etree.SubElement(d, 'data').text = "    %s (%s) which runs as %s is owned by %s\n" % (s.get_description(), s.get_name(), s.get_run_as(), p.get_fq_name())
 
+        elif data_name == 'user_reg_keys':
+            for data in self.get_supporting_data(data_name):
+                u = data[0]
+                r = data[1]
+                value_name = data[2]
+                value_data = data[3]
+                u_name = "UNKNOWN"
+                if u:
+                    u_name = u.get_fq_name()
+                etree.SubElement(d, 'data').text = "User: %s, Reg key: %s\%s, Value: %s" % (u_name, r.get_name(), value_name, value_data)
+
         elif data_name == 'exploit_list':
             for data in self.get_supporting_data(data_name):
                 e = data[0]
