@@ -30,6 +30,7 @@ def parseOptions():
     examine.add_option("-r", "--registry",  dest = "do_registry",      default = False, action = "store_true", help = "Registry Settings + Permissions")
     examine.add_option("-U", "--users",     dest = "do_users",         default = False, action = "store_true", help = "Users")
     examine.add_option("-G", "--groups",    dest = "do_groups",        default = False, action = "store_true", help = "Groups")
+    examine.add_option("-e", "--reg_keys",  dest = "do_reg_keys",      default = False, action = "store_true", help = "Misc security-related reg keys")
     examine.add_option("-v", "--verbose",   dest = "verbose",          default = False, action = "store_true", help = "More verbose output on console")
 
     host.add_option("-s", "--server", dest = "remote_host",   help = "Remote host or IP")
@@ -62,8 +63,8 @@ def parseOptions():
 
     # TODO can't use -m without -G
 
-    if not (options.do_all or options.do_services or options.do_drivers or options.do_processes or options.patchfile or options.do_registry or options.do_users or options.do_groups or options.do_program_files or options.do_paths or options.do_drives or options.do_eventlogs or options.do_shares or options.do_loggedin or options.do_users or options.do_groups):
-        print "[E] Specify something to look at.  At least one of: -a, -t, -D, -E, -H, -T, -L , -S, -k, -I, -U, -s, -d, -P, -r, -R, -U, -G.  -h for help."
+    if not (options.do_all or options.do_services or options.do_drivers or options.do_processes or options.patchfile or options.do_reg_keys or options.do_registry or options.do_users or options.do_groups or options.do_program_files or options.do_paths or options.do_drives or options.do_eventlogs or options.do_shares or options.do_loggedin or options.do_users or options.do_groups):
+        print "[E] Specify something to look at.  At least one of: -a, -t, -D, -E, -e, -H, -T, -L , -S, -k, -I, -U, -s, -d, -P, -r, -R, -U, -G.  -h for help."
         sys.exit()
 
     return options
