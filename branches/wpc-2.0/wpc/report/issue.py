@@ -48,6 +48,11 @@ class issue:
                 e = data[0]
                 etree.SubElement(d, 'data').text = "Missing patch %s: Metasploit exploit \"%s\" (%s)" % (e.get_msno(), e.get_title(), e.get_info("Metasploit Exploit Name"))
 
+        elif data_name == 'dc_info':
+            for data in self.get_supporting_data(data_name):
+                dc_info = data[0]
+                etree.SubElement(d, 'data').text = "Domain Name: %s" % (dc_info["DomainName"])
+
         elif data_name == 'writable_dirs':
             for data in self.get_supporting_data(data_name):
                 f = data[0]

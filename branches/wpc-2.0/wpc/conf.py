@@ -2613,6 +2613,17 @@ NB: This issue has only been reported for NTFS filesystems.  Other non-NTFS file
           },
        }
     },
+    'WPC092': {
+       'title': "Host Is In A Domain",
+       'description': '''The host audited is in a domain.  While this is a not a security issue in itself, the inherent trust of other systems could mean that this host is vulnerable to attack even if the local security audit identifies no siginficant security issues.''',
+       'recommendation': '''Ensure that the systems and accounts trusted by this host are also secure.  This may require significantly more auditing.''',
+       'supporting_data': {
+          'dc_info': {
+             'section': "description",
+             'preamble': "The following domain information was retrieved:",
+          },
+       }
+    },
 }
 
 # TODO: Manage auditing and security log - view and clear security log.  Disable per-object auditing.
