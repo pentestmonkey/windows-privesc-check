@@ -268,7 +268,26 @@ def audit_reg_keys(report):
     if v is not None:
         if v == 0:
             report.get_by_id("WPC097").add_supporting_data('reg_key_value', [r, "PromptOnSecureDesktop", v])
-                        
+
+    r = regkey('HKLM\\SYSTEM\\CurrentControlSet\\Control\\Lsa')
+    v = r.get_value("LmCompatibilityLevel")
+    if v is not None:
+        if v != 5:
+            report.get_by_id("WPC098").add_supporting_data('reg_key_value', [r, "LmCompatibilityLevel", v])
+
+    r = regkey('HKLM\\System\\CurrentControlSet\\Control\\Lsa')
+    v = r.get_value("NoLMHash")
+    if v is not None:
+        if v != 1:
+            report.get_by_id("WPC099").add_supporting_data('reg_key_value', [r, "NoLMHash", v])
+
+    r = regkey('HKLM\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon')
+    v = r.get_value("CachedLogonsCount")
+    if v is not None:
+        if v != 1:
+            report.get_by_id("WPC099").add_supporting_data('reg_key_value', [r, "CachedLogonsCount", v])
+
+                      
 def audit_patches(report):
     patchfile = options.patchfile
 

@@ -2683,6 +2683,39 @@ NB: This issue has only been reported for NTFS filesystems.  Other non-NTFS file
           },
        }
     },
+    'WPC098': {
+       'title': "LANMan Authentication Level Not Set To Mandate NTLMv2",
+       'description': '''The system has not been configured to mandate the use of NTLMv2 when acting as a client and a server.  This leaves network communications more open to attack.''',
+       'recommendation': '''Set the security policy setting 'Network security: LAN Manager authentication level' to 'Send NTLMv2 response only\refuse LM & NTLM'.''',
+       'supporting_data': {
+          'reg_key_value': {
+             'section': "description",
+             'preamble': "The following registry key shows the current policy setting:",
+          },
+       }
+    },
+    'WPC099': {
+       'title': "Weak LANMan Password Hash Used In SAM",
+       'description': '''LANMan password hashes are stored in the SAM.  If the system were to be compromised, it would be much easier for an attacker to recover passwords than if the use of LANman had been disabled.''',
+       'recommendation': '''Set the security policy setting 'Network security: Do not store LAN Manager hash value on next password change' to Enabled.''',
+       'supporting_data': {
+          'reg_key_value': {
+             'section': "description",
+             'preamble': "The following registry key shows the current policy setting:",
+          },
+       }
+    },
+    'WPC100': {
+       'title': "System Caches Logon Credentails",
+       'description': '''The system is configured to cache a number of logon credentials in case the domain controller is unavaialble next time a user tries to log in.  Such data can be accessed and potentially used to recover domain passwords in the event of a compromise.''',
+       'recommendation': '''Set the security policy setting 'Interactive logon: Number of previous logons to cache (in case domain controller is not available)' 0 if possible - though this might not be a usable configuration for laptops.''',
+       'supporting_data': {
+          'reg_key_value': {
+             'section': "description",
+             'preamble': "The following registry key shows the current policy setting:",
+          },
+       }
+    },
 }
 
 # TODO: Manage auditing and security log - view and clear security log.  Disable per-object auditing.
