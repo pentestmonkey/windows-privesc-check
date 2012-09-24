@@ -43,6 +43,13 @@ class issue:
                     u_name = u.get_fq_name()
                 etree.SubElement(d, 'data').text = "User: %s, Reg key: %s\%s, Value: %s" % (u_name, r.get_name(), value_name, value_data)
 
+        elif data_name == 'reg_key_value':
+            for data in self.get_supporting_data(data_name):
+                r = data[0]
+                value_name = data[1]
+                value_data = data[2]
+                etree.SubElement(d, 'data').text = "Reg key: %s\%s, Value: %s" % (r.get_name(), value_name, value_data)
+
         elif data_name == 'exploit_list':
             for data in self.get_supporting_data(data_name):
                 e = data[0]
@@ -60,6 +67,12 @@ class issue:
                 etree.SubElement(d, 'data').text = "    File %s has weak permissions: %s\n" % (f.get_name(), a.as_text())
 
         elif data_name == 'writable_progs':
+            for data in self.get_supporting_data(data_name):
+                f = data[0]
+                a = data[1]
+                etree.SubElement(d, 'data').text = "    File %s has weak permissions: %s\n" % (f.get_name(), a.as_text())
+
+        elif data_name == 'writable_files':
             for data in self.get_supporting_data(data_name):
                 f = data[0]
                 a = data[1]

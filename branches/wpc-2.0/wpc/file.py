@@ -49,6 +49,9 @@ class file:
         else:
             return 0
 
+    def get_type(self):
+        return self.type
+    
     def is_file(self):
         if self.type == 'file':
             return 1

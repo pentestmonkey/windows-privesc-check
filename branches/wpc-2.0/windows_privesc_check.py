@@ -245,7 +245,30 @@ def audit_reg_keys(report):
                 # should ask for password
                 report.get_by_id("WPC090").add_supporting_data('user_reg_keys', [u, r, "ScreenSaverIsSecure", ss_secure])
 
+    r = regkey('HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System')
+    v = r.get_value("ConsentPromptBehaviorAdmin")
+    if v is not None:
+        if v == 0 or v == 5:
+            report.get_by_id("WPC094").add_supporting_data('reg_key_value', [r, "ConsentPromptBehaviorAdmin", v])
 
+    r = regkey('HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System')
+    v = r.get_value("FilterAdministratorToken")
+    if v is not None:
+        if v == 0:
+            report.get_by_id("WPC095").add_supporting_data('reg_key_value', [r, "FilterAdministratorToken", v])
+
+    r = regkey('HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System')
+    v = r.get_value("EnableLUA")
+    if v is not None:
+        if v == 0:
+            report.get_by_id("WPC096").add_supporting_data('reg_key_value', [r, "EnableLUA", v])
+            
+    r = regkey('HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System')
+    v = r.get_value("PromptOnSecureDesktop")
+    if v is not None:
+        if v == 0:
+            report.get_by_id("WPC097").add_supporting_data('reg_key_value', [r, "PromptOnSecureDesktop", v])
+                        
 def audit_patches(report):
     patchfile = options.patchfile
 
@@ -924,6 +947,32 @@ def audit_program_files(report):
                 else:
                     print "[E] Ignoring thing that isn't file or directory: " + f.get_name()
 
+def audit_all_files(report):
+    # Record info about all directories
+    include_dirs = 1
+
+    # TODO other drives too
+    
+    prog_dirs = []
+    prog_dirs.append('c:\\')
+
+    for dir in prog_dirs:
+        # Walk program files directories looking for executables
+        for filename in wpc.utils.dirwalk(dir, '*', include_dirs):
+            f = File(filename)
+            # TODO check file owner, parent paths, etc.  Maybe use is_replaceable instead?
+            aces = f.get_dangerous_aces()
+
+            for ace in aces:
+                for p in ace.get_perms():
+                    print "%s\t%s\t%s\t%s\t%s" % (f.get_type(), f.get_name(), ace.get_type(), ace.get_principal().get_fq_name(), p)
+                if f.is_dir():
+                    report.get_by_id("WPC001").add_supporting_data('writable_dirs', [f, ace])
+                elif f.is_file():
+                    report.get_by_id("WPC001").add_supporting_data('writable_progs', [f, ace])    
+                else:
+                    print "[E] Ignoring thing that isn't file or directory: " + f.get_name()
+
 def audit_paths(report):
 # TODO this will be too slow.  Need some clever caching.
 #    print "[-] Checking every user's path"
@@ -1089,6 +1138,10 @@ if options.audit_mode:
     if options.do_all or options.do_program_files:
         section("audit_program_files")
         audit_program_files(issues)
+
+    if options.do_all or options.do_allfiles:
+        section("audit_all_files")
+        audit_all_files(issues)
 
     if options.do_all or options.do_registry:
         section("audit_registry")
