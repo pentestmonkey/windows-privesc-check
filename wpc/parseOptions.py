@@ -16,7 +16,7 @@ def parseOptions():
     parser.add_option("--dump",  dest = "dump_mode", default = False, action = "store_true", help = "Dumps info for you to analyse manually")
     parser.add_option("--audit", dest = "audit_mode", default = False, action = "store_true", help = "Identify and report security weaknesses")
 
-    examine.add_option("-a", "--all",       dest = "do_all",           default = False, action = "store_true", help = "All Checks")
+    examine.add_option("-a", "--all",       dest = "do_all",           default = False, action = "store_true", help = "All Simple Checks (non-slow)")
     examine.add_option("-t", "--paths",     dest = "do_paths",         default = False, action = "store_true", help = "PATH")
     examine.add_option("-D", "--drives",    dest = "do_drives",        default = False, action = "store_true", help = "Drives*")
     examine.add_option("-E", "--eventlogs", dest = "do_eventlogs",     default = False, action = "store_true", help = "Event Log*")
@@ -30,6 +30,7 @@ def parseOptions():
     examine.add_option("-r", "--registry",  dest = "do_registry",      default = False, action = "store_true", help = "Registry Settings + Permissions")
     examine.add_option("-U", "--users",     dest = "do_users",         default = False, action = "store_true", help = "Users")
     examine.add_option("-G", "--groups",    dest = "do_groups",        default = False, action = "store_true", help = "Groups")
+    examine.add_option("-A", "--allfiles",  dest = "do_allfiles",      default = False, action = "store_true", help = "All Files and Directories (slow)")
     examine.add_option("-e", "--reg_keys",  dest = "do_reg_keys",      default = False, action = "store_true", help = "Misc security-related reg keys")
     examine.add_option("-v", "--verbose",   dest = "verbose",          default = False, action = "store_true", help = "More verbose output on console")
 
@@ -63,7 +64,7 @@ def parseOptions():
 
     # TODO can't use -m without -G
 
-    if not (options.do_all or options.do_services or options.do_drivers or options.do_processes or options.patchfile or options.do_reg_keys or options.do_registry or options.do_users or options.do_groups or options.do_program_files or options.do_paths or options.do_drives or options.do_eventlogs or options.do_shares or options.do_loggedin or options.do_users or options.do_groups):
+    if not (options.do_all or options.do_services or options.do_drivers or options.do_processes or options.patchfile or options.do_reg_keys or options.do_registry or options.do_users or options.do_groups or options.do_program_files or options.do_paths or options.do_drives or options.do_eventlogs or options.do_shares or options.do_loggedin or options.do_users or options.do_groups or options.do_allfiles):
         print "[E] Specify something to look at.  At least one of: -a, -t, -D, -E, -e, -H, -T, -L , -S, -k, -I, -U, -s, -d, -P, -r, -R, -U, -G.  -h for help."
         sys.exit()
 

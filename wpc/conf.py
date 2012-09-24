@@ -2624,6 +2624,65 @@ NB: This issue has only been reported for NTFS filesystems.  Other non-NTFS file
           },
        }
     },
+    'WPC093': {
+       'title': "Files and Directories Can Be Modified By Non-Admin Users",
+       'description': '''Some files and/or directories can be modified by non-admin users.''',
+       'recommendation': '''Manual investigation is required to determine any impact.  This is just a generic issue.''',
+       'supporting_data': {
+          'writable_dirs': {
+             'section': "description",
+             'preamble': "The following directories were writeable by non-admin users:",
+          },
+          'writable_files': {
+             'section': "description",
+             'preamble': "The following files were writeable by non-admin users:",
+          },
+       }
+    },
+    'WPC094': {
+       'title': "User Access Control Setting Allows Malware to Elevate Without Prompt",
+       'description': '''The security policy setting 'User Account Control: Behavior of the elevation prompt for administrators in Admin Approval Mode' is set to 'Elevate without prompting' or 'Prompt for consent for non-Windows binaries' (default).  This allows malicious programs to elevate without the user agreeing.  Metasploit and other free tools can perform such escalation.''',
+       'recommendation': '''Alter security policy to 'Prompt for consent' or stronger setting.''',
+       'supporting_data': {
+          'reg_key_value': {
+             'section': "description",
+             'preamble': "The following registry key shows the current policy setting:",
+          },
+       }
+    },
+    'WPC095': {
+       'title': "User Access Control Is Not Applied To Builtin Administrator Account",
+       'description': '''The RID 500 account does not run in admin approval mode.  If this user account were to be compromised, UAC would not provide any mitigation.''',
+       'recommendation': '''Enable the security policy setting 'User Account Control: Use Admin Approval Mode for the built-in Administrator account'.''',
+       'supporting_data': {
+          'reg_key_value': {
+             'section': "description",
+             'preamble': "The following registry key shows the current policy setting:",
+          },
+       }
+    },
+    'WPC096': {
+       'title': "User Access Control Not Enabled",
+       'description': '''UAC has been disabled on the system.  It will not mitigate the compromise of administrative accounts.  This is not the default configuration.''',
+       'recommendation': '''Enable the security policy setting 'User Account Control: Run all administrators in Admin Approval Mode'.''',
+       'supporting_data': {
+          'reg_key_value': {
+             'section': "description",
+             'preamble': "The following registry key shows the current policy setting:",
+          },
+       }
+    },
+    'WPC097': {
+       'title': "User Access Control Does not Prompt on the Secure Desktop",
+       'description': '''UAC has not been configured to use the secure desktop when prompting for elevation.  It might be possible to subvert the consent process and trick a user into approving elevation of malware.''',
+       'recommendation': '''Enable the security policy setting 'User Account Control: Switch to the secure desktop when prompting for elevation'.''',
+       'supporting_data': {
+          'reg_key_value': {
+             'section': "description",
+             'preamble': "The following registry key shows the current policy setting:",
+          },
+       }
+    },
 }
 
 # TODO: Manage auditing and security log - view and clear security log.  Disable per-object auditing.
