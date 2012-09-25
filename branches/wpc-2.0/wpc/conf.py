@@ -2716,6 +2716,28 @@ NB: This issue has only been reported for NTFS filesystems.  Other non-NTFS file
           },
        }
     },
+    'WPC101': {
+       'title': "SMB Server Does Not Mandate Packet Signing",
+       'description': '''SMB clients that connect to this server are not forced to use signing.  As signing protects data from modification in transit, clients may end up receiving data that has been maliciously altered by an attacker.  This could lead to a compromise of the client if it opens or runs the files accessed - particularly in the case of a domain member access group policy information.''',
+       'recommendation': '''Set the security policy setting 'Microsoft network server: Digitally sign communications (always)' to Enabled.''',
+       'supporting_data': {
+          'reg_key_value': {
+             'section': "description",
+             'preamble': "The following registry key shows the current policy setting:",
+          },
+       }
+    },
+    'WPC101': {
+       'title': "SMB Client Does Not Mandate Packet Signing",
+       'description': '''SMB connection originating from this host might not negotiate pack signing.  As signing protects data from modification in transit, clients may end up sending or receiving data that has been maliciously altered by an attacker.  This could lead to a compromise of the client or server.''',
+       'recommendation': '''Set the security policy setting 'Microsoft network server: Digitally sign communications (always)' to Enabled.''',
+       'supporting_data': {
+          'reg_key_value': {
+             'section': "description",
+             'preamble': "The following registry key shows the current policy setting:",
+          },
+       }
+    },
 }
 
 # TODO: Manage auditing and security log - view and clear security log.  Disable per-object auditing.

@@ -285,9 +285,20 @@ def audit_reg_keys(report):
     v = r.get_value("CachedLogonsCount")
     if v is not None:
         if v != 1:
-            report.get_by_id("WPC099").add_supporting_data('reg_key_value', [r, "CachedLogonsCount", v])
+            report.get_by_id("WPC100").add_supporting_data('reg_key_value', [r, "CachedLogonsCount", v])
 
-                      
+    r = regkey('HKLM\\System\\CurrentControlSet\\Services\\LanManServer\\Parameters')
+    v = r.get_value("RequireSecuritySignature")
+    if v is not None:
+        if v != 1:
+            report.get_by_id("WPC101").add_supporting_data('reg_key_value', [r, "RequireSecuritySignature", v])
+
+    r = regkey('HKLM\\System\\CurrentControlSet\\Services\\LanmanWorkstation\\Parameters')
+    v = r.get_value("RequireSecuritySignature")
+    if v is not None:
+        if v != 1:
+            report.get_by_id("WPC102").add_supporting_data('reg_key_value', [r, "RequireSecuritySignature", v])
+
 def audit_patches(report):
     patchfile = options.patchfile
 
