@@ -228,14 +228,20 @@ def audit_reg_keys(report):
         ss_secure  = r.get_value("ScreenSaverIsSecure")
         ss_timeout = r.get_value("ScreenSaveTimeout")
 
-        if ss_exe and int(ss_active) > 0:
-            # Lookup username for this registry branch
-            m = re.search('HKEY_USERS.(S-[\d-]+)', r.get_name())
-            u = None
-            if m and m.group(1):
-                string_sid = m.group(1)
-                binary_sid = win32security.GetBinarySid(string_sid)
-                u = user(binary_sid)
+        # Lookup username for this registry branch
+        m = re.search('HKEY_USERS.(S-[\d-]+)', r.get_name())
+        u = None
+        if m and m.group(1):
+            string_sid = m.group(1)
+            binary_sid = win32security.GetBinarySid(string_sid)
+            u = user(binary_sid)
+
+        # Screen saver is inactive
+        if ss_active and int(ss_active) == 0:
+            report.get_by_id("WPC103").add_supporting_data('user_reg_keys', [u, r, "ScreenSaveActive", ss_active])
+
+        # Screen saver is active
+        elif ss_exe and int(ss_active) > 0:
 
             if int(ss_secure) > 0:
                 # should have low timeout
@@ -245,29 +251,32 @@ def audit_reg_keys(report):
                 # should ask for password
                 report.get_by_id("WPC090").add_supporting_data('user_reg_keys', [u, r, "ScreenSaverIsSecure", ss_secure])
 
-    r = regkey('HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System')
-    v = r.get_value("ConsentPromptBehaviorAdmin")
-    if v is not None:
-        if v == 0 or v == 5:
-            report.get_by_id("WPC094").add_supporting_data('reg_key_value', [r, "ConsentPromptBehaviorAdmin", v])
 
-    r = regkey('HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System')
-    v = r.get_value("FilterAdministratorToken")
-    if v is not None:
-        if v == 0:
-            report.get_by_id("WPC095").add_supporting_data('reg_key_value', [r, "FilterAdministratorToken", v])
-
+    # UAC checks.  Note that we only report UAC misconfigurations when UAC is enabled.  If UAC
+    #              is disabled, we just report that it's disabled.
     r = regkey('HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System')
     v = r.get_value("EnableLUA")
     if v is not None:
         if v == 0:
             report.get_by_id("WPC096").add_supporting_data('reg_key_value', [r, "EnableLUA", v])
-            
-    r = regkey('HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System')
-    v = r.get_value("PromptOnSecureDesktop")
-    if v is not None:
-        if v == 0:
-            report.get_by_id("WPC097").add_supporting_data('reg_key_value', [r, "PromptOnSecureDesktop", v])
+        else:
+            r = regkey('HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System')
+            v = r.get_value("ConsentPromptBehaviorAdmin")
+            if v is not None:
+                if v == 0 or v == 5:
+                    report.get_by_id("WPC094").add_supporting_data('reg_key_value', [r, "ConsentPromptBehaviorAdmin", v])
+
+            r = regkey('HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System')
+            v = r.get_value("FilterAdministratorToken")
+            if v is not None:
+                if v == 0:
+                    report.get_by_id("WPC095").add_supporting_data('reg_key_value', [r, "FilterAdministratorToken", v])
+
+            r = regkey('HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System')
+            v = r.get_value("PromptOnSecureDesktop")
+            if v is not None:
+                if v == 0:
+                    report.get_by_id("WPC097").add_supporting_data('reg_key_value', [r, "PromptOnSecureDesktop", v])
 
     r = regkey('HKLM\\SYSTEM\\CurrentControlSet\\Control\\Lsa')
     v = r.get_value("LmCompatibilityLevel")
@@ -320,9 +329,14 @@ def audit_patches(report):
         print "[E] Can't open patch data file: %s" % patchfile
         return 0
 
-    db = mspatchdb(patchfile)
+    try:
+        db = mspatchdb(patchfile)
+
+    except:
+        print "[E] Can't parse patch database.  Maybe file format has changed.  Skipping."
+        return 0
+
     p = patchdata({'patchdb': db})
-    
 
     print "[-] Gathering installed patches"
     print "[-] %s patches are installed" % len(p.get_installed_patches())
@@ -977,31 +991,37 @@ def audit_program_files(report):
                 else:
                     print "[E] Ignoring thing that isn't file or directory: " + f.get_name()
 
-def audit_all_files(report):
+def dump_all_files(report):
     # Record info about all directories
     include_dirs = 1
 
     # TODO other drives too
-    
+
     prog_dirs = []
     prog_dirs.append('c:\\')
 
+    count = 0
     for dir in prog_dirs:
         # Walk program files directories looking for executables
         for filename in wpc.utils.dirwalk(dir, '*', include_dirs):
             f = File(filename)
+            #print "[D] Processing %s" % f.get_name()
             # TODO check file owner, parent paths, etc.  Maybe use is_replaceable instead?
             aces = f.get_dangerous_aces()
-
+            count = count + 1
+#            if count > 1000:
+#                exit(1)
             for ace in aces:
                 for p in ace.get_perms():
                     print "%s\t%s\t%s\t%s\t%s" % (f.get_type(), f.get_name(), ace.get_type(), ace.get_principal().get_fq_name(), p)
-                if f.is_dir():
-                    report.get_by_id("WPC001").add_supporting_data('writable_dirs', [f, ace])
-                elif f.is_file():
-                    report.get_by_id("WPC001").add_supporting_data('writable_progs', [f, ace])    
-                else:
-                    print "[E] Ignoring thing that isn't file or directory: " + f.get_name()
+#                if f.is_dir():
+#                    report.get_by_id("WPC001").add_supporting_data('writable_dirs', [f, ace])
+#                elif f.is_file():
+#                    report.get_by_id("WPC001").add_supporting_data('writable_progs', [f, ace])    
+#                else:
+#                    print "[E] Ignoring thing that isn't file or directory: " + f.get_name()
+
+            #f.clearmem() # memory leak
 
 def audit_paths(report):
 # TODO this will be too slow.  Need some clever caching.
@@ -1071,6 +1091,10 @@ if options.dump_mode:
     if options.do_all or options.do_paths:
         section("dump_paths")
         dump_paths(issues)
+
+    if options.do_allfiles:
+        section("dump_all_files")
+        dump_all_files(issues)
 
     if options.do_all or options.do_eventlogs:
         section("dump_eventlogs")
@@ -1168,10 +1192,6 @@ if options.audit_mode:
     if options.do_all or options.do_program_files:
         section("audit_program_files")
         audit_program_files(issues)
-
-    if options.do_all or options.do_allfiles:
-        section("audit_all_files")
-        audit_all_files(issues)
 
     if options.do_all or options.do_registry:
         section("audit_registry")

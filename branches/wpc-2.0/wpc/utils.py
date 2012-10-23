@@ -196,11 +196,10 @@ def define_trusted_principals():
         #print "[D] converting string sid"
         #print "%s" % win32security.ConvertStringSidToSid("S-1-5-32-549")
         p = Group(win32security.ConvertStringSidToSid("S-1-5-32-549"))
-        
+
     except:
         wpc.conf.trusted_principals.append(p)
-        
-        
+
     # TODO this always ignored power users.  not what we want.
     # only want to ignore when group doesn't exist.
     try:
@@ -228,7 +227,7 @@ def dirwalk(directory, extensions, include_dirs):
     re_string = r'\.' + r'$|\.'.join(extensions)  # '\.exe$|\.py$|\.svn-base$|\.com$|\.bat$|\.dll$'
     re_exe = re.compile(re_string, re.IGNORECASE)
 
-    for root, dirs, files in os.walk(directory):
+    for root, dirs, files in oswalk(directory):
             #print "root=%s, dirs=%s, files=%s" % (root, dirs, files)
             yield root
 
@@ -242,6 +241,47 @@ def dirwalk(directory, extensions, include_dirs):
             if include_dirs:
                 for directory in dirs:
                     yield root + "\\" + directory
+
+# Copy of os.walk with minor mod to detect reparse points
+def oswalk(top, topdown=True, onerror=None, followlinks=False):
+    from os.path import join, isdir, islink
+    import errno
+    error = None
+    try:
+        # Note that listdir and error are globals in this module due
+        # to earlier import-*.
+        names = os.listdir(top)
+    except:
+        return
+
+    dirs, nondirs = [], []
+    for name in names:
+        if isdir(join(top, name)):
+            dirs.append(name)
+        else:
+            nondirs.append(name)
+
+    if topdown:
+        yield top, dirs, nondirs
+    for name in dirs:
+        path = join(top, name)
+        if followlinks or not is_reparse_point(path):
+            for x in oswalk(path, topdown, onerror, followlinks):
+                yield x
+    if not topdown:
+        yield top, dirs, nondirs
+
+
+def is_reparse_point(d):
+            try:
+                attr = win32api.GetFileAttributes(d)
+                # reparse point http://msdn.microsoft.com/en-us/library/windows/desktop/gg258117(v=vs.85).aspx
+                if attr & 0x400:
+                    print "[D] Is reparse point: %s" % d
+                    return 1
+            except:
+                pass
+            return 0
 
 
 # arg s contains windows-style env vars like: %windir%\foo

@@ -9,7 +9,7 @@ import wpc.conf
 class principal:
     def __init__(self, sid):
         self.name = None
-        self.info = None
+#        self.info = None
         self.domain = None
         self.set_sid(sid)
         self.type = None
@@ -19,11 +19,11 @@ class principal:
         self.cant_resolve = 0
         self.privileges = None
         self.info = {}
-        self.info['sid'] = self.get_sid_string()
-        self.info['privileges'] = " ".join(self.get_privileges())
+#        self.info['sid'] = self.get_sid_string()
+#        self.info['privileges'] = " ".join(self.get_privileges())
 
-#    def set_info(self, info):
-#        self.info = info
+    def set_info(self, info):
+        self.info = info
 
     def add_info(self, h):
         for k in h.keys():
@@ -121,7 +121,7 @@ class principal:
 #        return 0
 
     def is_trusted(self):
-        #print "Testing if %s is trusted" % self.get_fq_name()
+#        print "Testing if %s is trusted" % self.get_fq_name()
         if self.trusted_set:
             #print "Cache result returned for trust of %s: %s" % (self.get_fq_name(), self.trusted)
             return self.trusted
@@ -138,13 +138,14 @@ class principal:
 
         for p in wpc.conf.trusted_principals:
             # This also recurses through sub groups
-            #print "Testing if %s is in %s" % (self.get_fq_name(), p.get_fq_name())
-            #print "[D] pincipal.is_trusted: %s is group? %s" % (p.get_fq_name(), p.is_group_type())
+#            print "Testing if %s is in %s" % (self.get_fq_name(), p.get_fq_name())
+#            print "[D] pincipal.is_trusted: %s is group? %s" % (p.get_fq_name(), p.is_group_type())
+#            print "[D] self.is_in_group(p): %s" % (self.is_in_group(p))
             if p.is_group_type() and self.is_in_group(p):
-                #print "Yes"
+#                print "Yes"
                 self.trusted_set = 1
                 self.trusted = 1
-                #print "%s is trusted.  Member of trusted group %s" % (self.get_fq_name(), p.get_fq_name())
+#                print "%s is trusted.  Member of trusted group %s" % (self.get_fq_name(), p.get_fq_name())
                 return 1
             else:
                 #print "No"
@@ -160,6 +161,6 @@ class principal:
         return 0
 
     def is_in_group(self, group):
-        #print "is_in_group called for %s, %s" % (self.get_fq_name(), group.get_name())
+        # print "is_in_group called for %s, %s" % (self.get_fq_name(), group.get_name())
         return wpc.conf.cache.is_in_group(self, group)
 

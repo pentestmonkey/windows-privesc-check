@@ -2727,7 +2727,7 @@ NB: This issue has only been reported for NTFS filesystems.  Other non-NTFS file
           },
        }
     },
-    'WPC101': {
+    'WPC102': {
        'title': "SMB Client Does Not Mandate Packet Signing",
        'description': '''SMB connection originating from this host might not negotiate pack signing.  As signing protects data from modification in transit, clients may end up sending or receiving data that has been maliciously altered by an attacker.  This could lead to a compromise of the client or server.''',
        'recommendation': '''Set the security policy setting 'Microsoft network server: Digitally sign communications (always)' to Enabled.''',
@@ -2735,6 +2735,17 @@ NB: This issue has only been reported for NTFS filesystems.  Other non-NTFS file
           'reg_key_value': {
              'section': "description",
              'preamble': "The following registry key shows the current policy setting:",
+          },
+       }
+    },
+    'WPC103': {
+       'title': "Screen Saver Does Not Activate Automatically",
+       'description': '''No screensaver was configured for some users.''',
+       'recommendation': '''For user accounts that are logged into interactively, configure a suitable screen saver timeout to protect idle systems.  The precise timeout required may vary depending on the environment.''',
+       'supporting_data': {
+          'user_reg_keys': {
+             'section': "description",
+             'preamble': "The registy keys below show if the screen saver is active or inactive:",
           },
        }
     },

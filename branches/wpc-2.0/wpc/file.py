@@ -19,9 +19,21 @@ class file:
         # TODO could we defer this check?
         if os.path.isdir(self.name):
             self.type = 'dir'
+            if wpc.utils.is_reparse_point(self.name):
+                self.type = 'reparse_point'
+                # print "[D] reparse point: %s" % self.name
         else:
             self.type = 'file'
         self.sd = None
+
+#    def clearmem(self):
+#        self.name = None
+#        self.type = None
+#        self.parent_dir = None
+#        self.replaceable_set = None
+#        self.replaceable = None
+#        self.exist = None
+#        self.sd = None
 
     def as_text(self):
         s = "Filename: " + self.get_name() + "\n"
@@ -51,7 +63,7 @@ class file:
 
     def get_type(self):
         return self.type
-    
+
     def is_file(self):
         if self.type == 'file':
             return 1
@@ -174,7 +186,7 @@ class file:
             if self.get_parent_dir().is_replaceable():
                 self.replaceable_set = 1
                 self.replaceable = 1
-                return 1    
+                return 1
 
         # File/dir is not replaceable if we get this far
         self.replaceable_set = 1

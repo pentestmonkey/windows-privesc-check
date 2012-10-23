@@ -11,10 +11,10 @@ class user(principal):
         self.effective_privileges = []
 
         # populate principal.info['member_of'] (groups this user belongs to)
-        self.add_info({'member_of': " ".join(self.get_groups_fq_name())})
+#        self.add_info({'member_of': " ".join(self.get_groups_fq_name())})
 
         # populate principal.info['privileges'] (privs of user + privs of user's groups)
-        self.add_info({'privileges': " ".join(self.get_effective_privileges())})
+#        self.add_info({'privileges': " ".join(self.get_effective_privileges())})
 
     def get_effective_privileges(self):
         if self.effective_privileges:
