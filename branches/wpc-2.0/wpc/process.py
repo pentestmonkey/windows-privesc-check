@@ -23,6 +23,7 @@ class process:
         self.wts_session_id = None
         self.wts_sid = None
         self.token = None
+        self.short_name = "[none]"
         self.sd = None
 
     def get_pid(self):
@@ -30,6 +31,12 @@ class process:
 
     def set_wts_name(self, wts_name):
         self.wts_name = wts_name
+
+    def set_short_name(self, n):
+        self.short_name = n
+
+    def get_short_name(self):
+        return self.short_name
 
     def get_wts_session_id(self):
         return self.wts_session_id
@@ -154,6 +161,7 @@ class process:
         t = ''
         t += "-------------------------------------------------\n"
         t += "PID:            " + str(self.get_pid()) + "\n"
+        t += "Short Name:     " + str(self.get_short_name()) + "\n"
         t += "WTS Name:       " + str(self.get_wts_name()) + "\n"
         t += "WTS Session ID: " + str(self.get_wts_session_id()) + "\n"
         if self.get_wts_sid():

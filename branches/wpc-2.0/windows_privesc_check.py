@@ -116,7 +116,9 @@ def dump_processes(opts):
 
             for dll in p.get_dlls():
                 print "\nSecurity Descriptor for DLL File %s" % dll.get_name()
-                print dll.get_sd().as_text()
+                sd = dll.get_sd()
+                if sd:
+                    print sd.as_text()
 
         if p.is_wow64():
             wpc.utils.disable_wow64()
