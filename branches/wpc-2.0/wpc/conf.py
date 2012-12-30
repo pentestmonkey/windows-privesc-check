@@ -1486,6 +1486,30 @@ dangerous_perms_write = {
             #"GENERIC_ALL"
         )
     },
+    'token': {
+        win32con: (
+            "TOKEN_ADJUST_DEFAULT",
+            "TOKEN_ADJUST_GROUPS",
+            "TOKEN_ADJUST_PRIVILEGES",
+            #"TOKEN_ADJUST_SESSIONID", TODO what's the number for this?
+            "TOKEN_ASSIGN_PRIMARY",
+            "TOKEN_DUPLICATE",
+            "TOKEN_EXECUTE",
+            "TOKEN_IMPERSONATE",
+#            "TOKEN_QUERY",
+ #           "TOKEN_QUERY_SOURCE",
+  #          "TOKEN_READ",
+            "TOKEN_WRITE",
+            "TOKEN_ALL_ACCESS"
+        ),
+        ntsecuritycon: (
+            "DELETE",
+   #         "READ_CONTROL",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            #"SYNCHRONIZE",
+        )
+    },
     'service': {
         # For services:
         # http://msdn.microsoft.com/en-us/library/ms685981(VS.85).aspx
@@ -2976,6 +3000,17 @@ NB: This issue has only been reported for NTFS filesystems.  Other non-NTFS file
        'recommendation': '''TODO''',
        'supporting_data': {
           'thread_perms': {
+             'section': "description",
+             'preamble': "TODO",
+          },
+       }
+    },
+    'WPC105': {
+       'title': "Token Security Descriptor Allows Access To Non-Admin Users (TODO)",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'token_perms': {
              'section': "description",
              'preamble': "TODO",
           },

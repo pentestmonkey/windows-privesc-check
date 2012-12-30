@@ -430,6 +430,15 @@ def audit_processes(report):
                         report.get_by_id("WPC104").add_supporting_data('thread_perms', [t, perm])
         #print "[D] End"
 
+        for t in p.get_tokens():
+            if t.get_sd():
+                perms = t.get_sd().get_acelist().get_untrusted().get_dangerous_perms().get_aces()
+                for perm in perms:
+                    #print p.as_text()
+                    if perm.get_principal().get_fq_name() != 'NT AUTHORITY\RESTRICTED':
+                        # print t.get_sd().as_text()
+                        report.get_by_id("WPC105").add_supporting_data('token_perms', [t, p, perm])
+
         # When listing DLLs for a process we need to see the filesystem like they do
         if p.is_wow64():
             k32.Wow64EnableWow64FsRedirection(ctypes.byref(wow64))
