@@ -182,7 +182,7 @@ class file:
 
         # Recursive check of parent directories
         # 0: A file/dir can be replaced if it's parent dir can be replaced (doesn't really count as it's a recursive definition)
-        if self.get_parent_dir():
+        if self.get_parent_dir() and self.get_parent_dir().get_name() != self.get_name(): # "\" has parent of "\"
             if self.get_parent_dir().is_replaceable():
                 self.replaceable_set = 1
                 self.replaceable = 1

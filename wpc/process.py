@@ -1,12 +1,24 @@
 from wpc.file import file as File
 from wpc.sd import sd
 from wpc.token import token
+from wpc.thread import thread
 import win32api
 import win32con
 import win32process
 import win32security
 import wpc.utils
+import ctypes
 
+class THREADENTRY32(ctypes.Structure):
+    _fields_ = [
+        ("dwSize", ctypes.c_ulong),
+        ("cntUsage", ctypes.c_ulong),
+        ("th32ThreadID", ctypes.c_ulong),
+        ("th32OwnerProcessID", ctypes.c_ulong),
+        ("tpBasePri", ctypes.c_ulong),
+        ("tpDeltaPri", ctypes.c_ulong),
+        ("dwFlags", ctypes.c_ulong)
+    ]
 
 class process:
     def __init__(self, pid):
@@ -23,11 +35,82 @@ class process:
         self.wts_session_id = None
         self.wts_sid = None
         self.token = None
+        self.thread_ids = []
+        self.threads = []
         self.short_name = "[none]"
         self.sd = None
 
     def get_pid(self):
         return self.pid
+
+    def add_thread_id(self, tid):
+        if not int(tid) in self.thread_ids:
+            self.thread_ids.append(int(tid))
+
+    def add_thread(self, t):
+        t.set_parent_process(self)
+        self.threads.append(t)
+
+    def get_thread_ids(self):
+        if not self.thread_ids:
+            TH32CS_SNAPTHREAD = 0x00000004
+
+            CreateToolhelp32Snapshot = ctypes.windll.kernel32.CreateToolhelp32Snapshot
+            Thread32First = ctypes.windll.kernel32.Thread32First
+            Thread32Next = ctypes.windll.kernel32.Thread32Next
+            CloseHandle = ctypes.windll.kernel32.CloseHandle
+
+            hThreadSnap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, self.get_pid())
+            te32 = THREADENTRY32()
+            te32.dwSize = ctypes.sizeof(THREADENTRY32)
+            if Thread32First(hThreadSnap, ctypes.byref(te32)) == win32con.FALSE:
+                pass
+                #print >> sys.stderr, "Failed getting first process."
+                #return
+            else:
+                while True:
+                    # TODO can we just get thread info for a single process instead?
+#                    print "PID: %s, TID: %s" % (te32.th32OwnerProcessID, te32.th32ThreadID)
+                    if self.get_pid() == te32.th32OwnerProcessID:
+                        self.add_thread_id(te32.th32ThreadID)
+
+                    if Thread32Next(hThreadSnap, ctypes.byref(te32)) == win32con.FALSE:
+                        break
+            CloseHandle(hThreadSnap)
+        return sorted(self.thread_ids)
+
+    def get_thread_count(self):
+        return len(self.thread_ids)
+
+    def get_tokens(self):
+        self.token_handles = []
+
+        # Process Token
+        tok = self.get_token()
+        if tok:
+                self.token_handles.append(tok)
+
+        # Thread Tokens
+        for t in self.get_threads():
+            tok = t.get_token()
+            if tok:
+                self.token_handles.append(tok)
+
+        return self.token_handles
+
+    def get_token_handles_int(self):
+        self.token_handles_int = []
+        for t in self.get_tokens():
+            self.token_handles_int.append(t.get_th_int())
+
+        return self.token_handles_int 
+
+    def get_threads(self):
+        if not self.threads:
+            for t in self.get_thread_ids():
+                self.add_thread(thread(t))
+        return self.threads
+
 
     def set_wts_name(self, wts_name):
         self.wts_name = wts_name
@@ -168,6 +251,10 @@ class process:
             t += "WTS Sid:        " + str(self.get_wts_sid().get_fq_name()) + "\n"
         else:
             t += "WTS Sid:        None\n"
+        t += "Access Token Count: %s\n" % len(self.get_token_handles_int())
+        t += "Access Token Handles: %s\n" % ",".join(str(x) for x in self.get_token_handles_int())
+        t += "Thread Count:   %s\n" % self.get_thread_count()
+        t += "Thread IDs:     %s\n" % ",".join(str(x) for x in self.get_thread_ids())
         if self.get_ph():
             t += "Is WOW64:       " + str(self.is_wow64()) + "\n"
             if self.get_exe():
@@ -186,5 +273,13 @@ class process:
         if self.get_token():
             t += self.get_token().as_text()
         else:
-            t += "[unknown]"
+            t += "[unknown]\n"
+
+        for td in self.get_threads():
+            #thread_obj = thread(tid)
+            #print "Dumping thread object"
+            ttext = td.as_text()
+            #print "ttext: %s" % ttext
+            t += ttext
+            t += "\n"
         return t

@@ -33,6 +33,9 @@ class token:
     def get_th(self):
         return self.th
 
+    def get_th_int(self):
+        return int(self.th)
+
     def get_sd(self):
         if not self.sd:
             try:
@@ -257,6 +260,8 @@ class token:
     def as_text_no_rec(self):
         t = '--- Start Access Token ---\n'
 
+        if self.get_th():
+            t += "Token Handle: %s\n" % self.get_th()
         if self.get_token_owner():
             t += "Token Owner: " + str(self.get_token_owner().get_fq_name()) + "\n"
         if self.get_token_user():
@@ -353,6 +358,8 @@ class token:
     def as_text(self):
         t = '--- start access token ---\n'
 
+        if self.get_th_int():
+            t += "Token Handle: %s\n" % int(self.get_th_int())
         if self.get_token_owner():
             t += "Token Owner: " + str(self.get_token_owner().get_fq_name()) + "\n"
         if self.get_token_user():
@@ -389,4 +396,6 @@ class token:
         if self.get_sd():
             t += self.get_sd().as_text()
         t += '--- end access token ---\n'
+
+        #print "token: as_text returning %s" % t
         return t

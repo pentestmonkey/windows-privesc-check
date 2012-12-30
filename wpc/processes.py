@@ -47,14 +47,16 @@ class processes:
                     if proc_info[3]:  # sometimes None
                         p.set_wts_sid(principal(proc_info[3]))
 
-
             TH32CS_SNAPPROCESS = 0x00000002
 
             # See http://msdn2.microsoft.com/en-us/library/ms686701.aspx
             CreateToolhelp32Snapshot = ctypes.windll.kernel32.CreateToolhelp32Snapshot
             Process32First = ctypes.windll.kernel32.Process32First
             Process32Next = ctypes.windll.kernel32.Process32Next
+            Thread32First = ctypes.windll.kernel32.Thread32First
+            Thread32Next = ctypes.windll.kernel32.Thread32Next
             CloseHandle = ctypes.windll.kernel32.CloseHandle
+
             hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0)
             pe32 = PROCESSENTRY32()
             pe32.dwSize = ctypes.sizeof(PROCESSENTRY32)
@@ -67,7 +69,7 @@ class processes:
                     p = self.find_by_pid(pe32.th32ProcessID)
                     if p:  # might fail to find process - race condition
                         p.set_short_name(pe32.szExeFile)
-                    
+
                     if Process32Next(hProcessSnap, ctypes.byref(pe32)) == win32con.FALSE:
                         break
             CloseHandle(hProcessSnap)

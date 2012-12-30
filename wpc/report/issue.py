@@ -260,6 +260,17 @@ class issue:
                     exe = "[unknown]"
                 etree.SubElement(d, 'data').text = " Process ID %s (%s) has weak process-level permissions: %s\n" % (p.get_pid(), exe, perms.as_text())
 
+        elif data_name == 'thread_perms':
+            for data in self.get_supporting_data(data_name):
+                t = data[0]
+                perms = data[1]
+                p = t.get_parent_process()
+                if p and p.get_exe():
+                    exe = p.get_exe().get_name()
+                else:
+                    exe = "[unknown]"
+                etree.SubElement(d, 'data').text = " Tread ID %s of Process ID %s (%s) has weak thread-level permissions: %s\n" % (t.get_tid(), p.get_pid(), exe, perms.as_text())
+
         elif data_name == 'writeable_dirs' or data_name == 'files_write_perms':
             for o in self.get_supporting_data(data_name):
                 etree.SubElement(d, 'data').text = o.as_text() + "\n"

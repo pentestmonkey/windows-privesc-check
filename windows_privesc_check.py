@@ -417,7 +417,17 @@ def audit_processes(report):
         if p.get_sd():
             perms = p.get_sd().get_acelist().get_untrusted().get_dangerous_perms().get_aces()
             for perm in perms:
+                if p.get_token() and perm.get_principal().get_fq_name() != p.get_token().get_token_user().get_fq_name() and perm.get_principal().get_fq_name() != 'NT AUTHORITY\RESTRICTED':
                     report.get_by_id("WPC069").add_supporting_data('process_perms', [p, perm])
+
+        for t in p.get_threads():
+            if t.get_sd():
+                perms = t.get_sd().get_acelist().get_untrusted().get_dangerous_perms().get_aces()
+                for perm in perms:
+                    #print p.as_text()
+                    if p.get_token() and perm.get_principal().get_fq_name() != p.get_token().get_token_user().get_fq_name() and perm.get_principal().get_fq_name() != 'NT AUTHORITY\RESTRICTED':
+                        # print t.get_sd().as_text()
+                        report.get_by_id("WPC104").add_supporting_data('thread_perms', [t, perm])
         #print "[D] End"
 
         # When listing DLLs for a process we need to see the filesystem like they do
