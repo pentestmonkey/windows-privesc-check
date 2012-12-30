@@ -1252,6 +1252,30 @@ dangerous_perms_write = {
             "SC_MANAGER_QUERY_LOCK_STATUS",
         )
     },
+    # http://msdn.microsoft.com/en-gb/library/windows/desktop/ms686769(v=vs.85).aspx
+    'thread': {
+        win32con: (
+            "THREAD_TERMINATE",
+            #"THREAD_SUSPEND_RESUME",
+            #"THREAD_GET_CONTEXT",
+            "THREAD_SET_CONTEXT",
+            "THREAD_SET_INFORMATION",
+            #"THREAD_QUERY_INFORMATION",
+            "THREAD_SET_THREAD_TOKEN",
+            "THREAD_IMPERSONATE",
+            "THREAD_DIRECT_IMPERSONATION",
+            #"THREAD_ALL_ACCESS",
+            #"THREAD_QUERY_LIMITED_INFORMATION", TODO
+            # "THREAD_SET_LIMITED_INFORMATION" TODO
+        ),
+        ntsecuritycon: (
+            "DELETE",
+            #"READ_CONTROL",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            #"SYNCHRONIZE",
+        )
+    },
     # http://msdn.microsoft.com/en-us/library/ms684880(v=vs.85).aspx
     'process': {
         win32con: (
@@ -1451,6 +1475,30 @@ all_perms = {
             "GENERIC_ALL"
         )
     },
+    # http://msdn.microsoft.com/en-gb/library/windows/desktop/ms686769(v=vs.85).aspx
+    'thread': {
+        win32con: (
+            "THREAD_TERMINATE",
+            "THREAD_SUSPEND_RESUME",
+            "THREAD_GET_CONTEXT",
+            "THREAD_SET_CONTEXT",
+            "THREAD_SET_INFORMATION",
+            "THREAD_QUERY_INFORMATION",
+            "THREAD_SET_THREAD_TOKEN",
+            "THREAD_IMPERSONATE",
+            "THREAD_DIRECT_IMPERSONATION",
+            #"THREAD_ALL_ACCESS",
+            #"THREAD_QUERY_LIMITED_INFORMATION", TODO
+            # "THREAD_SET_LIMITED_INFORMATION" TODO
+        ),
+        ntsecuritycon: (
+            "DELETE",
+            "READ_CONTROL",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            "SYNCHRONIZE",
+        )
+    },
     # http://msdn.microsoft.com/en-us/library/ms684880(v=vs.85).aspx
     'process': {
         win32con: (
@@ -1499,9 +1547,9 @@ all_perms = {
             "THREAD_SET_THREAD_TOKEN",
             "THREAD_IMPERSONATE",
             "THREAD_DIRECT_IMPERSONATION",
-            "THREAD_ALL_ACCESS",
-            "THREAD_QUERY_LIMITED_INFORMATION",
-            "THREAD_SET_LIMITED_INFORMATION"
+            #"THREAD_ALL_ACCESS",
+            #"THREAD_QUERY_LIMITED_INFORMATION", TODO
+            # "THREAD_SET_LIMITED_INFORMATION" TODO
         ),
         ntsecuritycon: (
             "DELETE",
@@ -2746,6 +2794,17 @@ NB: This issue has only been reported for NTFS filesystems.  Other non-NTFS file
           'user_reg_keys': {
              'section': "description",
              'preamble': "The registy keys below show if the screen saver is active or inactive:",
+          },
+       }
+    },
+    'WPC104': {
+       'title': "Thread Security Descriptor Allows Access To Non-Admin Users (TODO)",
+       'description': '''TODO.  Writeme+Fixme.  This issue currently get false positives about non-priv users being able to change their own process.  Also needs to take account of RESTRICTED processes http://blogs.msdn.com/b/aaron_margosis/archive/2004/09/10/227727.aspx http://msdn.microsoft.com/en-us/library/ms972827.aspx''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'thread_perms': {
+             'section': "description",
+             'preamble': "TODO",
           },
        }
     },
