@@ -310,6 +310,12 @@ def audit_reg_keys(report):
         if v != 1:
             report.get_by_id("WPC102").add_supporting_data('reg_key_value', [r, "RequireSecuritySignature", v])
 
+    r = regkey('HKLM\\System\\CurrentControlSet\\Control\\Terminal Server')
+    v = r.get_value("TSUserEnabled")
+    if v is not None:
+        if v == 1:
+            report.get_by_id("WPC106").add_supporting_data('reg_key_value', [r, "TSUserEnabled", v])
+
 def audit_patches(report):
     patchfile = options.patchfile
 

@@ -111,7 +111,6 @@ class process:
                 self.add_thread(thread(t))
         return self.threads
 
-
     def set_wts_name(self, wts_name):
         self.wts_name = wts_name
 
