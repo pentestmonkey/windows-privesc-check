@@ -3016,6 +3016,17 @@ NB: This issue has only been reported for NTFS filesystems.  Other non-NTFS file
           },
        }
     },
+    'WPC106': {
+       'title': "Terminal Server Running in Relaxed Security Mode",
+       'description': '''The builtin security pricinpal NT AUTHORITY\TERMINAL SERVER USER is being applied to users who log in via Terminal Servies.  This is a powerful security principal able to change ciritical areas of the filesystem and registry.  It is intended to be used for legacy application that do not function properly under Terminal Services.  However, it has the side effect of allowing privilege escalation via tampering with crticial files such as program files.''',
+       'recommendation': '''Use Full Security Mode instead of Relaxed Security Mode.''',
+       'supporting_data': {
+          'reg_key_value': {
+             'section': "description",
+             'preamble': "The following registry key shows the current policy setting:",
+          },
+       }
+    },
 }
 
 # TODO: Manage auditing and security log - view and clear security log.  Disable per-object auditing.
