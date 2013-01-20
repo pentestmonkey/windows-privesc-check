@@ -319,7 +319,6 @@ def audit_reg_keys(report):
 
     r = regkey('HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager')
     v = r.get_value("CWDIllegalInDllSearch")
-    print "xxx: %s" % v
     if v is None or v == 0:
         report.get_by_id("WPC107").add_supporting_data('reg_key_value', [r, "CWDIllegalInDllSearch", v])
 
