@@ -3027,6 +3027,17 @@ NB: This issue has only been reported for NTFS filesystems.  Other non-NTFS file
           },
        }
     },
+    'WPC107': {
+       'title': "Current Working Directory Used For DLL Search - Including Network Locations",
+       'description': '''CWDIllegalInDllSearch was set to 0.  This causes applications (by default) to load DLLs from the current directory - even for network locations.  This can lead to malicious DLLs being executed in some attack scenarios.  Note that KB2264107 needs to be installed to enable more secure settings - not checked for.  Also apps can be secured individually - also not checked for.''',
+       'recommendation': '''Consider setting CWDIllegalInDllSearch to 1, 2 or 0xFFFFFFFF to improve security - though this may break some applications.  See http://support.microsoft.com/kb/2264107 for further information including how to set CWDIllegalInDllSearch on a per-application basis.''',
+       'supporting_data': {
+          'reg_key_value': {
+             'section': "description",
+             'preamble': "The following registry key shows the current policy setting:",
+          },
+       }
+    },
 }
 
 # TODO: Manage auditing and security log - view and clear security log.  Disable per-object auditing.
