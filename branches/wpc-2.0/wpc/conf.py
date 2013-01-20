@@ -10,6 +10,7 @@ executable_file_extensions = ('exe', 'com', 'bat', 'dll', 'pl', 'rb', 'py', 'php
 version = None
 cache = None
 on64bitwindows = None
+max_password_age = 365 * 24 * 60 * 60
 
 screensaver_max_timeout_secs = 600
 
@@ -1276,6 +1277,9 @@ sv_types = (
 )
 
 win32netcon.SV_TYPE_TERMINALSERVER = 0x2000000 
+win32netcon.UF_ENCRYPTED_TEXT_PASSWORD_ALLOWED = 0x000080
+win32netcon.UF_TRUSTED_FOR_DELEGATION = 0x080000
+win32netcon.UF_TRUSTED_TO_AUTHENTICATE_FOR_DELEGATION = 0x01000000
 
 sid_is_group_type = {
     ntsecuritycon.SidTypeUser: 0,
@@ -3038,7 +3042,86 @@ NB: This issue has only been reported for NTFS filesystems.  Other non-NTFS file
           },
        }
     },
+    'WPC108': {
+       'title': "User Password Stored Using Reversible Encryption",
+       'description': '''TODO UF_ENCRYPTED_TEXT_PASSWORD_ALLOWED was enabled for a user''',
+       'recommendation': '''Attackers undertaking post-exploitation activities could recover the cleartext password.  TODO''',
+       'supporting_data': {
+          'username': {
+             'section': "description",
+             'preamble': "The following users are affected:",
+          },
+       }
+    },
+    'WPC109': {
+       'title': "User Password Is Too Old",
+       'description': '''TODO The password had not been changed for over 1 year for some accounts that were neither locked nor disabled.''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'password_age': {
+             'section': "description",
+             'preamble': "The following users are affected:",
+          },
+       }
+    },
+    'WPC110': {
+       'title': "User Password Not Required",
+       'description': '''TODO UF_PASSWD_NOTREQD was set for some accounts that were neither locked nor disabled''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'username': {
+             'section': "description",
+             'preamble': "The following users are affected:",
+          },
+       }
+    },
+    'WPC111': {
+       'title': "Some Users Cannot Change Their Password",
+       'description': '''TODO UF_PASSWD_CANT_CHANGE was set for some accounts that were neither locked nor disabled''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'username': {
+             'section': "description",
+             'preamble': "The following users are affected:",
+          },
+       }
+    },
+    'WPC112': {
+       'title': "Some Users Have Passwords That Don't Expire",
+       'description': '''TODO UF_DONT_EXPIRE_PASSWD was set for some accounts that were neither locked nor disabled''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'username': {
+             'section': "description",
+             'preamble': "The following users are affected:",
+          },
+       }
+    },
+    'WPC113': {
+       'title': "Some User Accounts Trusted For Delegation",
+       'description': '''TODO UF_TRUSTED_FOR_DELEGATION was set for some accounts that were neither locked nor disabled''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'username': {
+             'section': "description",
+             'preamble': "The following users are affected:",
+          },
+       }
+    },
+    'WPC114': {
+       'title': "Some User Accounts Trusted To Authenticate For Delegation",
+       'description': '''TODO UF_TRUSTED_TO_AUTHENTICATE_FOR_DELEGATION was set for some accounts that were neither locked nor disabled''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'username': {
+             'section': "description",
+             'preamble': "The following users are affected:",
+          },
+       }
+    },
 }
+
+
 
 # TODO: Manage auditing and security log - view and clear security log.  Disable per-object auditing.
 # TODO: Log on locally - low priv users can exec commands if they have physical access.  Not required for service accounts.  Too voluminous?

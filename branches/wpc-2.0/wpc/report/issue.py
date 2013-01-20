@@ -206,6 +206,16 @@ class issue:
                 u = data[0]
                 etree.SubElement(d, 'data').text = " %s\n" % (u.get_fq_name())
 
+        elif data_name == 'username':
+            for data in self.get_supporting_data(data_name):
+                u = data[0]
+                etree.SubElement(d, 'data').text = " %s\n" % (u.get_fq_name())
+
+        elif data_name == 'password_age':
+            for data in self.get_supporting_data(data_name):
+                u = data[0]
+                etree.SubElement(d, 'data').text = " %s: %s days\n" % (u.get_fq_name(), u.get_password_age()/(3600))
+
         elif data_name == 'group_powerful_priv':
             for data in self.get_supporting_data(data_name):
                 u = data[0]

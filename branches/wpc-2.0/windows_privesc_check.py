@@ -14,6 +14,7 @@ from wpc.utils import k32, wow64
 from wpc.patchdata import patchdata
 from wpc.mspatchdb import mspatchdb
 from wpc.exploit import exploit as exploit2
+import win32netcon
 import urllib2
 import ctypes
 import os
@@ -478,7 +479,29 @@ def audit_processes(report):
 def audit_users(report):
     userlist = users()
     for u in userlist.get_all():
-        # print u.get_fq_name()
+        flags = u.get_flags()
+        
+        if flags & win32netcon.UF_ENCRYPTED_TEXT_PASSWORD_ALLOWED:
+            report.get_by_id("WPC108").add_supporting_data('username', [u])
+
+        if not (flags & win32netcon.UF_ACCOUNTDISABLE or flags & win32netcon.UF_LOCKOUT):
+            if u.get_password_age() > wpc.conf.max_password_age:
+                report.get_by_id("WPC109").add_supporting_data('password_age', [u])
+
+            if flags & win32netcon.UF_PASSWD_NOTREQD:
+                report.get_by_id("WPC110").add_supporting_data('username', [u])
+
+            if flags & win32netcon.UF_PASSWD_CANT_CHANGE:
+                report.get_by_id("WPC111").add_supporting_data('username', [u])
+
+            if flags & win32netcon.UF_DONT_EXPIRE_PASSWD:
+                report.get_by_id("WPC112").add_supporting_data('username', [u])
+
+            if flags & win32netcon.UF_TRUSTED_FOR_DELEGATION:
+                report.get_by_id("WPC113").add_supporting_data('username', [u])
+
+            if flags & win32netcon.UF_TRUSTED_TO_AUTHENTICATE_FOR_DELEGATION:
+                report.get_by_id("WPC114").add_supporting_data('username', [u])
 
         # TODO consider other privs too
         # TODO remove useless privs

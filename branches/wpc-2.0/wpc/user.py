@@ -31,7 +31,21 @@ class user(principal):
             self.member_of = self.get_groups()
 
         return map(lambda x: x.get_fq_name(), self.member_of)
-        
+    
+    def get_flags(self):
+        flags = 0
+        info = win32net.NetUserGetInfo(wpc.conf.remote_server, self.get_name(), 1)
+        if info['flags']:
+            flags = info['flags']
+        return flags
+    
+    def get_password_age(self):
+        password_age = 0
+        info = win32net.NetUserGetInfo(wpc.conf.remote_server, self.get_name(), 1)
+        if info['password_age']:
+            password_age = info['password_age']
+        return password_age
+       
     def get_groups(self):
         if self.member_of:
             return self.member_of
