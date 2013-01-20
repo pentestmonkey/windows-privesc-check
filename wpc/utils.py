@@ -442,25 +442,40 @@ def populate_scaninfo(report):
         report.add_info_item('ipaddress', ",".join(socket.gethostbyname_ex(socket.gethostname())[2]))  # have to do this before Wow64DisableWow64FsRedirection
     except:
         report.add_info_item('ipaddress', "<unknown>")  # have to do this before Wow64DisableWow64FsRedirection
-        
-    os_ver = str(ver_list[0]) + "." + str(ver_list[1])
+
+    major = ver_list[0]
+    minor = ver_list[1]
+    build = ver_list[2]
+    prod_type = ver_list[8]
+
     # version numbers from http://msdn.microsoft.com/en-us/library/ms724832(VS.85).aspx
-    if os_ver == "4.0":
-        os_str = "Windows NT"
-    if os_ver == "5.0":
-        os_str = "Windows 2000"
-    if os_ver == "5.1":
-        os_str = "Windows XP"
-    if os_ver == "5.2":
-        os_str = "Windows 2003"
-    if os_ver == "6.0":
-        os_str = "Windows Vista"
-    if os_ver == "6.0":
-        os_str = "Windows 2008"
-    if os_ver == "6.1":
-        os_str = "Windows 2008 R2"
-    if os_ver == "6.1":
-        os_str = "Windows 7"
+    os_name = {}
+    os_name[4] = {}
+    os_name[5] = {}
+    os_name[6] = {}
+    os_name[4][0] = {}
+    os_name[5][0] = {}
+    os_name[6][0] = {}
+    os_name[5][1] = {}
+    os_name[6][1] = {}
+    os_name[6][2] = {}
+    os_name[4][0][3] = "Windows NT"
+    os_name[5][0][3] = "Windows 2003"
+    os_name[6][0][3] = "Windows 2008"
+    os_name[6][1][3] = "Windows 2008 R2"
+    os_name[6][2][3] = "Windows 2012"
+    os_name[5][1][1] = "Windows XP"
+    os_name[6][0][1] = "Windows Vista"
+    os_name[6][1][1] = "Windows 7"
+    os_name[6][2][1] = "Windows 8"
+
+    search_prod_type = prod_type
+    if prod_type == 2: # domain controller
+        search_prod_type = 3
+    if major in os_name.keys() and minor in os_name[major].keys() and prod_type in os_name[major][minor].keys():
+        os_str = os_name[major][minor][prod_type]
+    else:
+        os_str = "Unrecognised Windows version: %s.%s.%s (type: %s)" % (major, minor, build, prod_type)
 
     report.add_info_item('os', os_str)
     report.add_info_item('os_version', str(ver_list[0]) + "." + str(ver_list[1]) + "." + str(ver_list[2]) + " SP" + str(ver_list[5]))
