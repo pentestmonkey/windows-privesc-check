@@ -97,6 +97,46 @@ def get_extra_privs():
     str(win32security.AdjustTokenPrivileges(th, False, privs))
 
 
+# Give ourselves all the privs available in our access token
+def get_all_privs(th):
+    privs = win32security.GetTokenInformation(th, ntsecuritycon.TokenPrivileges)
+    for privtuple in privs:
+        privs2 = win32security.GetTokenInformation(th, ntsecuritycon.TokenPrivileges)
+        newprivs = []
+        for privtuple2 in privs2:
+            if privtuple2[0] == privtuple[0]:
+                newprivs.append((privtuple2[0], 2))  # SE_PRIVILEGE_ENABLED
+            else:
+                newprivs.append((privtuple2[0], privtuple2[1]))
+
+        # Adjust privs
+        privs3 = tuple(newprivs)
+        win32security.AdjustTokenPrivileges(th, False, privs3)
+
+
+FILTER=''.join([(len(repr(chr(x))) == 3) and chr(x) or '.' for x in range(256)])
+def dump(src, length = 8):
+    # Hex dump code from
+    # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/142812
+
+    N = 0
+    result = ''
+    while src:
+        s, src = src[:length], src[length:]
+        hexa = ' '.join(["%02X" % ord(x) for x in s])
+        su = s
+        uni_string = ''
+        for n in range(0, len(su) / 2):
+            if su[n * 2 + 1] == "\0":
+                uni_string += unicode(su[n * 2:n * 2 + 1], errors = 'ignore')
+            else:
+                uni_string += '?'
+        s = s.translate(FILTER)
+        result += "%04X %-*s%-16s %s\n" % (N, length * 3, hexa, s, uni_string)
+        N += length
+    return result
+
+
 def load_libs():
     # Load win32security
     #
