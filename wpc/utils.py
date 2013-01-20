@@ -140,7 +140,7 @@ def dump(src, length = 8):
 def load_libs():
     # Load win32security
     #
-    # Try to open file and ingore the result.  This gets win32security loaded and working.
+    # Try to open file and ignore the result.  This gets win32security loaded and working.
     # We can then turn off WOW64 and call repeatedly.  If we turn off WOW64 first, 
     # win32security will fail to work properly.
     try:
