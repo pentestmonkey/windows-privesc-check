@@ -2,6 +2,7 @@ from wpc.file import file as File
 from wpc.sd import sd
 import win32net
 import wpc.conf
+import pywintypes
 
 
 class share:
@@ -23,7 +24,13 @@ class share:
     def get_info(self):
         if not self.info:
             try:
+                # For interactive users (users who are logged on locally to the machine), no special 
+                # group membership is required to execute the NetShareGetInfo function. For non-interactive 
+                # users, Administrator, Power User, Print Operator, or Server Operator group membership is 
+                # required to successfully execute the NetShareEnum function at levels 2, 502, and 503. No 
+                # special group membership is required for level 0 or level 1 calls.
                 shareinfo = win32net.NetShareGetInfo(wpc.conf.remote_server, self.get_name(), 502)
+                print shareinfo
                 self.description = shareinfo['reserved']
                 self.passwd = shareinfo['passwd']
                 self.current_uses = shareinfo['current_uses']
@@ -41,11 +48,19 @@ class share:
                 else:
                     self.sd = None
 
-                self.perms = shareinfo['permissions']
+                self.permissions = shareinfo['permissions']
 
                 self.info = shareinfo
-            except:
-                pass
+            except pywintypes.error as e:
+                print "[E] %s: %s" % (e[1], e[2])
+                try:
+                    shareinfo = win32net.NetShareGetInfo(wpc.conf.remote_server, self.get_name(), 501)
+                    self.description = shareinfo['remark']
+                    self.type = shareinfo['type']
+                    self.flags = shareinfo['flags']
+                    self.info = shareinfo
+                except pywintypes.error as e:
+                    print "[E] %s: %s" % (e[1], e[2])
         return self.info
 
     def get_description(self):
