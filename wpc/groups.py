@@ -1,12 +1,14 @@
 from wpc.group import group
 import win32net
 import wpc.conf
+import pywintypes
 
 
 class groups():
     def __init__(self):
         self.groups = []
 
+    # TODO need to call with level GROUP_INFO_3.  This will get SID and save the slow call to LookupAccountName.
     def get_all(self):
         if self.groups == []:
             try:
@@ -22,8 +24,8 @@ class groups():
                             print "[E] failed to lookup sid of %s" % group['name']
                     if resume == 0:
                         break
-            except:
-                print "[E] NetGroupEnum failed"
+            except pywintypes.error as e:
+                print "[E] %s: %s" % (e[1], e[2])
             try:
                 level = 0
                 resume = 0
@@ -37,6 +39,6 @@ class groups():
                             print "[E] failed to lookup sid of %s" % group['name']
                     if resume == 0:
                         break
-            except:
-                print "[E] NetLocalGroupEnum failed"
+            except pywintypes.error as e:
+                print "[E] %s: %s" % (e[1], e[2])
         return self.groups

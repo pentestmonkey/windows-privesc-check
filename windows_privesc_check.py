@@ -14,6 +14,8 @@ from wpc.utils import k32, wow64
 from wpc.patchdata import patchdata
 from wpc.mspatchdb import mspatchdb
 from wpc.exploit import exploit as exploit2
+import pywintypes
+import win32net
 import win32netcon
 import urllib2
 import ctypes
@@ -126,38 +128,52 @@ def dump_processes(opts):
             # k32.Wow64DisableWow64FsRedirection(ctypes.byref(wow64))
 
 
-def dump_users(opts):
+def dump_users(opts, get_privs = 0):
     print "[+] Dumping user list:"
     userlist = users()
     for u in userlist.get_all():
         print u.get_fq_name()
 
-#        if opts.get_privs:
-        print "\n\t[+] Privileges of this user:"
-        for priv in u.get_privileges():
-            print "\t%s" % priv
+        if get_privs:
+            print "\n\t[+] Privileges of this user:"
+            for priv in u.get_privileges():
+                print "\t%s" % priv
+    
+            print "\n\t[+] Privileges of this user + the groups it is in:"
+            for p in u.get_effective_privileges():
+                print "\t%s" % p
+            print
 
-        print "\n\t[+] Privileges of this user + the groups it is in:"
-        for p in u.get_effective_privileges():
-            print "\t%s" % p
-        print
 
-
-def dump_groups(opts):
+def dump_user_modals(opts):
+    d1 = d2 = d3 = d4 = {}
+    try:
+        d1 = win32net.NetUserModalsGet(wpc.conf.remote_server, 0)
+        d2 = win32net.NetUserModalsGet(wpc.conf.remote_server, 1)
+        d3 = win32net.NetUserModalsGet(wpc.conf.remote_server, 2)
+        d4 = win32net.NetUserModalsGet(wpc.conf.remote_server, 3)
+    except pywintypes.error as e:
+        print "[E] %s: %s" % (e[1], e[2])
+    
+    for d in (d1, d2, d3, d4):
+        for k in d.keys():
+            print "%s: %s" % (k, d[k])
+    
+def dump_groups(opts, get_privs = 0):
     print "[+] Dumping group list:"
     grouplist = groups()
     for g in grouplist.get_all():
-        print g.get_fq_name()
+        group_name = g.get_fq_name()
 
         #if opts.get_members:
-        print "\n\t[+] Members:"
+        #print "\n\t[+] Members:"
         for m in g.get_members():
-            print "\t%s" % m.get_fq_name()
+            print "%s has member: %s" % (group_name, m.get_fq_name())
 
-        #if opts.get_privs:
-        print "\n\t[+] Privileges of this group:"
-        for priv in g.get_privileges():
-            print "\t%s" % priv
+        if get_privs:
+            #print "\n\t[+] Privileges of this group:"
+            for priv in g.get_privileges():
+                print "%s has privilege: %s" % (group_name, priv)
 
         # TODO
         # print "\n\t[+] Privileges of this group + the groups it is in:"
@@ -1198,11 +1214,15 @@ if options.dump_mode:
 
     if options.do_all or options.do_users:
         section("dump_users")
-        dump_users(issues)
+        dump_users(issues, options.get_privs)
 
     if options.do_all or options.do_groups:
         section("dump_groups")
-        dump_groups(issues)
+        dump_groups(issues, options.get_privs)
+
+    if options.do_all or options.get_modals:
+        section("dump_user_modals")
+        dump_user_modals(issues)
 
 # Identify security issues
 if options.audit_mode:

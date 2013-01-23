@@ -41,6 +41,7 @@ def parseOptions():
 
     dump.add_option("-i", "--ignore_trusted", dest = "ignore_trusted", default = False, action = "store_true", help = "Ignore ACEs for Trusted Users")
     dump.add_option("-m", "--get_members",    dest = "get_members",    default = False, action = "store_true", help = "Dump group members (use with -G)")
+    dump.add_option("-M", "--get_modals",     dest = "get_modals",     default = False, action = "store_true", help = "Dump password policy, etc.")
     dump.add_option("-V", "--get_privs",      dest = "get_privs",      default = False, action = "store_true", help = "Dump privileges for users/groups")
 
     report.add_option("-o", "--report_file_stem",  dest = "report_file_stem",  default = False, help = "Filename stem for txt, html report files")
@@ -64,8 +65,8 @@ def parseOptions():
 
     # TODO can't use -m without -G
 
-    if not (options.do_all or options.do_services or options.do_drivers or options.do_processes or options.patchfile or options.do_reg_keys or options.do_registry or options.do_users or options.do_groups or options.do_program_files or options.do_paths or options.do_drives or options.do_eventlogs or options.do_shares or options.do_loggedin or options.do_users or options.do_groups or options.do_allfiles):
-        print "[E] Specify something to look at.  At least one of: -a, -t, -D, -E, -e, -H, -T, -L , -S, -k, -I, -U, -s, -d, -P, -r, -R, -U, -G.  -h for help."
+    if not (options.do_all or options.do_services or options.do_drivers or options.do_processes or options.patchfile or options.do_reg_keys or options.do_registry or options.do_users or options.do_groups or options.do_program_files or options.do_paths or options.do_drives or options.do_eventlogs or options.do_shares or options.do_loggedin or options.do_users or options.do_groups or options.do_allfiles or options.get_modals):
+        print "[E] Specify something to look at.  At least one of: -a, -t, -D, -E, -e, -H, -T, -L , -S, -k, -I, -U, -s, -d, -P, -r, -R, -U, -G, -M.  -h for help."
         sys.exit()
 
     return options
