@@ -154,11 +154,11 @@ def dump_user_modals(opts):
         d4 = win32net.NetUserModalsGet(wpc.conf.remote_server, 3)
     except pywintypes.error as e:
         print "[E] %s: %s" % (e[1], e[2])
-    
+
     for d in (d1, d2, d3, d4):
         for k in d.keys():
             print "%s: %s" % (k, d[k])
-    
+
 def dump_groups(opts, get_privs = 0):
     print "[+] Dumping group list:"
     grouplist = groups()
