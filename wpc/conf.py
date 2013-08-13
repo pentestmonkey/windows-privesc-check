@@ -1030,7 +1030,6 @@ msexploitstring = '''
    windows/scada/realwin_on_fc_binfile_a                          2011-03-21       great      DATAC RealWin SCADA Server 2 On_FC_CONNECT_FCS_a_FILE Buffer Overflow
    windows/scada/realwin_on_fcs_login                             2011-03-21       great      RealWin SCADA Server DATAC Login Buffer Overflow
    windows/scada/realwin_scpc_initialize                          2010-10-15       great      DATAC RealWin SCADA Server SCPC_INITIALIZE Buffer Overflow
-   windows/scada/realwin_scpc_initialize_rf                       2010-10-15       great      DATAC RealWin SCADA Server SCPC_INITIALIZE_RF Buffer Overflow
    windows/scada/realwin_scpc_txtevent                            2010-11-18       great      DATAC RealWin SCADA Server SCPC_TXTEVENT Buffer Overflow
    windows/scada/scadapro_cmdexe                                  2011-09-16       excellent  Measuresoft ScadaPro <= 4.0.0 Remote Command Execution
    windows/scada/sunway_force_control_netdbsrv                    2011-09-22       great      Sunway Forcecontrol SNMP NetDBServer.exe Opcode 0x57

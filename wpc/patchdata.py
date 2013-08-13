@@ -39,7 +39,7 @@ class patchdata():
     def parse_installed_patches_from_systeminfo(self):
         output = subprocess.check_output("systeminfo", stderr = open(os.devnull, 'w'))
         for line in output.splitlines():
-            m = re.search("OS Name:\s+.*Windows(?:\(R\))? (7|XP|Server 2003|Vista|Server 2008 R2)", line)
+            m = re.search("OS Name:\s+.*Windows(?:\(R\))? (7|XP|Server 2003|Vista|Server 2008 R2|Server 2012)", line)
             if m and m.group(1):
                 self.os['info']['winver'] = m.group(1)
 
