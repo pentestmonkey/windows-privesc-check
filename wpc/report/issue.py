@@ -132,14 +132,23 @@ class issue:
             for data in self.get_supporting_data(data_name):
                 s = data[0]
                 a = data[1]
-                etree.SubElement(d, 'data').text = " %s (%s) uses registry key %s:\n" % (s.get_description(), s.get_name(), a.get_name())        
+                etree.SubElement(d, 'data').text = " %s (%s) uses registry key %s:\n" % (s.get_description(), s.get_name(), a.get_name())
+                etree.SubElement(d, 'data').text = "  %s\n" % (a.as_text())
+
+        elif data_name == 'regkey_value_data_perms':
+            for data in self.get_supporting_data(data_name):
+                r = data[0]
+                v = data[1]
+                regdata = data[2]
+                a = data[3]
+                etree.SubElement(d, 'data').text = "Registry value %s\%s has data '%s' and permissions:\n" % (wpc.utils.to_printable(r.get_name()), wpc.utils.to_printable(v), wpc.utils.to_printable(regdata))
                 etree.SubElement(d, 'data').text = "  %s\n" % (a.as_text())
 
         elif data_name == 'regkey_perms':
             for data in self.get_supporting_data(data_name):
                 r = data[0]
                 a = data[1]
-                etree.SubElement(d, 'data').text = "Registry key %s has permissions:\n" % (r.get_name())        
+                etree.SubElement(d, 'data').text = "Registry value %s has permissions:\n" % (r.get_name())        
                 etree.SubElement(d, 'data').text = "  %s\n" % (a.as_text())
 
         elif data_name == 'service_info':

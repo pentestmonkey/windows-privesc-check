@@ -108,5 +108,26 @@ class ace:
     def as_text(self):
         return self.get_type() + " " + self.get_principal().get_fq_name() + ": \n    " + "\n    ".join(self.get_perms())
 
+    def as_tab_delim(self, name):
+        lines = []
+        for perm in self.get_perms():
+            lines.append("%s\t%s\t%s\t%s\t%s" % ("RegKey", name, self.get_type(), self.get_principal().get_fq_name(), perm))
+        return lines
+
+    def as_tab_delim2(self, name, value):
+        if value == "":
+            value = "(Default)"
+        lines = []
+        for perm in self.get_perms():
+            lines.append("%s\t%s\t%s\t%s\t%s\t%s" % ("RegKeyVal", name, value, self.get_type(), self.get_principal().get_fq_name(), perm))
+        return lines
+
+    def as_tab_delim3(self, name, value, data):
+        if value == "":
+            value = "(Default)"
+        lines = []
+        for perm in self.get_perms():
+            lines.append("%s\t%s\t%s\t%s\t%s\t%s\t%s" % ("RegKeyValData", name, value, repr(data), self.get_type(), self.get_principal().get_fq_name(), perm))
+        return lines
 #    def dangerous_as_text(self):
 #        return self.get_type() + " " + self.get_principal().get_fq_name() + ": \n  " + "\n  ".join(self.get_perms_dangerous())
