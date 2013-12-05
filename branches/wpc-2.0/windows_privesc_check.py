@@ -824,6 +824,18 @@ def audit_services(report):
                 report.get_by_id("WPC024").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
 
 
+def csv_registry(report):
+    print "[D] Walking registry"
+    for r in regkey('HKLM').get_all_subkeys():
+        aces = r.get_dangerous_aces()
+        if aces:
+            for a in aces:
+                for line in a.as_tab_delim(r.get_name()):
+                    print line
+                for v in r.get_values(): 
+                    for line in a.as_tab_delim3(r.get_name(), v, r.get_value(v)):
+                        print line
+
 def audit_registry(report):
 
     #
@@ -1034,6 +1046,34 @@ def audit_registry(report):
             acl = r.get_issue_acl_for_perms(["DELETE"])
             if acl:
                 report.get_by_id("WPC050").add_supporting_data('regkey_perms', [r, acl])
+
+    print "[-] Walking registry (very slow: probably 15 mins - 1 hour)"
+    for r in regkey('HKLM').get_all_subkeys():
+        #print "[D] Processing: %s" % r.get_name()
+        sd = r.get_sd()
+        if sd:
+            set_value_aces = sd.get_acelist().get_untrusted().get_aces_with_perms(["KEY_SET_VALUE"]).get_aces()
+            #aces = r.get_dangerous_aces()
+            if set_value_aces:
+                for v in r.get_values():
+                    #for a in set_value_aces:
+                    #   for line in a.as_tab_delim3(r.get_name(), v, r.get_value(v)):
+                    #        print line
+                    if wpc.utils.looks_like_executable(r.get_value(v)):
+                        for a in set_value_aces:
+                            report.get_by_id("WPC115").add_supporting_data('regkey_value_data_perms', [r, v, repr(r.get_value(v)), a])
+                    if wpc.utils.looks_like_path(r.get_value(v)):
+                        for a in set_value_aces:
+                            report.get_by_id("WPC116").add_supporting_data('regkey_value_data_perms', [r, v, repr(r.get_value(v)), a])
+                    if wpc.utils.looks_like_registry_path(r.get_value(v)):
+                        for a in set_value_aces:
+                            report.get_by_id("WPC117").add_supporting_data('regkey_value_data_perms', [r, v, repr(r.get_value(v)), a])
+                    if wpc.utils.looks_like_ip_address(r.get_value(v)):
+                        for a in set_value_aces:
+                            report.get_by_id("WPC118").add_supporting_data('regkey_value_data_perms', [r, v, repr(r.get_value(v)), a])
+                    if wpc.utils.looks_like_user(r.get_value(v)):
+                        for a in set_value_aces:
+                            report.get_by_id("WPC119").add_supporting_data('regkey_value_data_perms', [r, v, repr(r.get_value(v)), a])
 
 
 # Gather info about files and directories

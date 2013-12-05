@@ -130,6 +130,16 @@ class regkey:
                 # print "Can't open: " + self.get_name()
         return self.keyh
 
+    def get_dangerous_aces(self):
+        try:
+            #print "[D] File: " + self.get_name()
+            #print "[D] ACE: "
+            #for a in self.get_sd().get_acelist().get_dangerous_perms().get_aces():
+            #    print a.as_text()
+            return self.get_sd().get_acelist().get_untrusted().get_dangerous_perms().get_aces()
+        except:
+            return []
+
     def is_present(self):
         return self.get_keyh()
 

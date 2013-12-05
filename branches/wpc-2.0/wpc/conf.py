@@ -6,7 +6,7 @@ import win32netcon
 import win32service
 
 remote_server = None
-executable_file_extensions = ('exe', 'com', 'bat', 'dll', 'pl', 'rb', 'py', 'php', 'inc', 'asp', 'aspx', 'ocx', 'vbs')
+executable_file_extensions = ('exe', 'com', 'bat', 'dll', 'pl', 'rb', 'py', 'php', 'inc', 'asp', 'aspx', 'ocx', 'vbs', 'sys')
 version = None
 cache = None
 on64bitwindows = None
@@ -1365,7 +1365,7 @@ dangerous_perms_write = {
     # "READ_CONTROL",
     # "WRITE_DAC",
     #"WRITE_OWNER",
-    'regkey': {        
+    'regkey': {
         _winreg: (
             #"KEY_ALL_ACCESS",  # Combines the STANDARD_RIGHTS_REQUIRED, KEY_QUERY_VALUE, KEY_SET_VALUE, KEY_CREATE_SUB_KEY, KEY_ENUMERATE_SUB_KEYS, KEY_NOTIFY, and KEY_CREATE_LINK access rights.
             #"KEY_QUERY_VALUE", # GUI "Query Value"
@@ -3115,6 +3115,61 @@ NB: This issue has only been reported for NTFS filesystems.  Other non-NTFS file
           'username': {
              'section': "description",
              'preamble': "The following users are affected:",
+          },
+       }
+    },
+    'WPC115': {
+       'title': "Non-Admin Can Change Registry Keys Containing Executables",
+       'description': '''A walk of the registry found some registry keys that can be changed by non-admin users (KEY_SET_VALUE permission).  The data in some of those keys appears to be an executable (e.g. .exe, .py, .dll).  This is a simple regular-expression match so may report false positives.  In some instances it may be possible for an low-privilged user to cause a higher privileged process to launch an executable of their choosing.''',
+       'recommendation': '''Set strong registry permissions on any values that high privileged processes use to launch executable code.''',
+       'supporting_data': {
+          'regkey_value_data_perms': {
+             'section': "description",
+             'preamble': "The following registry value are affected:",
+          },
+       }
+    },
+    'WPC116': {
+       'title': "Non-Admin Can Change File Paths In Registry",
+       'description': '''A walk of the registry found some registry keys that can be changed by non-admin users (KEY_SET_VALUE permission).  The data in some of those keys appears to be a file or directory path (e.g. c:\..., \\host\share, \\.\pipe\...).  This is a simple regular-expression match so may report false positives.  In some instances it may be possible for an low-privilged user to cause other users to follow a malicious UNC file path, forcing disclosure of their netntlm password hash or SMB relay attack.  Other path-based attacks may also be possible.''',
+       'recommendation': '''Set strong registry permissions on any values that high privileged processes use to determine paths.''',
+       'supporting_data': {
+          'regkey_value_data_perms': {
+             'section': "description",
+             'preamble': "The following registry value are affected:",
+          },
+       }
+    },
+    'WPC117': {
+       'title': "Non-Admin Can Change Registry Paths That Are Stored In The Registry",
+       'description': '''A walk of the registry found some registry keys that can be changed by non-admin users (KEY_SET_VALUE permission).  The data in some of those keys appears to be a registry path (e.g. SYSTEM\...).  This is a simple regular-expression match so may report false positives.  In some instances it may be possible for an low-privilged user to cause other users to follow read malicious data from the registry.  The may or may not lead to privilege escalation depending on the context.''',
+       'recommendation': '''Set strong registry permissions on any values that high privileged processes use to determine registry paths.''',
+       'supporting_data': {
+          'regkey_value_data_perms': {
+             'section': "description",
+             'preamble': "The following registry value are affected:",
+          },
+       }
+    },
+    'WPC118': {
+       'title': "Non-Admin Can Change IP Addresses That Are Stored In The Registry",
+       'description': '''A walk of the registry found some registry keys that can be changed by non-admin users (KEY_SET_VALUE permission).  The data in some of those keys appears to be an IP Address.  This is a simple regular-expression match so may report false positives.  In some instances it may be possible for an low-privilged user to cause other users to connect to a malicious IP address.  This may facilitate other attacks such as man-in-the-middle.''',
+       'recommendation': '''Set strong registry permissions on any values that high privileged processes use to determine IP addresses.''',
+       'supporting_data': {
+          'regkey_value_data_perms': {
+             'section': "description",
+             'preamble': "The following registry value are affected:",
+          },
+       }
+    },
+    'WPC119': {
+       'title': "Non-Admin Can Change Usernames That Are Stored In The Registry",
+       'description': '''A walk of the registry found some registry keys that can be changed by non-admin users (KEY_SET_VALUE permission).  The data in some of those keys appears to be a username.  This is a simple regular-expression match so may report false positives.  In some instances it may be possible for an low-privilged user to cause another process to run as or otherwise affect a different user account.''',
+       'recommendation': '''Set strong registry permissions on any values that high privileged processes use to determine usernames.''',
+       'supporting_data': {
+          'regkey_value_data_perms': {
+             'section': "description",
+             'preamble': "The following registry value are affected:",
           },
        }
     },

@@ -15,6 +15,7 @@ import win32con
 import win32net
 import win32security
 import wpc.conf
+import string
 k32 = ctypes.windll.kernel32
 wow64 = ctypes.c_long(0)
 on64bitwindows = 1
@@ -254,6 +255,61 @@ def define_trusted_principals():
     print
 
 
+def looks_like_executable(s):
+    if s is None:
+        return 0
+    s = str(s) # doesn't work on int
+    re_string = r'\.' + r'$|\.'.join(wpc.conf.executable_file_extensions) + r'$'  # '\.exe$|\.py$|\.svn-base$|\.com$|\.bat$|\.dll$'
+    re_exe = re.compile(re_string, re.IGNORECASE)
+    m = re_exe.match(s)
+    if m is None:
+        return 0
+    return 1
+
+def looks_like_path(s):
+    if s is None:
+        return 0
+    s = str(s) # doesn't work on int
+    re_string = r'^\\\\|^[a-z]:\\|%systemroot%|%systemdrive%'
+    re_exe = re.compile(re_string, re.IGNORECASE)
+    m = re_exe.match(s)
+    if m is None:
+        return 0
+    return 1
+
+def looks_like_registry_path(s):
+    if s is None:
+        return 0
+    s = str(s) # doesn't work on int
+    re_string = r'^SYSTEM\\'
+    re_exe = re.compile(re_string, re.IGNORECASE)
+    m = re_exe.match(s)
+    if m is None:
+        return 0
+    return 1
+
+def looks_like_ip_address(s):
+    if s is None:
+        return 0
+    s = str(s) # doesn't work on int
+    re_string = r'^d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$'
+    re_exe = re.compile(re_string, re.IGNORECASE)
+    m = re_exe.match(s)
+    if m is None:
+        return 0
+    return 1
+
+def looks_like_user(s):
+    if s is None:
+        return 0
+    s = str(s) # doesn't work on int
+    re_string = r'^administrator|^system[^\\]|NT AUTHORITY\\|BUILTIN\\'
+    re_exe = re.compile(re_string, re.IGNORECASE)
+    m = re_exe.match(s)
+    if m is None:
+        return 0
+    return 1
+
 # Walk a directory tree, returning all matching files
 #
 # args:
@@ -311,7 +367,7 @@ def oswalk(top, topdown=True, onerror=None, followlinks=False):
     if not topdown:
         yield top, dirs, nondirs
 
-
+        
 def is_reparse_point(d):
             try:
                 attr = win32api.GetFileAttributes(d)
@@ -327,7 +383,7 @@ def is_reparse_point(d):
 # arg s contains windows-style env vars like: %windir%\foo
 def env_expand(s):
     re_env = re.compile(r'%\w+%')
-    return re_env.sub(expander, s)
+    return re_env.sub(expander, str(s))
 
 
 def find_in_path(f):
@@ -361,6 +417,14 @@ def lookup_files_for_clsid(clsid):
 def expander(mo):
     return os.environ.get(mo.group()[1:-1], 'UNKNOWN')
 
+def to_printable(s):
+    newstring = ""
+    for c in s:
+        if c in string.printable:
+            newstring = newstring + c
+        else:
+            newstring = newstring + "?"
+    return newstring
 
 # Attempts to clean up strange looking file paths like:
 #   \??\C:\WINDOWS\system32\csrss.exe
@@ -378,6 +442,7 @@ def get_exe_path_clean(binary_dirty):
             binary_dirty = m.group(1)
 
     # Paths for drivers are written in an odd way, so we regex them
+    binary_dirty = binary_dirty.replace("\x00", "")
     re1 = re.compile(r'^\\systemroot', re.IGNORECASE)
     binary_dirty = re1.sub(os.getenv('SystemRoot'), binary_dirty)
     re2 = re.compile(r'^system32\\', re.IGNORECASE)
