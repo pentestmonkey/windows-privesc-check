@@ -128,6 +128,14 @@ class issue:
                 r = data[0]
                 etree.SubElement(d, 'data').text = "Registry key %s is owned by %s" % (r.get_name(), r.get_sd().get_owner().get_fq_name())        
 
+        elif data_name == 'scheduled_task_exe_perms':
+            for data in self.get_supporting_data(data_name):
+                t = data[0]
+                f = data[1]
+                a = data[2]
+                etree.SubElement(d, 'data').text = " Task %s runs '%s' which has weak permissions:\n" % (t, f.get_name())
+                etree.SubElement(d, 'data').text = "  %s\n" % (a.as_text())
+
         elif data_name == 'service_reg_perms':
             for data in self.get_supporting_data(data_name):
                 s = data[0]

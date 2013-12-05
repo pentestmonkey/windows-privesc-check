@@ -16,6 +16,8 @@ from wpc.mspatchdb import mspatchdb
 from wpc.exploit import exploit as exploit2
 import pywintypes
 import win32net
+import subprocess
+from lxml import objectify
 import win32netcon
 import urllib2
 import ctypes
@@ -836,6 +838,68 @@ def csv_registry(report):
                     for line in a.as_tab_delim3(r.get_name(), v, r.get_value(v)):
                         print line
 
+def audit_scheduled_tasks(report):
+    try:
+        content = subprocess.check_output("schtasks /query /xml", stderr = open(os.devnull, 'w'))
+    except:
+        print "[E] Can't run schtasks.  Doesn't work < Vista.  Skipping."
+        return 0
+    
+    chunks = content.split("<!-- ")
+    
+    count = 0
+    for chunk in chunks:
+        count = count + 1
+        if count == 1:
+            continue # skip first chunk
+    
+        m = re.search("(.*) -->(.*)", chunk, re.MULTILINE | re.DOTALL)
+        name = m.group(1)
+        xml_string = m.group(2).lstrip()
+        xml_string = xml_string.replace("UTF-16", "UTF-8")
+        xml_string = xml_string.replace("</Tasks>", "")
+        # print "xml: %s" % xml_string
+        root = objectify.fromstring(xml_string)
+        
+        exec_command = "<none>"
+        exec_args = "<none>"
+        try: 
+            exec_command = root.Actions.Exec.Command
+            exec_args = root.Actions.Exec.Arguments
+        except:
+            pass
+            
+        enabled = 0
+        try: 
+            for trigger in root.Triggers.getchildren():
+                #print "trigger tag: %s" % trigger.tag
+                if trigger.Enabled.text == "true":
+                    enabled = 1
+        except:
+            pass
+            
+        runas_user = "<none>"
+        #runas_group = "<none>"
+        try:
+            runas_user = root.Principals.Principal.UserId
+        except:
+            runas_user = root.Principals.Principal.GroupId
+        if enabled and exec_command != "<none>":
+            print "------ %s -------" % name
+            print "runas user: %s" % runas_user
+            #print "runas group: %s" % runas_group
+            print "exec command: %s" % exec_command
+            exec_command = wpc.utils.env_expand(exec_command)
+            print "exec command2: %s" % exec_command
+            f = File(exec_command)
+            if f.is_replaceable():
+                print "[D] Weak perms for: %s" % f.get_name()
+                for a in f.get_dangerous_aces():
+                    report.get_by_id("WPC120").add_supporting_data('scheduled_task_exe_perms', [name, f, a])
+            print "exec args: %s" % exec_args
+            print
+
+
 def audit_registry(report):
 
     #
@@ -1312,6 +1376,12 @@ if options.audit_mode:
     if options.do_all or options.do_registry:
         section("audit_registry")
         audit_registry(issues)
+    if options.do_all or options.do_scheduled_tasks:
+        section("audit_scheduled_tasks")
+        try:
+            audit_scheduled_tasks(issues)
+        except:
+            pass
 
     if options.do_all or options.do_reg_keys:
         section("audit_reg_keys")

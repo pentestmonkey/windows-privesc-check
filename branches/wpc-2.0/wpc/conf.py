@@ -3173,6 +3173,17 @@ NB: This issue has only been reported for NTFS filesystems.  Other non-NTFS file
           },
        }
     },
+    'WPC120': {
+       'title': "Non-Admin Can Change Executable For Scheduled Task",
+       'description': '''The NTFS permissions on some of the executables run by scheduled tasks (schtasks /query /xml) allow modification by non-admin users.  For tasks run as low-privileged users, false positives may be reported (bug).''',
+       'recommendation': '''Set strong file permissions on programs used by scheduled tasks.''',
+       'supporting_data': {
+          'scheduled_task_exe_perms': {
+             'section': "description",
+             'preamble': "The following scheduled tasks are affected:",
+          },
+       }
+    },
 }
 
 
