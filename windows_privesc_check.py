@@ -1331,51 +1331,88 @@ if options.dump_mode:
 # Identify security issues
 if options.audit_mode:
     section("audit_misc_checks")
-    audit_misc_checks(issues)
+    try:
+        audit_misc_checks(issues)
+    except:
+        pass
 
     if options.do_all or options.do_paths:
         section("audit_paths")
-        audit_paths(issues)
+        try:
+            audit_paths(issues)
+        except:
+            pass
 
     if options.do_all or options.do_eventlogs:
         section("audit_eventlogs")
-        audit_eventlogs(issues)
+        try:
+            audit_eventlogs(issues)
+        except:
+            pass
 
     if options.do_all or options.do_shares:
         section("audit_shares")
-        audit_shares(issues)
+        try:
+            audit_shares(issues)
+        except:
+            pass
 
     if options.do_all or options.patchfile:
         section("audit_patches")
-        audit_patches(issues)
+        try:
+            audit_patches(issues)
+        except:
+            pass
 
     if options.do_all or options.do_loggedin:
         section("audit_loggedin")
-        audit_loggedin(issues)
+        try:
+            audit_loggedin(issues)
+        except:
+            pass
 
     if options.do_all or options.do_services:
         section("audit_services")
-        audit_services(issues)
+        try:
+            audit_services(issues)
+        except:
+            pass
 
     if options.do_all or options.do_drivers:
         section("audit_drivers")
-        audit_drivers(issues)
+        try:
+            audit_drivers(issues)
+        except:
+            pass
 
     if options.do_all or options.do_drives:
         section("audit_drives")
-        audit_drives(issues)
+        try:
+            audit_drives(issues)
+        except:
+            pass
 
     if options.do_all or options.do_processes:
         section("audit_processes")
-        audit_processes(issues)
+        try:
+            audit_processes(issues)
+        except:
+            pass
 
     if options.do_all or options.do_program_files:
         section("audit_program_files")
-        audit_program_files(issues)
+        try:
+            audit_program_files(issues)
+        except:
+            pass
 
     if options.do_all or options.do_registry:
         section("audit_registry")
-        audit_registry(issues)
+        try:
+            audit_registry(issues)
+        except:
+            pass
+
     if options.do_all or options.do_scheduled_tasks:
         section("audit_scheduled_tasks")
         try:
@@ -1385,15 +1422,26 @@ if options.audit_mode:
 
     if options.do_all or options.do_reg_keys:
         section("audit_reg_keys")
-        audit_reg_keys(issues)
+        try:
+            audit_reg_keys(issues)
+        except:
+            pass
 
     if options.do_all or options.do_users:
         section("audit_users")
-        audit_users(issues)
+        try:
+            audit_users(issues)
+        except:
+            pass
+
+
 
     if options.do_all or options.do_groups:
         section("audit_groups")
-        audit_groups(issues)
+        try:
+            audit_groups(issues)
+        except:
+            pass
 
     if options.report_file_stem:
         printline("Audit Complete")
