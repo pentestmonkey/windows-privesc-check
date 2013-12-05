@@ -103,6 +103,7 @@ msexploitstring = '''
    bsdi/softcart/mercantec_softcart                               2004-08-19       great      Mercantec SoftCart CGI Overflow
    dialup/multi/login/manyargs                                    2001-12-12       good       System V Derived /bin/login Extraneous Arguments Buffer Overflow
    freebsd/ftp/proftp_telnet_iac                                  2010-11-01       great      ProFTPD 1.3.2rc3 - 1.3.3b Telnet IAC Buffer Overflow (FreeBSD)
+   freebsd/local/mmap                                             2013-06-18       great      FreeBSD 9 Address Space Manipulation Privilege Escalation
    freebsd/samba/trans2open                                       2003-04-07       great      Samba trans2open Overflow (*BSD x86)
    freebsd/tacacs/xtacacsd_report                                 2008-01-08       average    XTACACSD <= 4.1.2 report() Buffer Overflow
    freebsd/telnet/telnet_encrypt_keyid                            2011-12-23       great      FreeBSD Telnet Service Encryption Key ID Buffer Overflow
@@ -114,10 +115,22 @@ msexploitstring = '''
    linux/games/ut2004_secure                                      2004-06-18       good       Unreal Tournament 2004 "secure" Overflow (Linux)
    linux/http/alcatel_omnipcx_mastercgi_exec                      2007-09-09       manual     Alcatel-Lucent OmniPCX Enterprise masterCGI Arbitrary Command Execution
    linux/http/ddwrt_cgibin_exec                                   2009-07-20       excellent  DD-WRT HTTP Daemon Arbitrary Command Execution
+   linux/http/dlink_diagnostic_exec_noauth                        2013-03-05       excellent  DLink DIR-645 / DIR-815 diagnostic.php Command Execution
+   linux/http/dlink_dir615_up_exec                                2013-02-07       excellent  D-Link DIR615h OS Command Injection
    linux/http/dolibarr_cmd_exec                                   2012-04-06       excellent  Dolibarr ERP & CRM 3 Post-Auth OS Command Injection
+   linux/http/dreambox_openpli_shell                              2013-02-08       great      OpenPLI Webif Arbitrary Command Execution
    linux/http/esva_exec                                           2012-08-16       excellent  E-Mail Security Virtual Appliance learn-msg.cgi Command Injection
    linux/http/gpsd_format_string                                  2005-05-25       average    Berlios GPSD Format String Vulnerability
+   linux/http/groundwork_monarch_cmd_exec                         2013-03-08       excellent  GroundWork monarch_scan.cgi OS Command Injection
+   linux/http/hp_system_management                                2012-09-01       normal     HP System Management Anonymous Access Code Execution
    linux/http/linksys_apply_cgi                                   2005-09-13       great      Linksys WRT54 Access Point apply.cgi Buffer Overflow
+   linux/http/linksys_e1500_apply_exec                            2013-02-05       excellent  Linksys E1500/E2500 apply.cgi Remote Command Injection
+   linux/http/linksys_wrt160nv2_apply_exec                        2013-02-11       excellent  Linksys WRT160nv2 apply.cgi Remote Command Injection
+   linux/http/linksys_wrt54gl_apply_exec                          2013-01-18       manual     Linksys WRT54GL apply.cgi Command Execution
+   linux/http/mutiny_frontend_upload                              2013-05-15       excellent  Mutiny 5 Arbitrary File Upload
+   linux/http/netgear_dgn1000b_setup_exec                         2013-02-06       excellent  Netgear DGN1000B setup.cgi Remote Command Execution
+   linux/http/netgear_dgn2200b_pppoe_exec                         2013-02-15       manual     Netgear DGN2200B pppoe.cgi Remote Command Execution
+   linux/http/nginx_chunked_size                                  2013-05-07       normal     Nginx HTTP Server 1.3.9-1.4.0 Chunked Encoding Stack Buffer Overflow
    linux/http/openfiler_networkcard_exec                          2012-09-04       excellent  Openfiler v2.x NetworkCard Command Execution
    linux/http/peercast_url                                        2006-03-08       average    PeerCast <= 0.1216 URL Handling Buffer Overflow (linux)
    linux/http/piranha_passwd_exec                                 2000-04-04       excellent  RedHat Piranha Virtual Server Package passwd.php3 Arbitrary Command Execution
@@ -133,8 +146,11 @@ msexploitstring = '''
    linux/http/zenoss_showdaemonxmlconfig_exec                     2012-07-30       good       Zenoss 3 showDaemonXMLConfig Command Execution
    linux/ids/snortbopre                                           2005-10-18       good       Snort Back Orifice Pre-Preprocessor Buffer Overflow
    linux/imap/imap_uw_lsub                                        2000-04-16       good       UoW IMAP server LSUB Buffer Overflow
+   linux/local/hp_smhstart                                        2013-03-30       normal     HP System Management Homepage Local Privilege Escalation
+   linux/local/kloxo_lxsuexec                                     2012-09-18       normal     Kloxo Local Privilege Escalation
    linux/local/sock_sendpage                                      2009-08-13       great      Linux Kernel Sendpage Local Privilege Escalation
    linux/local/udev_netlink                                       2009-04-16       great      Linux udev Netlink Local Privilege Escalation
+   linux/local/zpanel_zsudo                                       2013-06-07       excellent  ZPanel zsudo Local Privilege Escalation Exploit
    linux/madwifi/madwifi_giwscan_cb                               2006-12-08       average    Madwifi SIOCGIWSCAN Buffer Overflow
    linux/misc/accellion_fta_mpipe2                                2011-02-07       excellent  Accellion File Transfer Appliance MPIPE2 Command Execution
    linux/misc/drb_remote_codeexec                                 2011-03-23       excellent  Distributed Ruby Send instance_eval/syscall Code Execution
@@ -146,29 +162,43 @@ msexploitstring = '''
    linux/misc/ib_open_marker_file                                 2007-10-03       good       Borland InterBase open_marker_file() Buffer Overflow
    linux/misc/ib_pwd_db_aliased                                   2007-10-03       good       Borland InterBase PWD_db_aliased() Buffer Overflow
    linux/misc/lprng_format_string                                 2000-09-25       normal     LPRng use_syslog Remote Format String Vulnerability
+   linux/misc/mongod_native_helper                                2013-03-24       normal     MongoDB nativeHelper.apply Remote Code Execution
+   linux/misc/nagios_nrpe_arguments                               2013-02-21       excellent  Nagios Remote Plugin Executor Arbitrary Command Execution
    linux/misc/netsupport_manager_agent                            2011-01-08       average    NetSupport Manager Agent Remote Buffer Overflow
+   linux/misc/novell_edirectory_ncp_bof                           2012-12-12       normal     Novell eDirectory 8 Buffer Overflow
    linux/misc/zabbix_server_exec                                  2009-09-10       excellent  Zabbix Server Arbitrary Command Execution
    linux/mysql/mysql_yassl_getname                                2010-01-25       good       MySQL yaSSL CertDecoder::GetName Buffer Overflow
    linux/mysql/mysql_yassl_hello                                  2008-01-04       good       MySQL yaSSL SSL Hello Message Buffer Overflow
    linux/pop3/cyrus_pop3d_popsubfolders                           2006-05-21       normal     Cyrus IMAPD pop3d popsubfolders USER Buffer Overflow
+   linux/postgres/postgres_payload                                2007-06-05       excellent  PostgreSQL for Linux Payload Execution
    linux/pptp/poptop_negative_read                                2003-04-09       great      Poptop Negative Read Overflow
    linux/proxy/squid_ntlm_authenticate                            2004-06-08       great      Squid NTLM Authenticate Overflow
    linux/samba/chain_reply                                        2010-06-16       good       Samba chain_reply Memory Corruption (Linux x86)
    linux/samba/lsa_transnames_heap                                2007-05-14       good       Samba lsa_io_trans_names Heap Overflow
    linux/samba/setinfopolicy_heap                                 2012-04-10       normal     Samba SetInformationPolicy AuditEventsInfo Heap Overflow
    linux/samba/trans2open                                         2003-04-07       great      Samba trans2open Overflow (Linux x86)
+   linux/smtp/exim4_dovecot_exec                                  2013-05-03       excellent  Exim and Dovecot Insecure Configuration Command Injection
    linux/ssh/f5_bigip_known_privkey                               2012-06-11       excellent  F5 BIG-IP SSH Private Key Exposure
    linux/ssh/symantec_smg_ssh                                     2012-08-27       excellent  Symantec Messaging Gateway 9.5 Default SSH Password Vulnerability
    linux/telnet/telnet_encrypt_keyid                              2011-12-23       great      Linux BSD-derived Telnet Service Encryption Key ID Buffer Overflow
+   linux/upnp/miniupnpd_soap_bof                                  2013-03-27       normal     MiniUPnPd 1.0 Stack Buffer Overflow Remote Code Execution
    multi/browser/firefox_escape_retval                            2009-07-13       normal     Firefox 3.5 escape() Return Value Memory Corruption
    multi/browser/firefox_queryinterface                           2006-02-02       normal     Firefox location.QueryInterface() Code Execution
+   multi/browser/firefox_svg_plugin                               2013-01-08       excellent  Firefox 17.0.1 Flash Privileged Code Injection
    multi/browser/firefox_xpi_bootstrapped_addon                   2007-06-27       excellent  Mozilla Firefox Bootstrapped Addon Social Engineering Code Execution
    multi/browser/itms_overflow                                    2009-06-01       great      Apple OS X iTunes 8.1.1 ITMS Overflow
    multi/browser/java_atomicreferencearray                        2012-02-14       excellent  Java AtomicReferenceArray Type Violation Vulnerability
    multi/browser/java_calendar_deserialize                        2008-12-03       excellent  Sun Java Calendar Deserialization Privilege Escalation
    multi/browser/java_getsoundbank_bof                            2009-11-04       great      Sun Java JRE getSoundbank file:// URI Buffer Overflow
+   multi/browser/java_jre17_driver_manager                        2013-01-10       excellent  Java Applet Driver Manager Privileged toString() Remote Code Execution
    multi/browser/java_jre17_exec                                  2012-08-26       excellent  Java 7 Applet Remote Code Execution
+   multi/browser/java_jre17_glassfish_averagerangestatisticimpl   2012-10-16       excellent  Java Applet AverageRangeStatisticImpl Remote Code Execution
    multi/browser/java_jre17_jaxws                                 2012-10-16       excellent  Java Applet JAX-WS Remote Code Execution
+   multi/browser/java_jre17_jmxbean                               2013-01-10       excellent  Java Applet JMX Remote Code Execution
+   multi/browser/java_jre17_jmxbean_2                             2013-01-19       excellent  Java Applet JMX Remote Code Execution
+   multi/browser/java_jre17_method_handle                         2012-10-16       excellent  Java Applet Method Handle Remote Code Execution
+   multi/browser/java_jre17_provider_skeleton                     2013-06-18       great      Java Applet ProviderSkeleton Insecure Invoke Method
+   multi/browser/java_jre17_reflection_types                      2013-01-10       excellent  Java Applet Reflection Type Confusion Remote Code Execution
    multi/browser/java_rhino                                       2011-10-18       excellent  Java Applet Rhino Script Engine Remote Code Execution
    multi/browser/java_rmi_connection_impl                         2010-03-31       excellent  Java RMIConnectionImpl Deserialization Privilege Escalation
    multi/browser/java_setdifficm_bof                              2009-11-04       great      Sun Java JRE AWT setDiffICM Buffer Overflow
@@ -191,21 +221,28 @@ msexploitstring = '''
    multi/http/auxilium_upload_exec                                2012-09-14       excellent  Auxilium RateMyPet Arbitrary File Upload Vulnerability
    multi/http/axis2_deployer                                      2010-12-30       excellent  Axis2 / SAP BusinessObjects Authenticated Code Execution (via SOAP)
    multi/http/cuteflow_upload_exec                                2012-07-27       excellent  CuteFlow v2.11.2 Arbitrary File Upload Vulnerability
-   multi/http/eaton_nsm_code_exec                                 2012-06-26       excellent  Network Shutdown Module <= 3.21 (sort_values) Remote PHP Code Injection
+   multi/http/eaton_nsm_code_exec                                 2012-06-26       excellent  Network Shutdown Module (sort_values) Remote PHP Code Injection
+   multi/http/extplorer_upload_exec                               2012-12-31       excellent  eXtplorer v2.1 Arbitrary File Upload Vulnerability
    multi/http/familycms_less_exec                                 2011-11-29       excellent  Family Connections less.php Remote Command Execution
    multi/http/freenas_exec_raw                                    2010-11-06       great      FreeNAS exec_raw.php Arbitrary Command Execution
    multi/http/gitorious_graph                                     2012-01-19       excellent  Gitorious Arbitrary Command Execution
    multi/http/glassfish_deployer                                  2011-08-04       excellent  Sun/Oracle GlassFish Server Authenticated Code Execution
+   multi/http/glossword_upload_exec                               2013-02-05       excellent  Glossword v1.8.8 - 1.8.12 Arbitrary File Upload Vulnerability
    multi/http/horde_href_backdoor                                 2012-02-13       excellent  Horde 3.3.12 Backdoor Arbitrary PHP Code Execution
-   multi/http/hp_sitescope_uploadfileshandler                     2012-08-29       excellent  HP SiteScope Remote Code Execution
+   multi/http/hp_sitescope_uploadfileshandler                     2012-08-29       good       HP SiteScope Remote Code Execution
    multi/http/jboss_bshdeployer                                   2010-04-26       excellent  JBoss JMX Console Beanshell Deployer WAR Upload and Deployment
    multi/http/jboss_deploymentfilerepository                      2010-04-26       excellent  JBoss Java Class DeploymentFileRepository WAR Deployment
    multi/http/jboss_invoke_deploy                                 2007-02-20       excellent  JBoss DeploymentFileRepository WAR Deployment (via JMXInvokerServlet)
    multi/http/jboss_maindeployer                                  2007-02-20       excellent  JBoss JMX Console Deployer Upload and Execute
+   multi/http/jenkins_script_console                              2013-01-18       good       Jenkins Script-Console Java Execution
+   multi/http/kordil_edms_upload_exec                             2013-02-22       excellent  Kordil EDMS v2.2.60rc3 Unauthenticated Arbitrary File Upload Vulnerability
    multi/http/lcms_php_exec                                       2011-03-03       excellent  LotusCMS 3.0 eval() Remote Command Execution
    multi/http/log1cms_ajax_create_folder                          2011-04-11       excellent  Log1 CMS writeInfo() PHP Code Injection
    multi/http/manageengine_search_sqli                            2012-10-18       excellent  ManageEngine Security Manager Plus 5.5 build 5505 SQL Injection
    multi/http/mobilecartly_upload_exec                            2012-08-10       excellent  MobileCartly 1.0 Arbitrary File Creation Vulnerability
+   multi/http/movabletype_upgrade_exec                            2013-01-07       normal     Movable Type 4.2x, 4.3x Web Upgrade Remote Code Execution
+   multi/http/mutiny_subnetmask_exec                              2012-10-22       excellent  Mutiny Remote Command Execution
+   multi/http/netwin_surgeftp_exec                                2012-12-06       good       Netwin SurgeFTP Remote Command Execution
    multi/http/op5_license                                         2012-01-05       excellent  OP5 license.php Remote Command Execution
    multi/http/op5_welcome                                         2012-01-05       excellent  OP5 welcome Remote Command Execution
    multi/http/openfire_auth_bypass                                2008-11-10       excellent  Openfire Admin Console Authentication Bypass
@@ -213,26 +250,38 @@ msexploitstring = '''
    multi/http/php_volunteer_upload_exec                           2012-05-28       excellent  PHP Volunteer Management System v1.0.2 Arbitrary File Upload Vulnerability
    multi/http/phpldapadmin_query_engine                           2011-10-24       excellent  phpLDAPadmin <= 1.2.1.1 (query_engine) Remote PHP Code Injection
    multi/http/phpmyadmin_3522_backdoor                            2012-09-25       normal     phpMyAdmin 3.5.2.2 server_sync.php Backdoor
+   multi/http/phpmyadmin_preg_replace                             2013-04-25       excellent  phpMyAdmin Authenticated Remote Code Execution via preg_replace()
    multi/http/phpscheduleit_start_date                            2008-10-01       excellent  phpScheduleIt PHP reserve.php start_date Parameter Arbitrary Code Injection
    multi/http/phptax_exec                                         2012-10-08       excellent  PhpTax pfilez Parameter Exec Remote Code Injection
    multi/http/plone_popen2                                        2011-10-04       excellent  Plone and Zope XMLTools Remote Command Execution
    multi/http/pmwiki_pagelist                                     2011-11-09       excellent  PmWiki <= 2.2.34 pagelist.php Remote PHP Code Injection Exploit
+   multi/http/polarcms_upload_exec                                2012-01-21       excellent  PolarBear CMS PHP File Upload Vulnerability
    multi/http/qdpm_upload_exec                                    2012-06-14       excellent  qdPM v7 Arbitrary PHP File Upload Vulnerability
+   multi/http/rails_json_yaml_code_exec                           2013-01-28       excellent  Ruby on Rails JSON Processor YAML Deserialization Code Execution
+   multi/http/rails_xml_yaml_code_exec                            2013-01-07       excellent  Ruby on Rails XML Processor YAML Deserialization Code Execution
    multi/http/sflog_upload_exec                                   2012-07-06       excellent  Sflog! CMS 1.0 Arbitrary File Upload Vulnerability
    multi/http/sit_file_upload                                     2011-11-10       excellent  Support Incident Tracker <= 3.65 Remote Command Execution
    multi/http/snortreport_exec                                    2011-09-19       excellent  Snortreport nmap.php/nbtscan.php Remote Command Execution
+   multi/http/sonicwall_gms_upload                                2012-01-17       excellent  SonicWALL GMS 6 Arbitrary File Upload
    multi/http/splunk_mappy_exec                                   2011-12-12       excellent  Splunk Search Remote Code Execution
+   multi/http/splunk_upload_app_exec                              2012-09-27       good       Splunk 5.0 Custom App Remote Code Execution
    multi/http/spree_search_exec                                   2011-10-05       excellent  Spreecommerce 0.60.1 Arbitrary Command Execution
    multi/http/spree_searchlogic_exec                              2011-04-19       excellent  Spreecommerce < 0.50.0 Arbitrary Command Execution
-   multi/http/struts_code_exec                                    2010-07-13       excellent  Apache Struts < 2.2.0 Remote Command Execution
+   multi/http/struts_code_exec                                    2010-07-13       good       Apache Struts < 2.2.0 Remote Command Execution
    multi/http/struts_code_exec_exception_delegator                2012-01-06       excellent  Apache Struts <= 2.2.1.1 Remote Command Execution
+   multi/http/struts_code_exec_parameters                         2011-10-01       excellent  Apache Struts ParametersInterceptor Remote Code Execution
+   multi/http/struts_include_params                               2013-05-24       great      Apache Struts includeParams Remote Code Execution
+   multi/http/stunshell_eval                                      2013-03-23       great      STUNSHELL Web Shell Remote PHP Code Execution
+   multi/http/stunshell_exec                                      2013-03-23       great      STUNSHELL Web Shell Remote Code Execution
    multi/http/sun_jsws_dav_options                                2010-01-20       great      Sun Java System Web Server WebDAV OPTIONS Buffer Overflow
    multi/http/testlink_upload_exec                                2012-08-13       excellent  TestLink v1.9.3 Arbitrary File Upload Vulnerability
    multi/http/tomcat_mgr_deploy                                   2009-11-09       excellent  Apache Tomcat Manager Application Deployer Authenticated Code Execution
    multi/http/traq_plugin_exec                                    2011-12-12       excellent  Traq admincp/common.php Remote Code Execution
+   multi/http/v0pcr3w_exec                                        2013-03-23       great      v0pCr3w Web Shell Remote Code Execution
    multi/http/vbseo_proc_deutf                                    2012-01-23       excellent  vBSEO <= 3.6.0 proc_deutf() Remote PHP Code Injection
    multi/http/webpagetest_upload_exec                             2012-07-13       excellent  WebPageTest Arbitrary PHP File Upload
    multi/http/wikka_spam_exec                                     2011-11-30       excellent  WikkaWiki 1.3.2 Spam Logging PHP Injection
+   multi/http/zenworks_control_center_upload                      2013-03-22       great      Novell ZENworks Configuration Management Remote Execution
    multi/ids/snort_dce_rpc                                        2007-02-19       good       Snort 2 DCE/RPC preprocessor Buffer Overflow
    multi/misc/batik_svg_java                                      2012-05-11       excellent  Squiggle 1.7 SVG Browser Java Code Execution
    multi/misc/hp_vsa_exec                                         2011-11-11       excellent  HP StorageWorks P4000 Virtual SAN Appliance Command Execution
@@ -240,6 +289,7 @@ msexploitstring = '''
    multi/misc/java_rmi_server                                     2011-10-15       excellent  Java RMI Server Insecure Default Configuration Java Code Execution
    multi/misc/openview_omniback_exec                              2001-02-28       excellent  HP OpenView OmniBack II Command Execution
    multi/misc/pbot_exec                                           2009-11-02       excellent  PHP IRC Bot pbot eval() Remote Code Execution
+   multi/misc/ra1nx_pubcall_exec                                  2013-03-24       great      Ra1NX PHP Bot PubCall Authentication Bypass Remote Code Execution
    multi/misc/veritas_netbackup_cmdexec                           2004-10-21       excellent  VERITAS NetBackup Remote Command Execution
    multi/misc/wireshark_lwres_getaddrbyname                       2010-01-27       great      Wireshark LWRES Dissector getaddrsbyname_request Buffer Overflow
    multi/misc/wireshark_lwres_getaddrbyname_loop                  2010-01-27       great      Wireshark LWRES Dissector getaddrsbyname_request Buffer Overflow (loop)
@@ -249,7 +299,12 @@ msexploitstring = '''
    multi/realserver/describe                                      2002-12-20       great      RealServer Describe Buffer Overflow
    multi/samba/nttrans                                            2003-04-07       average    Samba 2.2.2 - 2.2.6 nttrans Buffer Overflow
    multi/samba/usermap_script                                     2007-05-14       excellent  Samba "username map script" Command Execution
+   multi/sap/sap_mgmt_con_osexec_payload                          2011-03-08       excellent  SAP Management Console OSExecute Payload Execution
+   multi/sap/sap_soap_rfc_sxpg_call_system_exec                   2013-03-26       great      SAP SOAP RFC SXPG_CALL_SYSTEM Remote Command Execution
+   multi/sap/sap_soap_rfc_sxpg_command_exec                       2012-05-08       great      SAP SOAP RFC SXPG_COMMAND_EXECUTE Remote Command Execution
+   multi/ssh/sshexec                                              1999-01-01       manual     SSH User Code Execution
    multi/svn/svnserve_date                                        2004-05-19       average    Subversion Date Svnserve
+   multi/upnp/libupnp_ssdp_overflow                               2013-01-29       normal     Portable UPnP SDK unique_service_name() Remote Code Execution
    multi/wyse/hagent_untrusted_hsdata                             2009-07-10       excellent  Wyse Rapport Hagent Fake Hserver Command Execution
    netware/smb/lsass_cifs                                         2007-01-21       average    Novell NetWare LSASS CIFS.NLM Driver Stack Buffer Overflow
    netware/sunrpc/pkernel_callit                                  2009-09-30       good       NetWare 6.5 SunRPC Portmapper CALLIT Stack Buffer Overflow
@@ -262,6 +317,8 @@ msexploitstring = '''
    osx/email/mailapp_image_exec                                   2006-03-01       manual     Mail.app Image Attachment Command Execution
    osx/ftp/webstar_ftp_user                                       2004-07-13       average    WebSTAR FTP Server USER Overflow
    osx/http/evocam_webserver                                      2010-06-01       average    MacOS X EvoCam HTTP GET Buffer Overflow
+   osx/local/setuid_tunnelblick                                   2012-08-11       excellent  Setuid Tunnelblick Privilege Escalation
+   osx/local/setuid_viscosity                                     2012-08-12       excellent  Viscosity setuid-set ViscosityHelper Privilege Escalation
    osx/mdns/upnp_location                                         2007-05-25       average    Mac OS X mDNSResponder UPnP Location Overflow
    osx/misc/ufo_ai                                                2009-10-28       average    UFO: Alien Invasion IRC Client Buffer Overflow
    osx/rtsp/quicktime_rtsp_content_type                           2007-11-23       average    MacOS X QuickTime RTSP Content-Type Overflow
@@ -299,31 +356,44 @@ msexploitstring = '''
    unix/webapp/basilic_diff_exec                                  2012-06-28       excellent  Basilic 1.5.14 diff.php Arbitrary Command Execution
    unix/webapp/cacti_graphimage_exec                              2005-01-15       excellent  Cacti graph_view.php Remote Command Execution
    unix/webapp/cakephp_cache_corruption                           2010-11-15       excellent  CakePHP <= 1.3.5 / 1.2.8 Cache Corruption Code Execution
+   unix/webapp/carberp_backdoor_exec                              2013-06-28       great      Carberp Web Panel C2 Backdoor Remote PHP Code Execution
    unix/webapp/citrix_access_gateway_exec                         2010-12-21       excellent  Citrix Access Gateway Command Execution
    unix/webapp/coppermine_piceditor                               2008-01-30       excellent  Coppermine Photo Gallery <= 1.4.14 picEditor.php Command Execution
+   unix/webapp/datalife_preview_exec                              2013-01-28       excellent  DataLife Engine preview.php PHP Code Injection
    unix/webapp/dogfood_spell_exec                                 2009-03-03       excellent  Dogfood CRM spell.php Remote Command Execution
    unix/webapp/egallery_upload_exec                               2012-07-08       excellent  EGallery PHP File Upload Vulnerability
+   unix/webapp/foswiki_maketext                                   2012-12-03       excellent  Foswiki MAKETEXT Remote Command Execution
    unix/webapp/generic_exec                                       1993-11-14       excellent  Generic Web Application Unix Command Execution
    unix/webapp/google_proxystylesheet_exec                        2005-08-16       excellent  Google Appliance ProxyStyleSheet Command Execution
    unix/webapp/guestbook_ssi_exec                                 1999-11-05       excellent  Matt Wright guestbook.pl Arbitrary Command Execution
    unix/webapp/hastymail_exec                                     2011-11-22       excellent  Hastymail 2.1.1 RC1 Command Injection
-   unix/webapp/invision_pboard_unserialize_exec                   2012-10-25       excellent  Invision IP.Board <= 3.3.4 unserialize() PHP Code Execution
+   unix/webapp/havalite_upload_exec                               2013-06-17       excellent  Havalite CMS Arbitary File Upload Vulnerability
+   unix/webapp/instantcms_exec                                    2013-06-26       excellent  InstantCMS 1.6 Remote PHP Code Execution
+   unix/webapp/invision_pboard_unserialize_exec                   2012-10-25       excellent  Invision IP.Board unserialize() PHP Code Execution
+   unix/webapp/joomla_comjce_imgmanager                           2012-08-02       excellent  Joomla Component JCE File Upload Remote Code Execution
    unix/webapp/joomla_tinybrowser                                 2009-07-22       excellent  Joomla 1.5.12 TinyBrowser File Upload Code Execution
+   unix/webapp/libretto_upload_exec                               2013-06-14       excellent  LibrettoCMS File Manager Arbitary File Upload Vulnerability
    unix/webapp/mambo_cache_lite                                   2008-06-14       excellent  Mambo Cache_Lite Class mosConfig_absolute_path Remote File Include
    unix/webapp/mitel_awc_exec                                     2010-12-12       excellent  Mitel Audio and Web Conferencing Command Injection
+   unix/webapp/moinmoin_twikidraw                                 2012-12-30       manual     MoinMoin twikidraw Action Traversal File Upload
    unix/webapp/mybb_backdoor                                      2011-10-06       excellent  myBB 1.6.4 Backdoor Arbitrary Command Execution
+   unix/webapp/nagios3_history_cgi                                2012-12-09       great      Nagios3 history.cgi Host Command Execution
    unix/webapp/nagios3_statuswml_ping                             2009-06-22       excellent  Nagios3 statuswml.cgi Ping Command Execution
+   unix/webapp/nagios_graph_explorer                              2012-11-30       excellent  Nagios XI Network Monitor Graph Explorer Component Command Injection
    unix/webapp/narcissus_backend_exec                             2012-11-14       excellent  Narcissus Image Configuration Passthru Vulnerability
+   unix/webapp/openemr_upload_exec                                2013-02-13       excellent  OpenEMR PHP File Upload Vulnerability
    unix/webapp/openview_connectednodes_exec                       2005-08-25       excellent  HP Openview connectedNodes.ovpl Remote Command Execution
    unix/webapp/openx_banner_edit                                  2009-11-24       excellent  OpenX banner-edit.php File Upload PHP Code Execution
    unix/webapp/oracle_vm_agent_utl                                2010-10-12       excellent  Oracle VM Server Virtual Server Agent Command Injection
    unix/webapp/oscommerce_filemanager                             2009-08-31       excellent  osCommerce 2.2 Arbitrary PHP Code Execution
    unix/webapp/pajax_remote_exec                                  2006-03-30       excellent  PAJAX Remote Command Execution
+   unix/webapp/php_charts_exec                                    2013-01-16       excellent  PHP-Charts v1.0 PHP Code Execution Vulnerability
    unix/webapp/php_eval                                           2008-10-13       manual     Generic PHP Code Evaluation
    unix/webapp/php_include                                        2006-12-17       normal     PHP Remote File Include Generic Code Execution
    unix/webapp/php_vbulletin_template                             2005-02-25       excellent  vBulletin misc.php Template Name Arbitrary Code Execution
    unix/webapp/php_wordpress_foxypress                            2012-06-05       excellent  WordPress plugin Foxypress uploadify.php Arbitrary Code Execution
    unix/webapp/php_wordpress_lastpost                             2005-08-09       excellent  WordPress cache_lastpostdate Arbitrary Code Execution
+   unix/webapp/php_wordpress_total_cache                          2013-04-17       excellent  Wordpress W3 Total Cache PHP Code Execution
    unix/webapp/php_xmlrpc_eval                                    2005-06-29       excellent  PHP XML-RPC Arbitrary Code Execution
    unix/webapp/phpbb_highlight                                    2004-11-12       excellent  phpBB viewtopic.php Arbitrary Code Execution
    unix/webapp/phpmyadmin_config                                  2009-03-24       excellent  PhpMyAdmin Config File Code Injection
@@ -338,9 +408,16 @@ msexploitstring = '''
    unix/webapp/tikiwiki_unserialize_exec                          2012-07-04       excellent  Tiki Wiki <= 8.3 unserialize() PHP Code Execution
    unix/webapp/trixbox_langchoice                                 2008-07-09       manual     Trixbox langChoice PHP Local File Inclusion
    unix/webapp/twiki_history                                      2005-09-14       excellent  TWiki History TWikiUsers rev Parameter Command Execution
+   unix/webapp/twiki_maketext                                     2012-12-15       excellent  TWiki MAKETEXT Remote Command Execution
    unix/webapp/twiki_search                                       2004-10-01       excellent  TWiki Search Function Arbitrary Command Execution
    unix/webapp/webmin_show_cgi_exec                               2012-09-06       excellent  Webmin /file/show.cgi Remote Command Execution
+   unix/webapp/wp_advanced_custom_fields_exec                     2012-11-14       excellent  WordPress Plugin Advanced Custom Fields Remote File Inclusion
+   unix/webapp/wp_asset_manager_upload_exec                       2012-05-26       excellent  WordPress Asset-Manager PHP File Upload Vulnerability
+   unix/webapp/wp_google_document_embedder_exec                   2013-01-03       normal     WordPress Plugin Google Document Embedder Arbitrary File Disclosure
+   unix/webapp/wp_property_upload_exec                            2012-03-26       excellent  WordPress WP-Property PHP File Upload Vulnerability
    unix/webapp/xoda_file_upload                                   2012-08-21       excellent  XODA 0.4.5 Arbitrary PHP File Upload Vulnerability
+   unix/webapp/zoneminder_packagecontrol_exec                     2013-01-22       excellent  ZoneMinder Video Server packageControl Command Execution
+   unix/webapp/zpanel_username_exec                               2013-06-07       excellent  ZPanel 10.0.0.2 htpasswd Module Username Command Execution
    windows/antivirus/ams_hndlrsvc                                 2010-07-26       excellent  Symantec System Center Alert Management System (hndlrsvc.exe) Arbitrary Command Execution
    windows/antivirus/ams_xfr                                      2009-04-28       excellent  Symantec System Center Alert Management System (xfr.exe) Arbitrary Command Execution
    windows/antivirus/symantec_iao                                 2009-04-28       good       Symantec Alert Management System Intel Alert Originator Service Buffer Overflow
@@ -417,6 +494,7 @@ msexploitstring = '''
    windows/browser/clear_quest_cqole                              2012-05-19       normal     IBM Rational ClearQuest CQOle Remote Code Execution
    windows/browser/communicrypt_mail_activex                      2010-05-19       great      CommuniCrypt Mail 1.16 SMTP ActiveX Stack Buffer Overflow
    windows/browser/creative_software_cachefolder                  2008-05-28       normal     Creative Software AutoUpdate Engine ActiveX Control Buffer Overflow
+   windows/browser/crystal_reports_printcontrol                   2010-12-14       normal     Crystal Reports CrystalPrintControl ActiveX ServerResourceVersion Property Overflow
    windows/browser/dell_webcam_crazytalk                          2012-03-19       normal     Dell Webcam CrazyTalk ActiveX BackImage Vulnerability
    windows/browser/dxstudio_player_exec                           2009-06-09       excellent  Worldweaver DX Studio Player <= 3.0.29 shell.execute() Command Execution
    windows/browser/ea_checkrequirements                           2007-10-08       normal     Electronic Arts SnoopyCtrl ActiveX Control Buffer Overflow
@@ -424,8 +502,11 @@ msexploitstring = '''
    windows/browser/enjoysapgui_comp_download                      2009-04-15       excellent  EnjoySAP SAP GUI ActiveX Control Arbitrary File Download
    windows/browser/enjoysapgui_preparetoposthtml                  2007-07-05       normal     EnjoySAP SAP GUI ActiveX Control Buffer Overflow
    windows/browser/facebook_extractiptc                           2008-01-31       normal     Facebook Photo Uploader 4 ActiveX Control Buffer Overflow
+   windows/browser/foxit_reader_plugin_url_bof                    2013-01-07       normal     Foxit Reader Plugin URL Processing Buffer Overflow
    windows/browser/gom_openurl                                    2007-10-27       normal     GOM Player ActiveX Control Buffer Overflow
    windows/browser/greendam_url                                   2009-06-11       normal     Green Dam URL Processing Buffer Overflow
+   windows/browser/honeywell_hscremotedeploy_exec                 2013-02-22       excellent  Honeywell HSC Remote Deployer ActiveX Remote Code Execution
+   windows/browser/honeywell_tema_exec                            2011-10-20       excellent  Honeywell Tema Remote Installer ActiveX Remote Code Execution
    windows/browser/hp_alm_xgo_setshapenodetype_exec               2012-08-29       normal     HP Application Lifecycle Management XGO.ocx ActiveX SetShapeNodeType() Remote Code Execution
    windows/browser/hp_easy_printer_care_xmlcachemgr               2012-01-11       great      HP Easy Printer Care XMLCacheMgr Class ActiveX Control Remote Code Execution
    windows/browser/hp_easy_printer_care_xmlsimpleaccessor         2011-08-16       great      HP Easy Printer Care XMLSimpleAccessor Class ActiveX Control Remote Code Execution
@@ -433,20 +514,27 @@ msexploitstring = '''
    windows/browser/hp_loadrunner_addfolder                        2007-12-25       good       HP LoadRunner 9.0 ActiveX AddFolder Buffer Overflow
    windows/browser/hpmqc_progcolor                                2007-04-04       normal     HP Mercury Quality Center ActiveX Control ProgColor Buffer Overflow
    windows/browser/hyleos_chemviewx_activex                       2010-02-10       good       Hyleos ChemView ActiveX Control Stack Buffer Overflow
+   windows/browser/ibm_spss_c1sizer                               2013-04-26       normal     IBM SPSS SamplePower C1Tab ActiveX Heap Overflow
    windows/browser/ibm_tivoli_pme_activex_bof                     2012-03-01       normal     IBM Tivoli Provisioning Manager Express for Software Distribution Isig.isigCtl.1 ActiveX RunAndUploadFile() Method Overflow
    windows/browser/ibmegath_getxmlvalue                           2009-03-24       normal     IBM Access Support ActiveX Control Buffer Overflow
    windows/browser/ibmlotusdomino_dwa_uploadmodule                2007-12-20       normal     IBM Lotus Domino Web Access Upload Module Buffer Overflow
+   windows/browser/ie_cbutton_uaf                                 2012-12-27       normal     Microsoft Internet Explorer CButton Object Use-After-Free Vulnerability
+   windows/browser/ie_cgenericelement_uaf                         2013-05-03       good       MS13-038 Microsoft Internet Explorer CGenericElement Object Use-After-Free Vulnerability
    windows/browser/ie_createobject                                2006-04-11       excellent  Internet Explorer COM CreateObject Code Execution
    windows/browser/ie_execcommand_uaf                             2012-09-14       good       MS12-063 Microsoft Internet Explorer execCommand Use-After-Free Vulnerability 
    windows/browser/ie_iscomponentinstalled                        2006-02-24       normal     Internet Explorer isComponentInstalled Overflow
    windows/browser/ie_unsafe_scripting                            2010-09-20       excellent  Internet Explorer Unsafe Scripting Misconfiguration
    windows/browser/imgeviewer_tifmergemultifiles                  2010-03-03       normal     Viscom Image Viewer CP Pro 8.0/Gold 6.0 ActiveX Control
+   windows/browser/indusoft_issymbol_internationalseparator       2012-04-28       normal     InduSoft Web Studio ISSymbol.ocx InternationalSeparator() Heap Overflow
+   windows/browser/inotes_dwa85w_bof                              2012-06-01       normal     IBM Lotus iNotes dwa85W ActiveX Buffer Overflow
    windows/browser/intrust_annotatex_add                          2012-03-28       average    Quest InTrust Annotation Objects Uninitialized Pointer
    windows/browser/java_basicservice_impl                         2010-10-12       excellent  Sun Java Web Start BasicServiceImpl Code Execution
+   windows/browser/java_cmm                                       2013-03-01       normal     Java CMM Remote Code Execution
    windows/browser/java_codebase_trust                            2011-02-15       excellent  Sun Java Applet2ClassLoader Remote Code Execution
    windows/browser/java_docbase_bof                               2010-10-12       great      Sun Java Runtime New Plugin docbase Buffer Overflow
    windows/browser/java_mixer_sequencer                           2010-03-30       great      Java MixerSequencer Object GM_Song Structure Handling Vulnerability
    windows/browser/java_ws_arginject_altjvm                       2010-04-09       excellent  Sun Java Web Start Plugin Command Line Argument Injection
+   windows/browser/java_ws_double_quote                           2012-10-16       excellent  Sun Java Web Start Double Quote Injection
    windows/browser/java_ws_vmargs                                 2012-02-14       excellent  Sun Java Web Start Plugin Command Line Argument Injection
    windows/browser/juniper_sslvpn_ive_setupdll                    2006-04-26       normal     Juniper SSL-VPN IVE JuniperSetupDLL.dll ActiveX Control Buffer Overflow
    windows/browser/kazaa_altnet_heap                              2007-10-03       normal     Kazaa Altnet Download Manager ActiveX Control Buffer Overflow
@@ -455,6 +543,7 @@ msexploitstring = '''
    windows/browser/lpviewer_url                                   2008-10-06       normal     iseemedia / Roxio / MGI Software LPViewer ActiveX Control Buffer Overflow
    windows/browser/macrovision_downloadandexecute                 2007-10-31       normal     Macrovision InstallShield Update Service Buffer Overflow
    windows/browser/macrovision_unsafe                             2007-10-20       excellent  Macrovision InstallShield Update Service ActiveX Unsafe Method
+   windows/browser/maxthon_history_xcs                            2012-11-26       excellent  Maxthon3 about:history XCS Trusted Zone Code Execution
    windows/browser/mcafee_mcsubmgr_vsprintf                       2006-08-01       normal     McAfee Subscription Manager Stack Buffer Overflow
    windows/browser/mcafee_mvt_exec                                2012-04-30       excellent  McAfee Virtual Technician MVTControl 6.3.0.1911 GetObject Vulnerability
    windows/browser/mcafeevisualtrace_tracetarget                  2007-07-07       normal     McAfee Visual Trace ActiveX Control Buffer Overflow
@@ -493,16 +582,21 @@ msexploitstring = '''
    windows/browser/ms10_090_ie_css_clip                           2010-11-03       good       Internet Explorer CSS SetUserClip Memory Corruption
    windows/browser/ms11_003_ie_css_import                         2010-11-29       good       Internet Explorer CSS Recursive Import Use After Free
    windows/browser/ms11_050_mshtml_cobjectelement                 2011-06-16       normal     MS11-050 IE mshtml!CObjectElement Use After Free
+   windows/browser/ms11_081_option                                2012-10-11       normal     Microsoft Internet Explorer Option Element Use-After-Free
    windows/browser/ms11_093_ole32                                 2011-12-13       normal     MS11-093 Microsoft Windows OLE Object File Handling Remote Code Execution
    windows/browser/ms12_004_midi                                  2012-01-10       normal     MS12-004 midiOutPlayNextPolyEvent Heap Overflow
    windows/browser/ms12_037_ie_colspan                            2012-06-12       normal     Microsoft Internet Explorer Fixed Table Col Span Heap Overflow
    windows/browser/ms12_037_same_id                               2012-06-12       normal     MS12-037 Internet Explorer Same ID Property Deleted Object Handling Memory Corruption
+   windows/browser/ms13_009_ie_slayoutrun_uaf                     2013-02-13       average    MS13-009 Microsoft Internet Explorer SLayoutRun Use-After-Free
+   windows/browser/ms13_037_svg_dashstyle                         2013-03-06       normal     MS13-037 Microsoft Internet Explorer COALineDashStyleArray Integer Overflow
    windows/browser/msvidctl_mpeg2                                 2009-07-05       normal     Microsoft DirectShow (msvidctl.dll) MPEG-2 Memory Corruption
    windows/browser/mswhale_checkforupdates                        2009-04-15       normal     Microsoft Whale Intelligent Application Gateway ActiveX Control Buffer Overflow
    windows/browser/msxml_get_definition_code_exec                 2012-06-12       good       MS12-043 Microsoft XML Core Services MSXML Uninitialized Memory Corruption
    windows/browser/nctaudiofile2_setformatlikesample              2007-01-24       normal     NCTAudioFile2 v2.x ActiveX Control SetFormatLikeSample() Buffer Overflow
    windows/browser/nis2004_antispam                               2004-03-19       normal     Norton AntiSpam 2004 SymSpamHelper ActiveX Control Buffer Overflow
    windows/browser/nis2004_get                                    2007-05-16       normal     Symantec Norton Internet Security 2004 ActiveX Control Buffer Overflow
+   windows/browser/notes_handler_cmdinject                        2012-06-18       excellent  IBM Lotus Notes Client URL Handler Command Injection
+   windows/browser/novell_groupwise_gwcls1_actvx                  2013-01-30       normal     Novell GroupWise Client gwcls1.dll ActiveX Remote Code Execution
    windows/browser/novelliprint_callbackurl                       2010-08-20       normal     Novell iPrint Client ActiveX Control call-back-url Buffer Overflow
    windows/browser/novelliprint_datetime                          2009-12-08       great      Novell iPrint Client ActiveX Control Date/Time Buffer Overflow
    windows/browser/novelliprint_executerequest                    2008-02-22       normal     Novell iPrint Client ActiveX Control ExecuteRequest Buffer Overflow
@@ -514,9 +608,12 @@ msexploitstring = '''
    windows/browser/ntr_activex_stopmodule                         2012-01-11       normal     NTR ActiveX Control StopModule() Remote Code Execution
    windows/browser/oracle_autovue_setmarkupmode                   2012-04-18       normal     Oracle AutoVue ActiveX Control SetMarkupMode Buffer Overflow
    windows/browser/oracle_dc_submittoexpress                      2009-08-28       normal     Oracle Document Capture 10g ActiveX Control Buffer Overflow
+   windows/browser/oracle_webcenter_checkoutandopen               2013-04-16       excellent  Oracle WebCenter Content CheckOutAndOpen.dll ActiveX Remote Code Execution
    windows/browser/orbit_connecting                               2009-02-03       normal     Orbit Downloader Connecting Log Creation Buffer Overflow
+   windows/browser/ovftool_format_string                          2012-11-08       normal     VMWare OVF Tools Format String Vulnerability
    windows/browser/pcvue_func                                     2011-10-05       average    PcVue 10.0 SV.UIGrdCtrl.1 'LoadObject()/SaveObject()' Trusted DWORD Vulnerability
    windows/browser/persits_xupload_traversal                      2009-09-29       excellent  Persits XUpload ActiveX MakeHttpRequest Directory Traversal
+   windows/browser/quickr_qp2_bof                                 2012-05-23       normal     IBM Lotus QuickR qp2 ActiveX Buffer Overflow
    windows/browser/real_arcade_installerdlg                       2011-04-03       normal     Real Networks Arcade Games StubbyUtil.ProcessMgr ActiveX Arbitrary Code Execution
    windows/browser/realplayer_cdda_uri                            2010-11-15       normal     RealNetworks RealPlayer CDDA URI Initialization Vulnerability
    windows/browser/realplayer_console                             2008-03-08       normal     RealPlayer rmoc3260.dll ActiveX Control Heap Corruption
@@ -534,6 +631,7 @@ msexploitstring = '''
    windows/browser/symantec_appstream_unsafe                      2009-01-15       excellent  Symantec AppStream LaunchObj ActiveX Control Arbitrary File Download and Execute
    windows/browser/symantec_backupexec_pvcalendar                 2008-02-28       normal     Symantec BackupExec Calendar Control Buffer Overflow
    windows/browser/symantec_consoleutilities_browseandsavefile    2009-11-02       normal     Symantec ConsoleUtilities ActiveX Control Buffer Overflow
+   windows/browser/synactis_connecttosynactis_bof                 2013-05-30       normal     Synactis PDF In-The-Box ConnectToSynactic Stack Buffer Overflow
    windows/browser/systemrequirementslab_unsafe                   2008-10-16       excellent  Husdawg, LLC. System Requirements Lab ActiveX Unsafe Method
    windows/browser/teechart_pro                                   2011-08-11       normal     TeeChart Professional ActiveX Control <= 2010.0.0.3 Trusted Integer Dereference
    windows/browser/tom_sawyer_tsgetx71ex552                       2011-05-03       normal     Tom Sawyer Software GET Extension Factory Remote Code Execution
@@ -572,6 +670,7 @@ msexploitstring = '''
    windows/emc/alphastor_agent                                    2008-05-27       great      EMC AlphaStor Agent Buffer Overflow
    windows/emc/networker_format_string                            2012-08-29       normal     EMC Networker Format String
    windows/fileformat/a-pdf_wav_to_mp3                            2010-08-17       normal     A-PDF WAV to MP3 v1.0.0 Buffer Overflow
+   windows/fileformat/abbs_amp_lst                                2013-06-30       normal     ABBS Audio Media Player .LST Buffer Overflow
    windows/fileformat/acdsee_fotoslate_string                     2011-09-12       good       ACDSee FotoSlate PLP File id Parameter Overflow
    windows/fileformat/acdsee_xpm                                  2007-11-23       good       ACDSee XPM File Section Buffer Overflow
    windows/fileformat/actfax_import_users_bof                     2012-08-28       normal     ActiveFax (ActFax) 4.3 Client Importer Buffer Overflow
@@ -596,6 +695,7 @@ msexploitstring = '''
    windows/fileformat/aol_phobos_bof                              2010-01-20       average    AOL 9.5 Phobos.Playlist Import() Stack-based Buffer Overflow
    windows/fileformat/apple_quicktime_pnsize                      2011-08-08       good       Apple QuickTime PICT PnSize Buffer Overflow
    windows/fileformat/apple_quicktime_texml                       2012-05-15       normal     Apple QuickTime TeXML Style Element Stack Buffer Overflow
+   windows/fileformat/audio_coder_m3u                             2013-05-01       normal     AudioCoder .M3U Buffer Overflow
    windows/fileformat/audio_wkstn_pls                             2009-12-08       good       Audio Workstation 6.4.2.4.3 pls Buffer Overflow
    windows/fileformat/audiotran_pls                               2010-01-09       good       Audiotran 1.4.1 (PLS File) Stack Buffer Overflow
    windows/fileformat/aviosoft_plf_buf                            2011-11-09       good       Aviosoft Digital TV Player Professional 1.0 Stack Buffer Overflow
@@ -606,6 +706,8 @@ msexploitstring = '''
    windows/fileformat/ca_cab                                      2007-06-05       good       CA Antivirus Engine CAB Buffer Overflow
    windows/fileformat/cain_abel_4918_rdp                          2008-11-30       good       Cain & Abel <= v4.9.24 RDP Buffer Overflow
    windows/fileformat/ccmplayer_m3u_bof                           2011-11-30       good       CCMPlayer 1.5 m3u Playlist Stack Based Buffer Overflow
+   windows/fileformat/coolpdf_image_stream_bof                    2013-01-18       normal     Cool PDF Image Stream Buffer Overflow
+   windows/fileformat/corelpdf_fusion_bof                         2013-07-08       normal     Corel PDF Fusion Stack Buffer Overflow
    windows/fileformat/csound_getnum_bof                           2012-02-23       normal     Csound hetro File Handling Stack Buffer Overflow
    windows/fileformat/cutezip_bof                                 2011-02-12       normal     GlobalSCAPE CuteZIP Stack Buffer Overflow
    windows/fileformat/cyberlink_p2g_bof                           2011-09-12       great      CyberLink Power2Go name attribute (p2g) Stack Buffer Overflow Exploit
@@ -617,6 +719,8 @@ msexploitstring = '''
    windows/fileformat/djvu_imageurl                               2008-10-30       low        DjVu DjVu_ActiveX_MSOffice.dll ActiveX ComponentBuffer Overflow
    windows/fileformat/dvdx_plf_bof                                2007-06-02       normal     DVD X Player 5.5 .plf PlayList Buffer Overflow
    windows/fileformat/emc_appextender_keyworks                    2009-09-29       average    EMC ApplicationXtender (KeyWorks) ActiveX Control Buffer Overflow
+   windows/fileformat/erdas_er_viewer_bof                         2013-04-23       normal     ERS Viewer 2011 ERS File Handling Buffer Overflow
+   windows/fileformat/erdas_er_viewer_rf_report_error             2013-05-23       normal     ERS Viewer 2013 ERS File Handling Buffer Overflow
    windows/fileformat/esignal_styletemplate_bof                   2011-09-06       normal     eSignal and eSignal Pro <= 10.6.2425.1208 file parsing buffer overflow in QUO
    windows/fileformat/etrust_pestscan                             2009-11-02       average    CA eTrust PestPatrol ActiveX Control Buffer Overflow
    windows/fileformat/ezip_wizard_bof                             2009-03-09       good       eZip Wizard 3.0 Stack Buffer Overflow
@@ -638,11 +742,13 @@ msexploitstring = '''
    windows/fileformat/ideal_migration_ipj                         2009-12-05       great      PointDev IDEAL Migration Buffer Overflow
    windows/fileformat/irfanview_jpeg2000_bof                      2012-01-16       normal     Irfanview JPEG2000 <= v4.3.2.0 jp2 Stack Buffer Overflow
    windows/fileformat/ispvm_xcf_ispxcf                            2012-05-16       normal     Lattice Semiconductor ispVM System XCF File Handling Overflow
+   windows/fileformat/kingview_kingmess_kvl                       2012-11-20       normal     KingView Log File Parsing Buffer Overflow
    windows/fileformat/lattice_pac_bof                             2012-05-16       normal     Lattice Semiconductor PAC-Designer 6.21 Symbol Value Buffer Overflow
    windows/fileformat/lotusnotes_lzh                              2011-05-24       good       Lotus Notes 8.0.x - 8.5.2 FP2 - Autonomy Keyview (.lzh Attachment)
    windows/fileformat/magix_musikmaker_16_mmm                     2011-04-26       good       Magix Musik Maker 16 .mmm Stack Buffer Overflow
    windows/fileformat/mcafee_hercules_deletesnapshot              2008-08-04       low        McAfee Remediation Client ActiveX Control Buffer Overflow
    windows/fileformat/mcafee_showreport_exec                      2012-01-12       normal     McAfee SaaS MyCioScan ShowReport Remote Command Execution
+   windows/fileformat/mediacoder_m3u                              2013-06-24       normal     MediaCoder .M3U Buffer Overflow
    windows/fileformat/mediajukebox                                2009-07-01       normal     Media Jukebox 8.0.400 Buffer Overflow (SEH)
    windows/fileformat/microp_mppl                                 2010-08-23       great      MicroP 0.1.1.1600 (MPPL File) Stack Buffer Overflow
    windows/fileformat/millenium_mp3_pls                           2009-07-30       great      Millenium MP3 Studio 2.0 (PLS File) Stack Buffer Overflow
@@ -667,9 +773,11 @@ msexploitstring = '''
    windows/fileformat/openoffice_ole                              2008-04-17       normal     OpenOffice OLE Importer DocumentSummaryInformation Stream Handling Overflow
    windows/fileformat/orbit_download_failed_bof                   2008-04-03       normal     Orbit Downloader URL Unicode Conversion Overflow
    windows/fileformat/orbital_viewer_orb                          2010-02-27       great      Orbital Viewer ORB File Parsing Buffer Overflow
+   windows/fileformat/ovf_format_string                           2012-11-08       normal     VMWare OVF Tools Format String Vulnerability
    windows/fileformat/proshow_cellimage_bof                       2009-08-20       great      ProShow Gold v4.0.2549 (PSH File) Stack Buffer Overflow
    windows/fileformat/proshow_load_bof                            2012-06-06       normal     Photodex ProShow Producer 5.0.3256 load File Handling Buffer Overflow
    windows/fileformat/real_networks_netzip_bof                    2011-01-30       good       Real Networks Netzip Classic 7.5.1 86 File Parsing Buffer Overflow Vulnerability
+   windows/fileformat/real_player_url_property_bof                2012-12-14       normal     RealPlayer RealMedia File Handling Buffer Overflow
    windows/fileformat/safenet_softremote_groupname                2009-10-30       good       SafeNet SoftRemote GROUPNAME Buffer Overflow
    windows/fileformat/sascam_get                                  2008-12-29       low        SasCam Webcam Server v.2.6.5 Get() method Buffer Overflow
    windows/fileformat/scadaphone_zip                              2011-09-12       good       ScadaTEC ScadaPhone <= v5.3.11.1230 Stack Buffer Overflow
@@ -715,6 +823,8 @@ msexploitstring = '''
    windows/ftp/easyftp_mkd_fixret                                 2010-04-04       great      EasyFTP Server <= 1.7.0.11 MKD Command Stack Buffer Overflow
    windows/ftp/filecopa_list_overflow                             2006-07-19       average    FileCopa FTP Server pre 18 Jul Version
    windows/ftp/filewrangler_list_reply                            2010-10-12       good       FileWrangler 5.30 Stack Buffer Overflow
+   windows/ftp/freefloatftp_user                                  2012-06-12       normal     Free Float FTP Server USER Command Buffer Overflow
+   windows/ftp/freefloatftp_wbem                                  2012-12-07       excellent  FreeFloat FTP Server Arbitrary File Upload
    windows/ftp/freeftpd_user                                      2005-11-16       average    freeFTPd 1.0 Username Overflow
    windows/ftp/ftpgetter_pwd_reply                                2010-10-12       good       FTPGetter Standard v3.55.0.05 Stack Buffer Overflow (PWD)
    windows/ftp/ftppad_list_reply                                  2010-10-12       good       FTPPad 1.2.0 Stack Buffer Overflow
@@ -734,6 +844,7 @@ msexploitstring = '''
    windows/ftp/proftp_banner                                      2009-08-25       normal     ProFTP 2.9 Banner Remote Buffer Overflow
    windows/ftp/quickshare_traversal_write                         2011-02-03       excellent  QuickShare File Server 1.2.1 Directory Traversal Vulnerability
    windows/ftp/ricoh_dl_bof                                       2012-03-01       normal     Ricoh DC DL-10 SR10 FTP USER Command Buffer Overflow
+   windows/ftp/sami_ftpd_list                                     2013-02-27       low        Sami FTP Server LIST Command Buffer Overflow
    windows/ftp/sami_ftpd_user                                     2006-01-24       normal     KarjaSoft Sami FTP Server v2.02 USER Overflow
    windows/ftp/sasser_ftpd_port                                   2004-05-10       average    Sasser Worm avserve FTP PORT Buffer Overflow
    windows/ftp/scriptftp_list                                     2011-10-12       good       ScriptFTP <= 3.3 Remote Buffer Overflow (LIST)
@@ -781,6 +892,7 @@ msexploitstring = '''
    windows/http/ektron_xslt_exec                                  2012-10-16       excellent  Ektron 8.02 XSLT Transform Remote Code Execution
    windows/http/ezserver_http                                     2012-06-18       excellent  EZHomeTech EzServer <= 6.4.017 Stack Buffer Overflow Vulnerability
    windows/http/fdm_auth_header                                   2009-02-02       great      Free Download Manager Remote Control Server Buffer Overflow
+   windows/http/hp_imc_mibfileupload                              2013-03-07       great      HP Intelligent Management Center Arbitrary File Upload
    windows/http/hp_nnm_getnnmdata_hostname                        2010-05-11       great      HP OpenView Network Node Manager getnnmdata.exe (Hostname) CGI Buffer Overflow
    windows/http/hp_nnm_getnnmdata_icount                          2010-05-11       great      HP OpenView Network Node Manager getnnmdata.exe (ICount) CGI Buffer Overflow
    windows/http/hp_nnm_getnnmdata_maxage                          2010-05-11       great      HP OpenView Network Node Manager getnnmdata.exe (MaxAge) CGI Buffer Overflow
@@ -803,6 +915,7 @@ msexploitstring = '''
    windows/http/hp_openview_insight_backdoor                      2011-01-31       excellent  HP OpenView Performance Insight Server Backdoor Account Code Execution
    windows/http/hp_power_manager_filename                         2011-10-19       normal     HP Power Manager 'formExportDataLogs' Buffer Overflow
    windows/http/hp_power_manager_login                            2009-11-04       average    Hewlett-Packard Power Manager Administration Buffer Overflow
+   windows/http/hp_sys_mgmt_exec                                  2013-06-11       excellent  HP System Management Homepage JustGetSNMPQueue Command Injection
    windows/http/httpdx_handlepeer                                 2009-10-08       great      HTTPDX h_handlepeer() Function Buffer Overflow
    windows/http/httpdx_tolog_format                               2009-11-17       great      HTTPDX tolog() Function Format String Vulnerability
    windows/http/ia_webmail                                        2003-11-03       average    IA WebMail 3.x Buffer Overflow
@@ -825,6 +938,7 @@ msexploitstring = '''
    windows/http/navicopa_get_overflow                             2006-09-28       great      NaviCOPA 2.0.1 URL Handling Buffer Overflow
    windows/http/netdecision_http_bof                              2012-02-24       normal     NetDecision 4.5.1 HTTP Server Buffer Overflow
    windows/http/novell_imanager_upload                            2010-10-01       excellent  Novell iManager getMultiPartParameters Arbitrary File Upload
+   windows/http/novell_mdm_lfi                                    2013-03-13       normal     Novell Zenworks Mobile Managment MDM.php Local File Inclusion Vulnerability
    windows/http/novell_messenger_acceptlang                       2006-04-13       average    Novell Messenger Server 2.0 Accept-Language Overflow
    windows/http/nowsms                                            2008-02-19       good       Now SMS/MMS Gateway Buffer Overflow
    windows/http/oracle9i_xdb_pass                                 2003-08-18       great      Oracle 9i XDB HTTP PASS Overflow (win32)
@@ -836,6 +950,7 @@ msexploitstring = '''
    windows/http/psoproxy91_overflow                               2004-02-20       average    PSO Proxy v0.91 Stack Buffer Overflow
    windows/http/rabidhamster_r4_log                               2012-02-09       normal     RabidHamster R4 Log Entry sprintf() Buffer Overflow
    windows/http/sambar6_search_results                            2003-06-21       normal     Sambar 6 Search Results Buffer Overflow
+   windows/http/sap_configservlet_exec_noauth                     2012-11-01       great      SAP ConfigServlet Remote Code Execution
    windows/http/sap_host_control_cmd_exec                         2012-08-14       average    SAP NetWeaver HostControl Command Injection
    windows/http/sap_mgmt_con_osexec_payload                       2011-03-08       excellent  SAP Management Console OSExecute Payload Execution
    windows/http/sapdb_webtools                                    2007-07-05       great      SAP DB 7.4 WebTools Buffer Overflow
@@ -892,12 +1007,19 @@ msexploitstring = '''
    windows/license/calicserv_getconfig                            2005-03-02       normal     Computer Associates License Server GETCONFIG Overflow
    windows/license/flexnet_lmgrd_bof                              2012-03-23       normal     FlexNet License Server Manager lmgrd Buffer Overflow
    windows/license/sentinel_lm7_udp                               2005-03-07       average    SentinelLM UDP Buffer Overflow
+   windows/local/adobe_sandbox_adobecollabsync                    2013-05-14       great      AdobeCollabSync Buffer Overflow Adobe Reader X Sandbox Bypass
    windows/local/always_install_elevated                          2010-03-18       average    Windows AlwaysInstallElevated MSI
    windows/local/ask                                              2012-01-03       excellent  Windows Escalate UAC Execute RunAs
    windows/local/bypassuac                                        2010-12-31       excellent  Windows Escalate UAC Protection Bypass
    windows/local/current_user_psexec                              1999-01-01       excellent  PsExec via Current User Token
    windows/local/ms10_092_schelevator                             2010-09-13       excellent  Windows Escalate Task Scheduler XML Privilege Escalation
    windows/local/ms11_080_afdjoinleaf                             2011-11-30       average    MS11-080 AfdJoinLeaf Privilege Escalation
+   windows/local/novell_client_nicm                               2013-05-22       average    Novell Client 2 SP3 nicm.sys Local Privilege Escalation
+   windows/local/novell_client_nwfs                               2008-06-26       average    Novell Client 4.91 SP4 nwfs.sys Local Privilege Escalation
+   windows/local/payload_inject                                   2011-10-12       excellent  Windows Manage Memory Payload Injection
+   windows/local/persistence                                      2011-10-19       excellent  Windows Manage Persistent Payload Installer
+   windows/local/ppr_flatten_rec                                  2013-05-15       average    Windows EPATHOBJ::pprFlattenRec Local Privilege Escalation
+   windows/local/s4u_persistence                                  2013-01-02       excellent  Windows Manage User Level Persistent Payload Installer
    windows/local/service_permissions                              2012-10-15       great      Windows Escalate Service Permissions Local Privilege Escalation
    windows/local/trusted_service_path                             2001-10-25       excellent  Windows Service Trusted Path Privilege Escalation
    windows/lotus/domino_http_accept_language                      2008-05-20       average    IBM Lotus Domino Web Server Accept-Language Stack Buffer Overflow
@@ -908,6 +1030,7 @@ msexploitstring = '''
    windows/lpd/niprint                                            2003-11-05       good       NIPrint LPD Request Overflow
    windows/lpd/saplpd                                             2008-02-04       good       SAP SAPLPD 6.28 Buffer Overflow
    windows/lpd/wincomlpd_admin                                    2008-02-04       good       WinComLPD <= 3.0.2 Buffer Overflow
+   windows/misc/actfax_raw_server_bof                             2013-02-05       normal     ActFax 5.01 RAW Server Buffer Overflow
    windows/misc/agentxpp_receive_agentx                           2010-04-16       good       AgentX++ Master AgentX::receive_agentx Stack Buffer Overflow
    windows/misc/allmediaserver_bof                                2012-07-04       normal     ALLMediaServer 0.8 Buffer Overflow
    windows/misc/apple_quicktime_rtsp_response                     2007-11-23       normal     Apple QuickTime 7.3 RTSP Response Header Buffer Overflow
@@ -918,6 +1041,8 @@ msexploitstring = '''
    windows/misc/bcaaa_bof                                         2011-04-04       good       Blue Coat Authentication and Authorization Agent (BCAAA) 5 Buffer Overflow
    windows/misc/bigant_server                                     2008-04-15       average    BigAnt Server 2.2 Buffer Overflow
    windows/misc/bigant_server_250                                 2008-04-15       great      BigAnt Server 2.50 SP1 Buffer Overflow
+   windows/misc/bigant_server_dupf_upload                         2013-01-09       excellent  BigAnt Server DUPF Command Arbitrary File Upload
+   windows/misc/bigant_server_sch_dupf_bof                        2013-01-09       normal     BigAnt Server 2 SCH And DUPF Buffer Overflow
    windows/misc/bigant_server_usv                                 2009-12-29       great      BigAnt Server 2.52 USV Buffer Overflow
    windows/misc/bomberclone_overflow                              2006-02-16       average    Bomberclone 0.11.6 Buffer Overflow
    windows/misc/bopup_comm                                        2009-06-18       good       Bopup Communications Server Buffer Overflow
@@ -931,11 +1056,14 @@ msexploitstring = '''
    windows/misc/doubletake                                        2008-06-04       average    DoubleTake/HP StorageWorks Storage Mirroring Service Authentication Overflow
    windows/misc/eiqnetworks_esa                                   2006-07-24       average    eIQNetworks ESA License Manager LICMGR_ADDLICENSE Overflow
    windows/misc/eiqnetworks_esa_topology                          2006-07-25       average    eIQNetworks ESA Topology DELETEDEVICE Overflow
+   windows/misc/enterasys_netsight_syslog_bof                     2011-12-19       normal     Enterasys NetSight nssyslogd.exe Buffer Overflow
    windows/misc/eureka_mail_err                                   2009-10-22       normal     Eureka Email 2.2q ERR Remote Buffer Overflow
+   windows/misc/fb_cnct_group                                     2013-01-31       normal     Firebird Relational Database CNCT Group Number Buffer Overflow
    windows/misc/fb_isc_attach_database                            2007-10-03       average    Firebird Relational Database isc_attach_database() Buffer Overflow
    windows/misc/fb_isc_create_database                            2007-10-03       average    Firebird Relational Database isc_create_database() Buffer Overflow
    windows/misc/fb_svc_attach                                     2007-10-03       average    Firebird Relational Database SVC_attach() Buffer Overflow
    windows/misc/gimp_script_fu                                    2012-05-18       normal     GIMP script-fu Server Buffer Overflow
+   windows/misc/hp_dataprotector_dtbclslogin                      2010-09-09       normal     HP Data Protector DtbClsLogin Buffer Overflow
    windows/misc/hp_dataprotector_new_folder                       2012-03-12       normal     HP Data Protector Create New Folder Buffer Overflow
    windows/misc/hp_imc_uam                                        2012-08-29       normal     HP Intelligent Management Center UAM Buffer Overflow
    windows/misc/hp_magentservice                                  2012-01-12       average    HP Diagnostics Server magentservice.exe Overflow
@@ -949,10 +1077,13 @@ msexploitstring = '''
    windows/misc/ib_isc_attach_database                            2007-10-03       good       Borland InterBase isc_attach_database() Buffer Overflow
    windows/misc/ib_isc_create_database                            2007-10-03       good       Borland InterBase isc_create_database() Buffer Overflow
    windows/misc/ib_svc_attach                                     2007-10-03       good       Borland InterBase SVC_attach() Buffer Overflow
+   windows/misc/ibm_cognos_tm1admsd_bof                           2012-04-02       normal     IBM Cognos tm1admsd.exe Overflow
+   windows/misc/ibm_director_cim_dllinject                        2009-03-10       excellent  IBM System Director Agent DLL Injection
    windows/misc/ibm_tsm_cad_ping                                  2009-11-04       good       IBM Tivoli Storage Manager Express CAD Service Buffer Overflow
    windows/misc/ibm_tsm_rca_dicugetidentify                       2009-11-04       great      IBM Tivoli Storage Manager Express RCA Service Buffer Overflow
    windows/misc/itunes_extm3u_bof                                 2012-06-21       normal     Apple iTunes 10 Extended M3U Stack Buffer Overflow
    windows/misc/landesk_aolnsrvr                                  2007-04-13       average    LANDesk Management Suite 8.7 Alert Service Buffer Overflow
+   windows/misc/lianja_db_net                                     2013-05-22       normal     Lianja SQL 1.0.0RC5.1 db_netserver Stack Buffer Overflow
    windows/misc/mercury_phonebook                                 2005-12-19       average    Mercury/32 <= v4.01b PH Server Module Buffer Overflow
    windows/misc/mini_stream                                       2009-12-25       normal     Mini-Stream 3.0.1.1 Buffer Overflow
    windows/misc/mirc_privmsg_server                               2008-10-02       normal     mIRC <= 6.34 PRIVMSG Handling Stack Buffer Overflow
@@ -984,6 +1115,7 @@ msexploitstring = '''
    windows/mssql/ms02_056_hello                                   2002-08-05       good       Microsoft SQL Server Hello Overflow
    windows/mssql/ms09_004_sp_replwritetovarbin                    2008-12-09       good       Microsoft SQL Server sp_replwritetovarbin Memory Corruption
    windows/mssql/ms09_004_sp_replwritetovarbin_sqli               2008-12-09       excellent  Microsoft SQL Server sp_replwritetovarbin Memory Corruption via SQL Injection
+   windows/mssql/mssql_linkcrawler                                2000-01-01       great      Microsoft SQL Server Database Link Crawling Command Execution
    windows/mssql/mssql_payload                                    2000-05-30       excellent  Microsoft SQL Server Payload Execution
    windows/mssql/mssql_payload_sqli                               2000-05-30       excellent  Microsoft SQL Server Payload Execution via SQL Injection
    windows/mysql/mysql_mof                                        2012-12-01       excellent  Oracle MySQL for Microsoft Windows MOF Execution
@@ -1014,6 +1146,7 @@ msexploitstring = '''
    windows/proxy/proxypro_http_get                                2004-02-23       great      Proxy-Pro Professional GateKeeper 4.7 GET Request Overflow
    windows/proxy/qbik_wingate_wwwproxy                            2006-06-07       good       Qbik WinGate WWW Proxy Server URL Processing Overflow
    windows/scada/citect_scada_odbc                                2008-06-11       normal     CitectSCADA/CitectFacilities ODBC Buffer Overflow
+   windows/scada/codesys_gateway_server_traversal                 2013-02-02       excellent  SCADA 3S CoDeSys Gateway Server Directory Traversal
    windows/scada/codesys_web_server                               2011-12-02       normal     SCADA 3S CoDeSys CmpWebServer <= v3.4 SP4 Patch 2 Stack Buffer Overflow
    windows/scada/daq_factory_bof                                  2011-09-13       good       DaqFactory HMI NETB Request Overflow
    windows/scada/factorylink_csservice                            2011-03-25       normal     Siemens FactoryLink 8 CSService Logging Path Param Buffer Overflow
@@ -1030,6 +1163,7 @@ msexploitstring = '''
    windows/scada/realwin_on_fc_binfile_a                          2011-03-21       great      DATAC RealWin SCADA Server 2 On_FC_CONNECT_FCS_a_FILE Buffer Overflow
    windows/scada/realwin_on_fcs_login                             2011-03-21       great      RealWin SCADA Server DATAC Login Buffer Overflow
    windows/scada/realwin_scpc_initialize                          2010-10-15       great      DATAC RealWin SCADA Server SCPC_INITIALIZE Buffer Overflow
+   windows/scada/realwin_scpc_initialize_rf                       2010-10-15       great      DATAC RealWin SCADA Server SCPC_INITIALIZE_RF Buffer Overflow
    windows/scada/realwin_scpc_txtevent                            2010-11-18       great      DATAC RealWin SCADA Server SCPC_TXTEVENT Buffer Overflow
    windows/scada/scadapro_cmdexe                                  2011-09-16       excellent  Measuresoft ScadaPro <= 4.0.0 Remote Command Execution
    windows/scada/sunway_force_control_netdbsrv                    2011-09-22       great      Sunway Forcecontrol SNMP NetDBServer.exe Opcode 0x57
@@ -1055,6 +1189,7 @@ msexploitstring = '''
    windows/smb/ms10_061_spoolss                                   2010-09-14       excellent  Microsoft Print Spooler Service Impersonation Vulnerability
    windows/smb/netidentity_xtierrpcpipe                           2009-04-06       great      Novell NetIdentity Agent XTIERRPCPIPE Named Pipe Buffer Overflow
    windows/smb/psexec                                             1999-01-01       manual     Microsoft Windows Authenticated User Code Execution
+   windows/smb/psexec_psh                                         1999-01-01       manual     Microsoft Windows Authenticated Powershell Command Execution
    windows/smb/smb_relay                                          2001-03-31       excellent  Microsoft Windows SMB Relay Code Execution
    windows/smb/timbuktu_plughntcommand_bof                        2009-06-25       great      Timbuktu <= 8.6.6 PlughNTCommand Named Pipe Buffer Overflow
    windows/smtp/mailcarrier_smtp_ehlo                             2004-10-26       good       TABS MailCarrier v2.51 SMTP EHLO Overflow
@@ -1064,6 +1199,7 @@ msexploitstring = '''
    windows/smtp/wmailserver                                       2005-07-11       average    SoftiaCom WMailserver 1.0 Buffer Overflow
    windows/smtp/ypops_overflow1                                   2004-09-27       average    YPOPS 0.6 Buffer Overflow
    windows/ssh/freeftpd_key_exchange                              2006-05-12       average    FreeFTPd 1.0.10 Key Exchange Algorithm String Buffer Overflow
+   windows/ssh/freesshd_authbypass                                2010-08-11       excellent  Freesshd Authentication Bypass
    windows/ssh/freesshd_key_exchange                              2006-05-12       average    FreeSSHd 1.0.9 Key Exchange Algorithm String Buffer Overflow
    windows/ssh/putty_msg_debug                                    2002-12-16       normal     PuTTy.exe <= v0.53 Buffer Overflow
    windows/ssh/securecrt_ssh1                                     2002-07-23       average    SecureCRT <= 4.0 Beta 2 SSH1 Buffer Overflow
