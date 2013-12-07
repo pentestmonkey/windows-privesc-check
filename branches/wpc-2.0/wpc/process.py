@@ -8,6 +8,7 @@ import win32process
 import win32security
 import wpc.utils
 import ctypes
+import win32job
 
 class THREADENTRY32(ctypes.Structure):
     _fields_ = [
@@ -183,6 +184,14 @@ class process:
                 self.exe = File(self.get_exe_path_clean())
         return self.exe
 
+    def is_in_job(self):
+        try:
+            if win32job.IsProcessInJob(self.get_ph(), 0):
+                return 1
+        except:
+            pass
+        return 0
+    
     def get_ph(self):
         if not self.ph:
             try:
@@ -252,6 +261,7 @@ class process:
             t += "WTS Sid:        None\n"
         t += "Access Token Count: %s\n" % len(self.get_token_handles_int())
         t += "Access Token Handles: %s\n" % ",".join(str(x) for x in self.get_token_handles_int())
+        t += "In Job?:        %s\n" % self.is_in_job()
         t += "Thread Count:   %s\n" % self.get_thread_count()
         t += "Thread IDs:     %s\n" % ",".join(str(x) for x in self.get_thread_ids())
         if self.get_ph():
