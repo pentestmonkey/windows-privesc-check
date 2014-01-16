@@ -128,6 +128,7 @@ class service:
             binary_dirty = re2.sub(os.getenv('SystemRoot') + r'\\system32\\', binary_dirty)
             re2 = re.compile(r'^\\\?\?\\', re.IGNORECASE)
             binary_dirty = re2.sub('', binary_dirty)
+            binary_dirty = binary_dirty.replace("/", "\\")  # c:/foo/bar -> c:\foo\bar
 
             if os.path.exists(binary_dirty):
                 self.exe_path_clean = binary_dirty
