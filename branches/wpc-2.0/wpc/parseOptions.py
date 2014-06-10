@@ -2,7 +2,7 @@ import wpc.utils
 from optparse import OptionParser
 from optparse import OptionGroup
 import sys
-
+ 
 def parseOptions():
     wpc.utils.print_banner()
     usage = "%s (--dump [ dump opts] |--audit) [examine opts] [host opts] -o report-file-stem" % (sys.argv[0])
