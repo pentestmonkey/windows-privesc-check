@@ -91,7 +91,10 @@ def dump_program_files(report):
 
 def dump_services(opts):
     for s in services().get_services():
-        print s.as_text()
+        if s:
+            print s.as_text()
+        else:
+            print "[W] Failed to get info about a service.  Skipping."
 
 
 def dump_drivers(opts):
@@ -1262,71 +1265,122 @@ printline("Starting Audit")
 # Dump raw data if required
 if options.dump_mode:
     section("dump_misc_checks")
-    dump_misc_checks(issues)
+    try:
+        dump_misc_checks(issues)
+    except:
+        pass
 
     if options.do_all or options.do_paths:
         section("dump_paths")
-        dump_paths(issues)
+        try:
+            dump_paths(issues)
+        except:
+            pass
 
     if options.do_allfiles:
         section("dump_all_files")
-        dump_all_files(issues)
+        try:
+            dump_all_files(issues)
+        except:
+            pass
 
     if options.do_all or options.do_eventlogs:
         section("dump_eventlogs")
-        dump_eventlogs(issues)
+        try:
+            dump_eventlogs(issues)
+        except:
+            pass
 
     if options.do_all or options.do_shares:
         section("dump_shares")
-        dump_shares(issues)
+        try:
+            dump_shares(issues)
+        except:
+            pass
 
     if options.do_all or options.patchfile:
         section("dump_patches")
-        dump_patches(issues)
+        try:
+            dump_patches(issues)
+        except:
+            pass
 
     if options.do_all or options.do_loggedin:
         section("dump_loggedin")
-        dump_loggedin(issues)
+        try:
+            dump_loggedin(issues)
+        except:
+            pass
 
     if options.do_all or options.do_services:
         section("dump_services")
-        dump_services(issues)
+        try:
+            dump_services(issues)
+        except:
+            pass
 
     if options.do_all or options.do_drivers:
         section("dump_drivers")
-        dump_drivers(issues)
+        try:
+            dump_drivers(issues)
+        except:
+            pass
 
     if options.do_all or options.do_drives:
         section("dump_drives")
-        dump_drives(issues)
+        try:
+            dump_drives(issues)
+        except:
+            pass
 
     if options.do_all or options.do_processes:
         section("dump_processes")
-        dump_processes(issues)
+        try:
+            dump_processes(issues)
+        except:
+            pass
 
     if options.do_all or options.do_program_files:
         section("dump_program_files")
-        dump_program_files(issues)
+        try:
+            dump_program_files(issues)
+        except:
+            pass
 
     if options.do_all or options.do_registry:
         section("dump_registry")
-        dump_registry(issues)
+        try:
+            dump_registry(issues)
+        except:
+            pass
 
     if options.do_all or options.do_reg_keys:
         section("dump_reg_keys")
-        dump_reg_keys(issues)
+        try:
+            dump_reg_keys(issues)
+        except:
+            pass
 
     if options.do_all or options.do_users:
         section("dump_users")
-        dump_users(issues, options.get_privs)
+        try:
+            dump_users(issues, options.get_privs)
+        except:
+            pass
 
     if options.do_all or options.do_groups:
         section("dump_groups")
-        dump_groups(issues, options.get_privs)
+        try:
+            dump_groups(issues, options.get_privs)
+        except:
+            pass
 
     if options.do_all or options.get_modals:
         section("dump_user_modals")
-        dump_user_modals(issues)
+        try:
+            dump_user_modals(issues)
+        except:
+            pass
 
 # Identify security issues
 if options.audit_mode:
