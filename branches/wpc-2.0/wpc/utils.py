@@ -63,7 +63,7 @@ def print_banner():
 
 
 def get_version():
-    wpc.conf.version = "2.0"
+    wpc.conf.version = "2.0" 
     svnversion = "$Revision$"  # Don't change this line.  Auto-updated.
     svnnum = re.sub('[^0-9]', '', svnversion)
     if svnnum:
