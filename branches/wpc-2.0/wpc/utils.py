@@ -19,7 +19,7 @@ import string
 k32 = ctypes.windll.kernel32
 wow64 = ctypes.c_long(0)
 on64bitwindows = 1
-
+ 
 
 # There some strange stuff that we need to do in order
 # We hide it all in here

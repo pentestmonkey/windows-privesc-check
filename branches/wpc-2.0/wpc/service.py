@@ -111,6 +111,7 @@ class service:
         if not self.exe_path_clean:
             self.exe_path_clean = None
             binary_dirty = self.get_exe_path()
+            binary_dirty = str.replace(str(binary_dirty), "/", "\\")
 
             # remove quotes and leading white space
             m = re.search('^[\s]*?"([^"]+)"', binary_dirty)
