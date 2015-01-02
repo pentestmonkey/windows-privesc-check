@@ -630,6 +630,8 @@ def audit_services(report):
             report.get_by_id("WPC065").add_supporting_data('sectool_services', [s])
         elif s.get_description() in ("PsExec", "Abel", "fgexec"):
             report.get_by_id("WPC065").add_supporting_data('sectool_services', [s])
+        if not s.get_sd().get_dacl():
+                report.get_by_id("WPC122").add_supporting_data('service', [s])
 
         # TODO check for the presence of files - but not from here 
         #
