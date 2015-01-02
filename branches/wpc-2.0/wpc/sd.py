@@ -157,6 +157,8 @@ class sd(acelist):
             s += "Group:    " + self.get_group().get_fq_name() + "\n"
         else:
             s += "Group:   [none] \n"
+        if not self.get_dacl():
+            s += "No DACL set!\n"
         for a in self.get_aces():
             if flag:
                 if not a.get_principal().is_trusted():
@@ -165,3 +167,4 @@ class sd(acelist):
                 s += a.as_text() + "\n"            
         s += "--- end security descriptor ---\n"
         return s
+
