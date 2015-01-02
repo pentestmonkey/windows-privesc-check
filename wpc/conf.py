@@ -3320,6 +3320,17 @@ NB: This issue has only been reported for NTFS filesystems.  Other non-NTFS file
           },
        }
     },
+    'WPC121': {
+       'title': "Process Has No DACL Set",
+       'description': '''Some processes did not have a DACL set.  Any user is therefore able to set a DACL and grant themselves full access.  This could lead to privilege escalation.''',
+       'recommendation': '''Set a strong DACL on the affected processes.''',
+       'supporting_data': {
+          'process': {
+             'section': "description",
+             'preamble': "The following processes are affected:",
+          },
+       }
+    },
 }
 
 

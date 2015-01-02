@@ -449,6 +449,8 @@ def audit_processes(report):
         #print "[D] Dangerous process perms"
         # TODO check the dangerous perms aren't held by the process owner
         if p.get_sd():
+            if not p.get_sd().get_dacl():
+                    report.get_by_id("WPC121").add_supporting_data('process', [p])
             perms = p.get_sd().get_acelist().get_untrusted().get_dangerous_perms().get_aces()
             for perm in perms:
                 if p.get_token() and perm.get_principal().get_fq_name() != p.get_token().get_token_user().get_fq_name() and perm.get_principal().get_fq_name() != 'NT AUTHORITY\RESTRICTED':

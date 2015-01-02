@@ -277,6 +277,15 @@ class issue:
                     exe = "[unknown]"
                 etree.SubElement(d, 'data').text = " Process ID %s (%s) uses DLL %s.  DLL has weak permissions.  TODO: Weak how?\n" % (p.get_pid(), p.get_exe().get_name(), dll.get_name())
 
+        elif data_name == 'process':
+            for data in self.get_supporting_data(data_name):
+                p = data[0]
+                if p.get_exe():
+                    exe = p.get_exe().get_name()
+                else:
+                    exe = "[unknown]"
+                etree.SubElement(d, 'data').text = " Process ID %s (%s) running as %s\n" % (p.get_pid(), p.get_exe().get_name(), p.get_token().get_token_user().get_fq_name())
+
         elif data_name == 'process_perms':
             for data in self.get_supporting_data(data_name):
                 p = data[0]
