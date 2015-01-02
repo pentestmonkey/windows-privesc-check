@@ -3331,6 +3331,17 @@ NB: This issue has only been reported for NTFS filesystems.  Other non-NTFS file
           },
        }
     },
+    'WPC122': {
+       'title': "Windows Service Has No DACL Set",
+       'description': '''Some services did not have a DACL set.  Any user is therefore able to set a DACL and grant themselves full access.  This could lead to privilege escalation.''',
+       'recommendation': '''Set a strong DACL on the affected services.''',
+       'supporting_data': {
+          'service': {
+             'section': "description",
+             'preamble': "The following services are affected:",
+          },
+       }
+    },
 }
 
 
