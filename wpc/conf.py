@@ -3342,6 +3342,28 @@ NB: This issue has only been reported for NTFS filesystems.  Other non-NTFS file
           },
        }
     },
+    'WPC123': {
+       'title': "Windows Service Registry Key Has No DACL Set",
+       'description': '''Some service registry keys did not have a DACL set.  Any user is therefore able to set a DACL and grant themselves full access.  This could lead to privilege escalation.''',
+       'recommendation': '''Set a strong DACL on the affected registry keys.''',
+       'supporting_data': {
+          'service_regkey': {
+             'section': "description",
+             'preamble': "The following services are affected:",
+          },
+       }
+    },
+    'WPC124': {
+       'title': "Windows Service Executable Has No DACL Set",
+       'description': '''Some service executables did not have a DACL set.  Any user is therefore able to set a DACL and grant themselves full access.  This could lead to privilege escalation.''',
+       'recommendation': '''Set a strong DACL on the affected service executables.''',
+       'supporting_data': {
+          'service_exe_no_dacl': {
+             'section': "description",
+             'preamble': "The following services are affected:",
+          },
+       }
+    },
 }
 
 

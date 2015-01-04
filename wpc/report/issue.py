@@ -159,6 +159,16 @@ class issue:
                 etree.SubElement(d, 'data').text = "Registry value %s has permissions:\n" % (r.get_name())        
                 etree.SubElement(d, 'data').text = "  %s\n" % (a.as_text())
 
+        elif data_name == 'service_regkey':
+            for data in self.get_supporting_data(data_name):
+                s = data[0]
+                etree.SubElement(d, 'data').text = "Service %s (%s) runs as %s.  Its registry key has no DACL: %s\n" % (s.get_description(), s.get_name(), s.get_run_as(), s.get_reg_key().get_name())        
+
+        elif data_name == 'service_exe_no_dacl':
+            for data in self.get_supporting_data(data_name):
+                s = data[0]
+                etree.SubElement(d, 'data').text = "Service %s (%s) runs as %s.  Its executable has no DACL: %s\n" % (s.get_description(), s.get_name(), s.get_run_as(), s.get_exe_file().get_name())        
+
         elif data_name == 'service_info':
             for data in self.get_supporting_data(data_name):
                 s = data[0]
