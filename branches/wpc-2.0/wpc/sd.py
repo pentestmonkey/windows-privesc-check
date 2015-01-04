@@ -56,6 +56,18 @@ class sd(acelist):
 
     def dump(self):
         print self.as_text()
+    
+    def has_no_dacl(self):
+		if self.get_dacl():
+			return 0
+		else:
+			return 1
+
+    def has_dacl(self):
+		if self.get_dacl():
+			return 1
+		else:
+			return 0
 
     def perms_for(self, principal):
         # TODO use all_perms above

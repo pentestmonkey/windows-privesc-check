@@ -50,6 +50,11 @@ class issue:
                 value_data = data[2]
                 etree.SubElement(d, 'data').text = "Reg key: %s\%s, Value: %s" % (r.get_name(), value_name, value_data)
 
+        elif data_name == 'object_name_and_type':
+            for data in self.get_supporting_data(data_name):
+                o = data[0]
+                etree.SubElement(d, 'data').text = "%s (%s)" % (o.get_name(), o.get_type())
+
         elif data_name == 'exploit_list':
             for data in self.get_supporting_data(data_name):
                 e = data[0]
@@ -84,6 +89,12 @@ class issue:
                 f = data[1]
                 etree.SubElement(d, 'data').text = " %s (%s) runs the following program as %s:\n" % (s.get_description(), s.get_name(), s.get_run_as())
                 etree.SubElement(d, 'data').text = "  %s\n" % (f.as_text())
+
+        elif data_name == 'object_perms' or data_name == 'object_perms_symboliclink' or data_name == 'object_perms_directory' or data_name == 'object_perms_device' or data_name == 'object_perms_mutant' or data_name == 'object_perms_callback' or data_name == 'object_perms_keyedEvent' or data_name == 'object_perms_event' or data_name == 'object_perms_job' or data_name == 'object_perms_regkey' or data_name == 'object_perms_section' or data_name == 'object_perms_waitableport' or data_name == 'object_perms_windowstation':
+            for data in self.get_supporting_data(data_name):
+                o = data[0]
+                a = data[1]
+                etree.SubElement(d, 'data').text = " %s (%s) has the following weak permissions: %s:\n" % (o.get_name(), o.get_type(), a.as_text())
 
         elif data_name == 'service_exe_owner':
             for data in self.get_supporting_data(data_name):

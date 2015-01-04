@@ -26,6 +26,7 @@ def parseOptions():
     examine.add_option("-S", "--services",  dest = "do_services",      default = False, action = "store_true", help = "Windows Services")
     examine.add_option("-k", "--drivers",   dest = "do_drivers",       default = False, action = "store_true", help = "Kernel Drivers")
     examine.add_option("-R", "--processes", dest = "do_processes",     default = False, action = "store_true", help = "Processes")
+    examine.add_option("-O", "--ntobjects", dest = "do_nt_objects",    default = False, action = "store_true", help = "NT Objects")
     examine.add_option("-P", "--progfiles", dest = "do_program_files", default = False, action = "store_true", help = "Program Files Directory Tree")
     examine.add_option("-r", "--registry",  dest = "do_registry",      default = False, action = "store_true", help = "Registry Settings + Permissions")
     examine.add_option("-j", "--tasks",     dest = "do_scheduled_tasks", default = False, action = "store_true", help = "Scheduled Tasks")
@@ -66,8 +67,8 @@ def parseOptions():
 
     # TODO can't use -m without -G
 
-    if not (options.do_all or options.do_services or options.do_drivers or options.do_processes or options.patchfile or options.do_reg_keys or options.do_registry or options.do_users or options.do_groups or options.do_program_files or options.do_paths or options.do_drives or options.do_eventlogs or options.do_shares or options.do_loggedin or options.do_users or options.do_groups or options.do_allfiles or options.get_modals or options.do_scheduled_tasks):
-        print "[E] Specify something to look at.  At least one of: -a, -j, -t, -D, -E, -e, -H, -T, -L , -S, -k, -I, -U, -s, -d, -P, -r, -R, -U, -G, -M.  -h for help."
+    if not (options.do_all or options.do_services or options.do_drivers or options.do_processes or options.patchfile or options.do_reg_keys or options.do_registry or options.do_users or options.do_groups or options.do_program_files or options.do_paths or options.do_drives or options.do_eventlogs or options.do_shares or options.do_loggedin or options.do_users or options.do_groups or options.do_allfiles or options.get_modals or options.do_scheduled_tasks or options.do_nt_objects):
+        print "[E] Specify something to look at.  At least one of: -a, -j, -O, -t, -D, -E, -e, -H, -T, -L , -S, -k, -I, -U, -s, -d, -P, -r, -R, -U, -G, -M.  -h for help."
         sys.exit()
 
     return options

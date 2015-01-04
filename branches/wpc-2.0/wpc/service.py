@@ -264,9 +264,15 @@ class service:
     def as_text(self):
         return self._as_text(0)
 
+    def as_tab_delim(self):
+        return self._as_tab_delim(0)
+
     def untrusted_as_text(self):
         return self._as_text(1)
 
+    def _as_tab_delim(self, flag):
+        return "%s\t%s\t%s\t%s" % (wpc.conf.remote_server, self.get_name(), self.get_run_as(), self.get_exe_path())
+        
     def _as_text(self, flag):
         t = ""
         t += "---------------------------------------\n"
