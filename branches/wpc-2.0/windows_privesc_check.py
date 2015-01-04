@@ -630,9 +630,6 @@ def audit_services(report):
             report.get_by_id("WPC065").add_supporting_data('sectool_services', [s])
         elif s.get_description() in ("PsExec", "Abel", "fgexec"):
             report.get_by_id("WPC065").add_supporting_data('sectool_services', [s])
-        if not s.get_sd().get_dacl():
-                report.get_by_id("WPC122").add_supporting_data('service', [s])
-
         # TODO check for the presence of files - but not from here 
         #
         # Check if pentest/audit tools have accidentally been left running
@@ -657,6 +654,10 @@ def audit_services(report):
         #
         if s.get_reg_key() and s.get_reg_key().get_sd():
 
+            # Check DACL set
+            if not s.get_reg_key().get_sd().get_dacl():
+                    report.get_by_id("WPC123").add_supporting_data('service_regkey', [s])
+                    
             # Check owner
             if not s.get_reg_key().get_sd().get_owner().is_trusted():
                 report.get_by_id("WPC035").add_supporting_data('service_exe_regkey_untrusted_ownership', [s, s.get_reg_key()])
@@ -733,6 +734,10 @@ def audit_services(report):
         #
         if s.get_exe_file() and s.get_exe_file().get_sd():
 
+            # Check DACL set
+            if not s.get_exe_file().get_sd().get_dacl():
+                    report.get_by_id("WPC124").add_supporting_data('service_exe_no_dacl', [s])
+                    
             # Examine parent directories
             parent = s.get_exe_file().get_parent_dir()
             while parent and parent.get_sd():
@@ -799,6 +804,10 @@ def audit_services(report):
         # Examine security descriptor for service
         #
         if s.get_sd():
+
+            # Check DACL is set
+            if not s.get_sd().get_dacl():
+                report.get_by_id("WPC122").add_supporting_data('service', [s])
 
             # TODO all mine are owned by SYSTEM.  Maybe this issue can never occur!?
             if not s.get_sd().get_owner().is_trusted():
