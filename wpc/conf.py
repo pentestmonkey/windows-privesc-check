@@ -11,6 +11,21 @@ version = None
 cache = None
 on64bitwindows = None
 max_password_age = 365 * 24 * 60 * 60
+win32con.TIMER_MODIFY_STATE = 0x0002
+win32con.TIMER_QUERY_STATE = 0x0001
+ntsecuritycon.JOB_OBJECT_ASSIGN_PROCESS = 0x0001
+ntsecuritycon.JOB_OBJECT_QUERY = 0x0004
+ntsecuritycon.JOB_OBJECT_SET_ATTRIBUTES = 0x0002
+ntsecuritycon.JOB_OBJECT_SET_SECURITY_ATTRIBUTES = 0x0010
+ntsecuritycon.JOB_OBJECT_TERMINATE = 0x0008
+win32con.SECTION_MAP_EXECUTE_EXPLICIT = 0x0020
+ntsecuritycon.DIRECTORY_QUERY = 0x0001
+ntsecuritycon.DIRECTORY_TRAVERSE = 0x0002
+ntsecuritycon.DIRECTORY_CREATE_OBJECT = 0x0004
+ntsecuritycon.DIRECTORY_CREATE_SUBDIRECTORY = 0x0008
+ntsecuritycon.SYMBOLIC_LINK_QUERY = 0x001
+ntsecuritycon.KEYEDEVENT_WAIT = 0x0001
+ntsecuritycon.KEYEDEVENT_WAKE = 0x0002
 
 screensaver_max_timeout_secs = 600
 
@@ -1478,6 +1493,141 @@ dangerous_perms_write = {
             #"SYNCHRONIZE",
         )
     },
+     # Synchronization Objects: Event, Mutex, Semaphore, Waitable Timer http://msdn.microsoft.com/en-us/library/windows/desktop/ms686670(v=vs.85).aspx
+    'event': {
+        win32con: (
+            "DELETE",
+            #"READ_CONTROL",
+            #"SYNCHRONIZE",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            "EVENT_MODIFY_STATE",
+        )
+    },
+    'keyedevent': {
+        ntsecuritycon: (
+            "DELETE",
+            #"READ_CONTROL",
+            #"SYNCHRONIZE",
+            "WRITE_DAC",
+            "KEYEDEVENT_WAIT",
+            "KEYEDEVENT_WAKE",
+        )
+    },
+    'mutant': {
+        win32con: (
+            "DELETE",
+            #"READ_CONTROL",
+            #"SYNCHRONIZE",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            "MUTANT_QUERY_STATE",
+        )
+    },
+    'semaphore': {
+        win32con: (
+            "DELETE",
+            #"READ_CONTROL",
+            #"SYNCHRONIZE",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            "SEMAPHORE_MODIFY_STATE",
+        )
+    },
+    'timer': {
+        win32con: (
+            "DELETE",
+            #"READ_CONTROL",
+            #"SYNCHRONIZE",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            "TIMER_MODIFY_STATE",
+            "TIMER_QUERY_STATE",
+        )
+    },
+    'job': { # http://msdn.microsoft.com/en-us/library/windows/desktop/ms684164(v=vs.85).aspx
+        ntsecuritycon: (
+            "DELETE",
+            #"READ_CONTROL",
+            #"SYNCHRONIZE",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            "JOB_OBJECT_ASSIGN_PROCESS",
+            #"JOB_OBJECT_QUERY",
+            "JOB_OBJECT_SET_ATTRIBUTES",
+            "JOB_OBJECT_SET_SECURITY_ATTRIBUTES",
+            "JOB_OBJECT_TERMINATE",
+        )
+    },
+    'winstation': { # http://msdn.microsoft.com/en-us/library/windows/desktop/ms687391(v=vs.85).aspx
+        win32con: (
+            "DELETE",
+            #"READ_CONTROL",
+            #"SYNCHRONIZE",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            "WINSTA_ALL_ACCESS",
+            "WINSTA_ACCESSCLIPBOARD",
+            "WINSTA_ACCESSGLOBALATOMS",
+            "WINSTA_CREATEDESKTOP",
+            "WINSTA_ENUMDESKTOPS",
+            "WINSTA_ENUMERATE",
+            "WINSTA_EXITWINDOWS",
+            "WINSTA_READATTRIBUTES",
+            "WINSTA_READSCREEN",
+            "WINSTA_WRITEATTRIBUTES",
+        )
+    },
+    'desktop': { # http://msdn.microsoft.com/en-us/library/windows/desktop/ms682575(v=vs.85).aspx
+        win32con: (
+            "DELETE",
+            #"READ_CONTROL",
+            #"SYNCHRONIZE",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            "DESKTOP_CREATEMENU",
+            "DESKTOP_CREATEWINDOW",
+            "DESKTOP_ENUMERATE",
+            "DESKTOP_HOOKCONTROL",
+            "DESKTOP_JOURNALPLAYBACK",
+            "DESKTOP_JOURNALRECORD",
+            "DESKTOP_READOBJECTS",
+            "DESKTOP_SWITCHDESKTOP",
+            "DESKTOP_WRITEOBJECTS",
+        )
+    },
+    'section': { # aka file mapping http://msdn.microsoft.com/en-us/library/windows/desktop/aa366559(v=vs.85).aspx
+        win32con: (
+            "DELETE",
+            #"READ_CONTROL",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            #"SECTION_QUERY",
+            "SECTION_MAP_WRITE",
+            #"SECTION_MAP_READ",
+            #"SECTION_MAP_EXECUTE",
+            "SECTION_EXTEND_SIZE",
+            #"SECTION_MAP_EXECUTE_EXPLICIT",
+        )
+    },
+    'ntobj': { # just guessing kernel object perms are similar to those for directories
+        ntsecuritycon: (
+            #"FILE_LIST_DIRECTORY",
+            "FILE_ADD_FILE",
+            "FILE_ADD_SUBDIRECTORY",
+            #"FILE_READ_EA",
+            "FILE_WRITE_EA",
+            #"FILE_TRAVERSE",
+            "FILE_DELETE_CHILD",
+            #"FILE_READ_ATTRIBUTES",
+            "FILE_WRITE_ATTRIBUTES",
+            "DELETE",
+            #"READ_CONTROL",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            #"SYNCHRONIZE",
+        )
+    },
     # http://msdn.microsoft.com/en-us/library/ms724878(VS.85).aspx
     # KEY_ALL_ACCESS: STANDARD_RIGHTS_REQUIRED KEY_QUERY_VALUE KEY_SET_VALUE KEY_CREATE_SUB_KEY KEY_ENUMERATE_SUB_KEYS KEY_NOTIFY KEY_CREATE_LINK
     # KEY_CREATE_LINK (0x0020) Reserved for system use.
@@ -1526,6 +1676,34 @@ dangerous_perms_write = {
             #"STANDARD_RIGHTS_READ",
         )
     },
+    'device': { # just guessing
+        ntsecuritycon: (
+            #"FILE_READ_DATA",
+            "FILE_WRITE_DATA",
+            "FILE_APPEND_DATA",
+            #"FILE_READ_EA",
+            "FILE_WRITE_EA",
+            #"FILE_TRAVERSE",
+            #"FILE_EXECUTE",
+            #"FILE_READ_ATTRIBUTES",
+            "FILE_WRITE_ATTRIBUTES",
+            "DELETE",
+            #"READ_CONTROL",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            #"SYNCHRONIZE",
+        )
+    },
+    'symboliclink': { # just guessing
+        ntsecuritycon: (
+            #"SYMBOLIC_LINK_QUERY",
+            "DELETE",
+            #"READ_CONTROL",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            #"SYNCHRONIZE",
+        )
+    },
     'directory': {
         ntsecuritycon: (
             #"FILE_LIST_DIRECTORY",
@@ -1537,6 +1715,20 @@ dangerous_perms_write = {
             "FILE_DELETE_CHILD",
             #"FILE_READ_ATTRIBUTES",
             "FILE_WRITE_ATTRIBUTES",
+            "DELETE",
+            #"READ_CONTROL",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            #"SYNCHRONIZE",
+        )
+    },
+    'directory_object': {
+        ntsecuritycon: (
+            #"DIRECTORY_QUERY",
+            #"DIRECTORY_TRAVERSE",
+            "DIRECTORY_CREATE_OBJECT",
+            "DIRECTORY_CREATE_SUBDIRECTORY",
+            #"DIRECTORY_ALL_ACCESS",
             "DELETE",
             #"READ_CONTROL",
             "WRITE_DAC",
@@ -1723,6 +1915,170 @@ all_perms = {
             "SYNCHRONIZE",
         )
     },
+     # Synchronization Objects: Event, Mutex, Semaphore, Waitable Timer http://msdn.microsoft.com/en-us/library/windows/desktop/ms686670(v=vs.85).aspx
+    'event': {
+        win32con: (
+            "DELETE",
+            "READ_CONTROL",
+            "SYNCHRONIZE",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            "EVENT_MODIFY_STATE",
+        )
+    },
+    'keyedevent': { # TODO can't read SD for this yet
+        ntsecuritycon: (
+            "DELETE",
+            "READ_CONTROL",
+            "SYNCHRONIZE",
+            "WRITE_DAC",
+            "KEYEDEVENT_WAIT",
+            "KEYEDEVENT_WAKE",
+        )
+    },
+    'mutant': {
+        win32con: (
+            "DELETE",
+            "READ_CONTROL",
+            "SYNCHRONIZE",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            "MUTANT_QUERY_STATE",
+        )
+    },
+    'semaphore': {
+        win32con: (
+            "DELETE",
+            "READ_CONTROL",
+            "SYNCHRONIZE",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            "SEMAPHORE_MODIFY_STATE",
+        )
+    },
+    'timer': {
+        win32con: (
+            "DELETE",
+            "READ_CONTROL",
+            "SYNCHRONIZE",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            "TIMER_MODIFY_STATE",
+            "TIMER_QUERY_STATE",
+        )
+    },
+    'job': { # http://msdn.microsoft.com/en-us/library/windows/desktop/ms684164(v=vs.85).aspx
+        ntsecuritycon: (
+            "DELETE",
+            "READ_CONTROL",
+            "SYNCHRONIZE",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            "JOB_OBJECT_ASSIGN_PROCESS",
+            "JOB_OBJECT_QUERY",
+            "JOB_OBJECT_SET_ATTRIBUTES",
+            "JOB_OBJECT_SET_SECURITY_ATTRIBUTES",
+            "JOB_OBJECT_TERMINATE",
+        )
+    },
+    'winstation': { # http://msdn.microsoft.com/en-us/library/windows/desktop/ms687391(v=vs.85).aspx
+        win32con: (
+            "DELETE",
+            "READ_CONTROL",
+            "SYNCHRONIZE",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            "WINSTA_ALL_ACCESS",
+            "WINSTA_ACCESSCLIPBOARD",
+            "WINSTA_ACCESSGLOBALATOMS",
+            "WINSTA_CREATEDESKTOP",
+            "WINSTA_ENUMDESKTOPS",
+            "WINSTA_ENUMERATE",
+            "WINSTA_EXITWINDOWS",
+            "WINSTA_READATTRIBUTES",
+            "WINSTA_READSCREEN",
+            "WINSTA_WRITEATTRIBUTES",
+        )
+    },
+    'desktop': { # http://msdn.microsoft.com/en-us/library/windows/desktop/ms682575(v=vs.85).aspx
+        win32con: (
+            "DELETE",
+            "READ_CONTROL",
+            "SYNCHRONIZE",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            "DESKTOP_CREATEMENU",
+            "DESKTOP_CREATEWINDOW",
+            "DESKTOP_ENUMERATE",
+            "DESKTOP_HOOKCONTROL",
+            "DESKTOP_JOURNALPLAYBACK",
+            "DESKTOP_JOURNALRECORD",
+            "DESKTOP_READOBJECTS",
+            "DESKTOP_SWITCHDESKTOP",
+            "DESKTOP_WRITEOBJECTS",
+        )
+    },
+    'section': { # aka file mapping http://msdn.microsoft.com/en-us/library/windows/desktop/aa366559(v=vs.85).aspx
+        win32con: (
+            "DELETE",
+            "READ_CONTROL",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            "SECTION_QUERY",
+            "SECTION_MAP_WRITE",
+            "SECTION_MAP_READ",
+            "SECTION_MAP_EXECUTE",
+            "SECTION_EXTEND_SIZE",
+            "SECTION_MAP_EXECUTE_EXPLICIT",
+        )
+    },
+    # named pipe http://msdn.microsoft.com/en-us/library/windows/desktop/aa365600(v=vs.85).aspx - TODO just generic rights?
+    'ntobj': { # just guessing kernel object perms are similar to those for directories
+        ntsecuritycon: (
+            "FILE_LIST_DIRECTORY",
+            "FILE_ADD_FILE",
+            "FILE_ADD_SUBDIRECTORY",
+            "FILE_READ_EA",
+            "FILE_WRITE_EA",
+            "FILE_TRAVERSE",
+            "FILE_DELETE_CHILD",
+            "FILE_READ_ATTRIBUTES",
+            "FILE_WRITE_ATTRIBUTES",
+            "DELETE",
+            "READ_CONTROL",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            "SYNCHRONIZE",
+        )
+    },
+    'device': { # just guessing
+        ntsecuritycon: (
+            "FILE_READ_DATA",
+            "FILE_WRITE_DATA",
+            "FILE_APPEND_DATA",
+            "FILE_READ_EA",
+            "FILE_WRITE_EA",
+            "FILE_TRAVERSE",
+            "FILE_EXECUTE",
+            "FILE_READ_ATTRIBUTES",
+            "FILE_WRITE_ATTRIBUTES",
+            "DELETE",
+            "READ_CONTROL",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            "SYNCHRONIZE",
+        )
+    },
+    'symboliclink': { # just guessing
+        ntsecuritycon: (
+            "SYMBOLIC_LINK_QUERY",
+            "DELETE",
+            "READ_CONTROL",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            "SYNCHRONIZE",
+        )
+    },
     'regkey': {
         _winreg: (
             #"KEY_ALL_ACCESS",
@@ -1760,6 +2116,20 @@ all_perms = {
             "FILE_DELETE_CHILD",
             "FILE_READ_ATTRIBUTES",
             "FILE_WRITE_ATTRIBUTES",
+            "DELETE",
+            "READ_CONTROL",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            "SYNCHRONIZE",
+        )
+    },
+    'directory_object': {
+        ntsecuritycon: (
+            "DIRECTORY_QUERY",
+            "DIRECTORY_TRAVERSE",
+            "DIRECTORY_CREATE_OBJECT",
+            "DIRECTORY_CREATE_SUBDIRECTORY",
+            #"DIRECTORY_ALL_ACCESS",
             "DELETE",
             "READ_CONTROL",
             "WRITE_DAC",
@@ -3321,6 +3691,171 @@ NB: This issue has only been reported for NTFS filesystems.  Other non-NTFS file
        }
     },
     'WPC121': {
+       'title': "Securable Object Found With No DACL",
+       'description': '''Some securable objects were found with no DACL.  This allows any user to take full control over the object.  Depending on the type of object this might lead to denial of service or more serious consequences such as privilege escalation.''',
+       'recommendation': '''Set an appopriate DACL on all affected objects.''',
+       'supporting_data': {
+          'object_name_and_type': {
+             'section': "description",
+             'preamble': "The following objects are affected:",
+          },
+       }
+    },
+    'WPC122': {
+       'title': "Securable Object (symboliclink) Found With Weak Permissions",
+       'description': '''Some securable objects were found to allow write access to non-admin users.  TODO: impact?''',
+       'recommendation': '''Set strong permissions on all affected objects.''',
+       'supporting_data': {
+          'object_perms': {
+             'section': "description",
+             'preamble': "The following symboliclink objects are affected:",
+          },
+       }
+    },
+    'WPC123': {
+       'title': "Securable Object (regkey) Found With Weak Permissions",
+       'description': '''Some securable objects were found to allow write access to non-admin users.  TODO: impact?''',
+       'recommendation': '''Set strong permissions on all affected objects.''',
+       'supporting_data': {
+          'object_perms': {
+             'section': "description",
+             'preamble': "The following regkey objects are affected:",
+          },
+       }
+    },
+    'WPC124': {
+       'title': "Securable Object (section) Found With Weak Permissions",
+       'description': '''Some securable objects were found to allow write access to non-admin users.  TODO: impact?''',
+       'recommendation': '''Set strong permissions on all affected objects.''',
+       'supporting_data': {
+          'object_perms': {
+             'section': "description",
+             'preamble': "The following section objects are affected:",
+          },
+       }
+    },
+    'WPC125': {
+       'title': "Securable Object (waitableport) Found With Weak Permissions",
+       'description': '''Some securable objects were found to allow write access to non-admin users.  TODO: impact?''',
+       'recommendation': '''Set strong permissions on all affected objects.''',
+       'supporting_data': {
+          'object_perms': {
+             'section': "description",
+             'preamble': "The following waitableport objects are affected:",
+          },
+       }
+    },
+    'WPC126': {
+       'title': "Securable Object (windowstation) Found With Weak Permissions",
+       'description': '''Some securable objects were found to allow write access to non-admin users.  TODO: impact?''',
+       'recommendation': '''Set strong permissions on all affected objects.''',
+       'supporting_data': {
+          'object_perms': {
+             'section': "description",
+             'preamble': "The following windowstation objects are affected:",
+          },
+       }
+    },
+    'WPC127': {
+       'title': "Securable Object (desktop) Found With Weak Permissions",
+       'description': '''Some securable objects were found to allow write access to non-admin users.  TODO: impact?''',
+       'recommendation': '''Set strong permissions on all affected objects.''',
+       'supporting_data': {
+          'object_perms': {
+             'section': "description",
+             'preamble': "The following desktop objects are affected:",
+          },
+       }
+    },
+    'WPC128': {
+       'title': "Securable Object (job) Found With Weak Permissions",
+       'description': '''Some securable objects were found to allow write access to non-admin users.  TODO: impact?''',
+       'recommendation': '''Set strong permissions on all affected objects.''',
+       'supporting_data': {
+          'object_perms': {
+             'section': "description",
+             'preamble': "The following job objects are affected:",
+          },
+       }
+    },
+    'WPC129': {
+       'title': "Securable Object (mutant) Found With Weak Permissions",
+       'description': '''Some securable objects were found to allow write access to non-admin users.  TODO: impact?''',
+       'recommendation': '''Set strong permissions on all affected objects.''',
+       'supporting_data': {
+          'object_perms': {
+             'section': "description",
+             'preamble': "The following mutant objects are affected:",
+          },
+       }
+    },
+    'WPC130': {
+       'title': "Securable Object (callback) Found With Weak Permissions",
+       'description': '''Some securable objects were found to allow write access to non-admin users.  TODO: impact?''',
+       'recommendation': '''Set strong permissions on all affected objects.''',
+       'supporting_data': {
+          'object_perms': {
+             'section': "description",
+             'preamble': "The following callback objects are affected:",
+          },
+       }
+    },
+    'WPC131': {
+       'title': "Securable Object (keyedEvent) Found With Weak Permissions",
+       'description': '''Some securable objects were found to allow write access to non-admin users.  TODO: impact?''',
+       'recommendation': '''Set strong permissions on all affected objects.''',
+       'supporting_data': {
+          'object_perms': {
+             'section': "description",
+             'preamble': "The following keyedEvent objects are affected:",
+          },
+       }
+    },
+    'WPC132': {
+       'title': "Securable Object (event) Found With Weak Permissions",
+       'description': '''Some securable objects were found to allow write access to non-admin users.  TODO: impact?''',
+       'recommendation': '''Set strong permissions on all affected objects.''',
+       'supporting_data': {
+          'object_perms': {
+             'section': "description",
+             'preamble': "The following event objects are affected:",
+          },
+       }
+    },
+    'WPC133': {
+       'title': "Securable Object (device) Found With Weak Permissions",
+       'description': '''Some securable objects were found to allow write access to non-admin users.  This situation is normal.  While write access to these devices forms part of the attack surfce, allowing write access is not a vulnerability in itself.''',
+       'recommendation': '''Investigate if write access to the affected devices constitutes a vulnerability.''',
+       'supporting_data': {
+          'object_perms': {
+             'section': "description",
+             'preamble': "The following device objects are affected:",
+          },
+       }
+    },
+    'WPC134': {
+       'title': "Securable Object (directory) Found With Weak Permissions",
+       'description': '''Some securable objects were found to allow write access to non-admin users.  TODO: impact?''',
+       'recommendation': '''Set strong permissions on all affected objects.''',
+       'supporting_data': {
+          'object_perms': {
+             'section': "description",
+             'preamble': "The following directory objects are affected:",
+          },
+       }
+    },
+    'WPC135': {
+       'title': "Securable Object (semaphore) Found With Weak Permissions",
+       'description': '''Some securable objects were found to allow write access to non-admin users.  TODO: impact?''',
+       'recommendation': '''Set strong permissions on all affected objects.''',
+       'supporting_data': {
+          'object_perms': {
+             'section': "description",
+             'preamble': "The following semaphore objects are affected:",
+          },
+       }
+    },
+    'WPC136': {
        'title': "Process Has No DACL Set",
        'description': '''Some processes did not have a DACL set.  Any user is therefore able to set a DACL and grant themselves full access.  This could lead to privilege escalation.''',
        'recommendation': '''Set a strong DACL on the affected processes.''',
@@ -3331,7 +3866,7 @@ NB: This issue has only been reported for NTFS filesystems.  Other non-NTFS file
           },
        }
     },
-    'WPC122': {
+    'WPC137': {
        'title': "Windows Service Has No DACL Set",
        'description': '''Some services did not have a DACL set.  Any user is therefore able to set a DACL and grant themselves full access.  This could lead to privilege escalation.''',
        'recommendation': '''Set a strong DACL on the affected services.''',
@@ -3342,7 +3877,7 @@ NB: This issue has only been reported for NTFS filesystems.  Other non-NTFS file
           },
        }
     },
-    'WPC123': {
+    'WPC138': {
        'title': "Windows Service Registry Key Has No DACL Set",
        'description': '''Some service registry keys did not have a DACL set.  Any user is therefore able to set a DACL and grant themselves full access.  This could lead to privilege escalation.''',
        'recommendation': '''Set a strong DACL on the affected registry keys.''',
@@ -3353,7 +3888,7 @@ NB: This issue has only been reported for NTFS filesystems.  Other non-NTFS file
           },
        }
     },
-    'WPC124': {
+    'WPC139': {
        'title': "Windows Service Executable Has No DACL Set",
        'description': '''Some service executables did not have a DACL set.  Any user is therefore able to set a DACL and grant themselves full access.  This could lead to privilege escalation.''',
        'recommendation': '''Set a strong DACL on the affected service executables.''',
