@@ -14,6 +14,7 @@ from wpc.utils import k32, wow64
 from wpc.patchdata import patchdata
 from wpc.mspatchdb import mspatchdb
 from wpc.exploit import exploit as exploit2
+from wpc.ntobj import ntobj
 import pywintypes
 import win32net
 import subprocess
@@ -343,6 +344,127 @@ def audit_reg_keys(report):
     if v is None or v == 0:
         report.get_by_id("WPC107").add_supporting_data('reg_key_value', [r, "CWDIllegalInDllSearch", v])
 
+def audit_nt_objects(report):
+    root = ntobj("\\")
+    issue_for = {
+        'symboliclink': 'WPC122',
+        'regkey': 'WPC123',
+        'section': 'WPC124',
+        'waitableport': 'WPC125',
+        'windowstation': 'WPC126',
+        'desktop': 'WPC127',
+        'job': 'WPC128',
+        'mutant': 'WPC129',
+        'callback': 'WPC130',
+        'keyedevent': 'WPC131',
+        'event': 'WPC132',
+        'device': 'WPC133',
+        'directory': 'WPC134',
+        'semaphore': 'WPC135',
+    }
+    print issue_for.keys()
+    for child in root.get_all_child_objects():
+        print child.as_text()
+        # if child.type_is_implemented() and child.get_sd():
+        if child.get_sd():
+            if child.get_sd().has_no_dacl():
+                report.get_by_id("WPC121").add_supporting_data('object_name_and_type', [child])
+
+            for a in child.get_sd().get_acelist().get_untrusted().get_dangerous_perms().get_aces():
+                lc_type = child.get_type().lower()
+                if lc_type in issue_for.keys():
+                    report.get_by_id(issue_for[lc_type]).add_supporting_data('object_perms', [child, a])
+                else:
+                    print "[W] No issue exists for object type: %s" % lc_type
+
+def dump_nt_objects(report):
+    
+    #
+    # Windows stations and Desktops - TODO make is more OO: objects for windowstations and desktops.
+    #
+    
+    import win32con
+    import win32service
+    import pywintypes
+    import win32security
+    from wpc.sd import sd
+    import win32process
+    win32con.WINSTA_ALL_ACCESS = 0x0000037f
+
+    import win32ts
+    print
+    print "[-] Sessions"
+    print
+    for session in win32ts.WTSEnumerateSessions(win32ts.WTS_CURRENT_SERVER_HANDLE, 1, 0):
+        print "SessionId: %s" % session['SessionId']
+        print "\tWinStationName: %s" % session['WinStationName']
+        print "\tState: %s" % session['State']
+        print
+
+    session = win32ts.ProcessIdToSessionId(win32process.GetCurrentProcessId())
+    print
+    print "[-] Winstations in session %s" % session
+    print
+    for w in win32service.EnumWindowStations():
+        print "winstation: %s" % w
+    print
+
+    for w in win32service.EnumWindowStations():
+        print
+        print "[-] Session %s, Winstation '%s'" % (session, w)
+        print
+
+        # Get SD
+        try:
+            h = 0
+            h = win32service.OpenWindowStation(w, False, win32con.READ_CONTROL)
+            s = win32security.GetKernelObjectSecurity(h, win32security.OWNER_SECURITY_INFORMATION | win32security.GROUP_SECURITY_INFORMATION | win32security.DACL_SECURITY_INFORMATION)
+            s = sd('winstation', s)
+            print s.as_text()
+        except pywintypes.error,details:
+            print "[E] Can't get READ_CONTROL winstation handle: %s" % details
+
+        # Get Desktops
+        try:
+            h = 0
+            h = win32service.OpenWindowStation(w, False, win32con.WINSTA_ENUMDESKTOPS)
+            print "[-] Session %s, Winstation '%s' has these desktops:" % (session, w)
+            for d in h.EnumDesktops():
+                print "\t%s" % d
+            print
+        except pywintypes.error,details:
+            print "[E] Can't get WINSTA_ENUMDESKTOPS winstation handle: %s" % details
+        if h:
+            h.SetProcessWindowStation()
+            for d in h.EnumDesktops():
+                print "[-] Session %s, Winstation '%s', Desktop '%s'" % (session, w, d)
+                try:
+                    hd = win32service.OpenDesktop(d, 0, False, win32con.READ_CONTROL)
+                    s = win32security.GetKernelObjectSecurity(hd, win32security.OWNER_SECURITY_INFORMATION | win32security.GROUP_SECURITY_INFORMATION | win32security.DACL_SECURITY_INFORMATION)
+                    s = sd('desktop', s)
+                    print s.as_text()
+                except pywintypes.error,details:
+                    print "[E] Can't get READ_CONTROL desktop handle: %s" % details
+        print
+
+    #
+    # Objects
+    #
+    print
+    print "[-] Objects"
+    print
+    root = ntobj("\\")
+    for child in root.get_all_child_objects():
+        print child.as_text()
+        if (child.get_type() == "Semaphore" or child.get_type() == "Event" or child.get_type() == "Mutant" or child.get_type() == "Timer" or child.get_type() == "Section"  or child.get_type() == "Device" or child.get_type() == "SymbolicLink" or child.get_type() == "Key" or child.get_type() == "Directory") and child.get_sd():
+                print child.get_sd().as_text()
+        else:
+            print "Skipping unknown object type: %s" % child.get_type()
+            print
+
+# Type - can't open
+# Device - can open, has sd
+# SymbolicLink - can open, has sd
 
 def audit_patches(report):
     patchfile = options.patchfile
@@ -450,7 +572,7 @@ def audit_processes(report):
         # TODO check the dangerous perms aren't held by the process owner
         if p.get_sd():
             if not p.get_sd().get_dacl():
-                    report.get_by_id("WPC121").add_supporting_data('process', [p])
+                    report.get_by_id("WPC136").add_supporting_data('process', [p])
             perms = p.get_sd().get_acelist().get_untrusted().get_dangerous_perms().get_aces()
             for perm in perms:
                 if p.get_token() and perm.get_principal().get_fq_name() != p.get_token().get_token_user().get_fq_name() and perm.get_principal().get_fq_name() != 'NT AUTHORITY\RESTRICTED':
@@ -656,7 +778,7 @@ def audit_services(report):
 
             # Check DACL set
             if not s.get_reg_key().get_sd().get_dacl():
-                    report.get_by_id("WPC123").add_supporting_data('service_regkey', [s])
+                    report.get_by_id("WPC138").add_supporting_data('service_regkey', [s])
                     
             # Check owner
             if not s.get_reg_key().get_sd().get_owner().is_trusted():
@@ -736,7 +858,7 @@ def audit_services(report):
 
             # Check DACL set
             if not s.get_exe_file().get_sd().get_dacl():
-                    report.get_by_id("WPC124").add_supporting_data('service_exe_no_dacl', [s])
+                    report.get_by_id("WPC139").add_supporting_data('service_exe_no_dacl', [s])
                     
             # Examine parent directories
             parent = s.get_exe_file().get_parent_dir()
@@ -807,7 +929,7 @@ def audit_services(report):
 
             # Check DACL is set
             if not s.get_sd().get_dacl():
-                report.get_by_id("WPC122").add_supporting_data('service', [s])
+                report.get_by_id("WPC137").add_supporting_data('service', [s])
 
             # TODO all mine are owned by SYSTEM.  Maybe this issue can never occur!?
             if not s.get_sd().get_owner().is_trusted():
@@ -1373,6 +1495,12 @@ if options.dump_mode:
             dump_reg_keys(issues)
         except:
             pass
+    if options.do_all or options.do_nt_objects:
+        section("dump_nt_objects")
+        try:
+	        dump_nt_objects(issues)
+        except:
+            pass
 
     if options.do_all or options.do_users:
         section("dump_users")
@@ -1501,7 +1629,12 @@ if options.audit_mode:
         except:
             pass
 
-
+    if options.do_all or options.do_nt_objects:
+        section("audit_nt_objects")
+        try:
+	        audit_nt_objects(issues)
+        except:
+            pass
 
     if options.do_all or options.do_groups:
         section("audit_groups")
