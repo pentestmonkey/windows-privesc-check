@@ -16,6 +16,20 @@ class issue:
     def get_id(self):
         return self.id
 
+    def get_severity(self):
+        #print "get_severity returning %s" % wpc.conf.issue_template[self.get_id()]['severity']
+        return wpc.conf.issue_template[self.get_id()]['severity']
+    
+    def get_confidence(self):
+        #print "get_confidence returning %s" % wpc.conf.issue_template[self.get_id()]['confidence']
+        return wpc.conf.issue_template[self.get_id()]['confidence']
+    
+    def get_ease(self):
+        return wpc.conf.issue_template[self.get_id()]['ease']
+    
+    def get_impact(self):
+        return wpc.conf.issue_template[self.get_id()]['impact']
+    
     def render_supporting_data(self, data_name):
         # TODO: Also stash raw data in the report object.  XSLTs could then present differently.
         # expect an array of issue.fileAcl type for now
@@ -370,6 +384,36 @@ class issue:
     def as_xml(self):
         r = etree.Element('issue')
         etree.SubElement(r, 'title').text = wpc.conf.issue_template[self.get_id()]['title']
+        
+        impact_number = None
+        impact_text = "Not defined"
+        confidence_number = None
+        confidence_text = "Not defined"
+        ease_number = None
+        ease_text = "Not defined"
+        severity = 0
+        
+        if wpc.conf.issue_template[self.get_id()]['impact']:
+            impact_number = wpc.conf.issue_template[self.get_id()]['impact']
+            impact_text = wpc.conf.rating_mappings['impact'][impact_number]
+        if wpc.conf.issue_template[self.get_id()]['confidence']:
+            confidence_number = wpc.conf.issue_template[self.get_id()]['confidence']
+            confidence_text = wpc.conf.rating_mappings['confidence'][confidence_number]
+        if wpc.conf.issue_template[self.get_id()]['ease']:
+            ease_number = wpc.conf.issue_template[self.get_id()]['ease']
+            ease_text = wpc.conf.rating_mappings['ease'][ease_number]
+        if wpc.conf.issue_template[self.get_id()]['severity']:
+            severity = wpc.conf.issue_template[self.get_id()]['severity']
+            
+        etree.SubElement(r, 'impact_number').text = str(impact_number)
+        etree.SubElement(r, 'impact_text').text = impact_text
+        etree.SubElement(r, 'confidence_number').text = str(confidence_number)
+        etree.SubElement(r, 'confidence_text').text = confidence_text
+        etree.SubElement(r, 'ease_number').text = str(ease_number)
+        etree.SubElement(r, 'ease_text').text = ease_text
+        etree.SubElement(r, 'severity').text = str(severity)
+        etree.SubElement(r, 'id').text = self.get_id()
+        
         s = etree.SubElement(r, 'section', type = 'description')
         etree.SubElement(s, 'body').text = wpc.conf.issue_template[self.get_id()]['description']
         s.append(self.get_rendered_supporting_data('description'))

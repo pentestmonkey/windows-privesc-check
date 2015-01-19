@@ -17,6 +17,7 @@ class service:
         self.sd = None  # sd for service
         self.description = None
         self.type = None
+        self.typename = None
         self.sh_read_control = None
         self.service_info = None
         self.service_config_failure_actions = None
@@ -195,6 +196,19 @@ class service:
                     self.type = "WIN32_OWN_PROCESS"
         return self.type
 
+    def get_type_name(self):
+        if not self.typename:
+                type = self.get_type()
+                if type == "KERNEL_DRIVER":
+                    self.typename = "driver"
+                elif type == "FILE_SYSTEM_DRIVER":
+                    self.typename = "driver"
+                elif type == "WIN32_SHARE_PROCESS":
+                    self.typename = "service"
+                elif type == "WIN32_OWN_PROCESS":
+                    self.typename = "service"
+        return self.typename
+        
     def get_startup_type(self):
         if not self.startup_type:
             self.startup_type = self.get_service_info(1)
@@ -329,3 +343,19 @@ class service:
 
     def removeNonAscii(self, s): 
         return "".join(i for i in s if ord(i) < 128)
+    
+    def as_tab(self):
+        lines = []
+        lines.append(wpc.utils.tab_line("info", self.get_type_name(), str(self.get_name())))
+        if self.get_sd():
+            lines.append(wpc.utils.tab_line("gotsd", self.get_type_name(), str(self.get_name()), "yes"))
+            lines.append(wpc.utils.tab_line("owner", self.get_type_name(), str(self.get_name()), str(self.get_sd().get_owner().get_fq_name())))         
+            if self.get_sd().has_dacl():
+                lines.append(wpc.utils.tab_line("hasdacl", self.get_type_name(), str(self.get_name()), "yes"))
+                lines.extend(self.get_sd().aces_as_tab("ace", self.get_type_name(), str(self.get_name())))
+            else:
+                lines.append(wpc.utils.tab_line("hasdacl", self.get_type_name(), str(self.get_name()), "no"))
+        else:
+            lines.append(wpc.utils.tab_line("gotsd", self.get_type_name(), str(self.get_name()), "no"))
+        #print lines
+        return "\n".join(lines)

@@ -399,3 +399,67 @@ class token:
 
         #print "token: as_text returning %s" % t
         return t
+
+    def get_type(self):
+        return 'token'
+    
+    def as_tab(self):
+        lines = []
+
+        info = ["info", self.get_type()]
+        if self.get_th_int():
+            info.append(int(self.get_th_int()))
+        else:
+            info.append("")
+        if self.get_token_owner():
+            info.append(self.get_token_owner().get_fq_name())
+        else:
+            info.append("")
+        if self.get_token_user():
+            info.append(self.get_token_user().get_fq_name())
+        else:
+            info.append("")
+        if self.get_token_primary_group():
+            info.append(self.get_token_primary_group().get_fq_name())
+        else:
+            info.append("")
+        info.append(self.get_token_type())
+        info.append(self.get_token_origin())
+        info.append(self.get_token_source())
+        info.append(self.get_token_restrictions())
+        info.append(self.get_token_elevation_type())
+        info.append(self.get_token_ui_access())
+        info.append(self.get_token_linked_token())
+        info.append(self.get_token_logon_sid())
+        info.append(self.get_token_elevation())
+        if self.get_token_integrity_level():
+            info.append(self.get_token_integrity_level().get_fq_name())
+        else:
+            info.append("")
+        info.append(self.get_token_mandatory_policy())
+        info.append(self.get_token_restricted())
+
+        t =""
+        if self.get_token_linked_token():
+            t += token(self.get_token_linked_token()).as_text_no_rec()
+        info.append(t)
+
+        lines.append(wpc.utils.tab_line(*info))
+        for sid in self.get_token_restricted_sids():
+            lines.append(wpc.utils.tab_line("info", "token_restricted_sid", self.get_th_int(), sid.get_fq_name()))
+        for g, attr_a in self.get_token_groups():
+            lines.append(wpc.utils.tab_line("info", "token_group", self.get_th_int(), g.get_fq_name(), "|".join(attr_a)))
+        for p, a in self.get_token_privileges():
+            lines.append(wpc.utils.tab_line("info", "token_privs", self.get_th_int(), p, "|".join(a)))
+        if self.get_sd():
+            lines.append(wpc.utils.tab_line("gotsd", self.get_type(), str(self.get_th_int()), "yes"))
+            lines.append(wpc.utils.tab_line("owner", self.get_type(), str(self.get_th_int()), str(self.get_sd().get_owner().get_fq_name())))         
+            if self.get_sd().has_dacl():
+                lines.append(wpc.utils.tab_line("hasdacl", self.get_type(), str(self.get_th_int()), "yes"))
+                lines.extend(self.get_sd().aces_as_tab("ace", self.get_type(), str(self.get_th_int())))
+            else:
+                lines.append(wpc.utils.tab_line("hasdacl", self.get_type(), str(self.get_th_int()), "no"))
+        else:
+            lines.append(wpc.utils.tab_line("gotsd", self.get_type(), str(self.get_th_int()), "no"))
+        #print lines
+        return "\n".join(lines)

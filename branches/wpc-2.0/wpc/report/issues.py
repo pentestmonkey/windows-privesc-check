@@ -1,6 +1,7 @@
 from wpc.report.issue import issue
 import xml.etree.cElementTree as etree
 from lxml import etree as letree
+from operator import itemgetter, attrgetter, methodcaller
 
 
 # TODO should this class contain info about the scan?  or define a new class called report?
@@ -30,7 +31,8 @@ class issues:
         self.get_by_id(identifier).add_supporting_data(k, v)
 
     def get_all(self):
-        return self.issues
+        s = sorted(self.issues, key=methodcaller('get_confidence'), reverse=True)
+        return sorted(s, key=methodcaller('get_severity'), reverse=True)
 
     def as_xml_string(self):
         return etree.tostring(self.as_xml())
