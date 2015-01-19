@@ -81,9 +81,38 @@ class report():
     <html>
         <style type="text/css">
             body {color:black}
-            td
-            {
-            vertical-align:top;
+            td {
+                vertical-align:top;
+            }
+            #ratinginfo {
+                border-collapse:collapse;
+            }
+            #ratinginfo td {
+                border: 1px solid black;
+            }
+            #ratinginfo td.rating0 {
+                color:#000000;
+                background-color:#FFFFFF;
+            }
+            #ratinginfo td.rating1 {
+                color:#000000;
+                background-color:#FFFFBF;
+            }
+            #ratinginfo td.rating2 {
+                color:#000000;
+                background-color:#FFFF00;
+            }
+            #ratinginfo td.rating3 {
+                color:#000000;
+                background-color:#FF7F00;
+            }
+            #ratinginfo td.rating4 {
+                color:#000000;
+                background-color:#FF3F00;
+            }
+            #ratinginfo td.rating5 {
+                color:#000000;
+                background-color:#FF0000;
             }
             h1 {font-size: 300%; text-align:center}
             h2 {font-size: 200%; margin-top: 25px; margin-bottom: 0px; padding: 5px; background-color: #CCCCCC;}
@@ -91,20 +120,19 @@ class report():
             #frontpage {height: 270px; background-color: #F3F3F3;}
             p.ex {color:rgb(0,0,255)}
 
-            #customers
-            {
-            font-family:"Trebuchet MS", Arial, Helvetica, sans-serif;
-            /* width:100%; */
-            padding:10px 0px 0px 0px;
-            border-collapse:collapse;
+            #auditinfo {            
+                font-family:"Trebuchet MS", Arial, Helvetica, sans-serif;
+                /* width:100%; */
+                padding:10px 0px 0px 0px;
+                border-collapse:collapse;
             }
-            #customers td, #customers th 
+            #auditinfo td, #auditinfo th 
             {
             font-size:1em;
             border:1px solid #989898;
             padding:3px 7px 2px 7px;
             }
-            #customers th 
+            #auditinfo th 
             {
             font-size:1.1em;
             text-align:left;
@@ -113,7 +141,7 @@ class report():
             background-color:#A7C942;
             color:#ffffff;
             }
-            #customers tr.alt td 
+            #auditinfo tr.alt td 
             {
             color:#000000;
             background-color:#EAF2D3;
@@ -128,15 +156,29 @@ class report():
         
         <body>
             <h2>Contents</h2>    
+            <p></p>
+                <table id="ratinginfo">
+                    <tr>
+                        <td><b>Impact</b></td>
+                        <td><b>Ease of exploitation</b></td>
+                        <td><b>Confidence</b></td>
+                        <td><b>Title</b></td>
+                    </tr>
             <xsl:for-each select="issues/issue">
-                <p><xsl:text disable-output-escaping="yes">&lt;a href=&quot;#</xsl:text><xsl:value-of select="normalize-space(title)"/><xsl:text disable-output-escaping="yes">&quot;&gt;</xsl:text><xsl:value-of select="normalize-space(title)"/><xsl:text disable-output-escaping="yes">&lt;/a&gt;</xsl:text></p>
+                    <tr>
+                        <xsl:text disable-output-escaping="yes">&lt;td class=&quot;rating</xsl:text><xsl:value-of select="normalize-space(impact_number)"/><xsl:text disable-output-escaping="yes">&quot;&gt;</xsl:text><xsl:value-of select="normalize-space(impact_text)"/><xsl:text disable-output-escaping="yes">&lt;/td&gt;</xsl:text>
+                        <xsl:text disable-output-escaping="yes">&lt;td class=&quot;rating</xsl:text><xsl:value-of select="normalize-space(ease_number)"/><xsl:text disable-output-escaping="yes">&quot;&gt;</xsl:text><xsl:value-of select="normalize-space(ease_text)"/><xsl:text disable-output-escaping="yes">&lt;/td&gt;</xsl:text>
+                        <xsl:text disable-output-escaping="yes">&lt;td class=&quot;rating</xsl:text><xsl:value-of select="normalize-space(confidence_number)"/><xsl:text disable-output-escaping="yes">&quot;&gt;</xsl:text><xsl:value-of select="normalize-space(confidence_text)"/><xsl:text disable-output-escaping="yes">&lt;/td&gt;</xsl:text>
+                        <xsl:text disable-output-escaping="yes">&lt;td&gt;</xsl:text><xsl:text disable-output-escaping="yes">&lt;a href=&quot;#</xsl:text><xsl:value-of select="normalize-space(title)"/><xsl:text disable-output-escaping="yes">&quot;&gt;</xsl:text><xsl:value-of select="normalize-space(title)"/><xsl:text disable-output-escaping="yes">&lt;/a&gt;</xsl:text><xsl:text disable-output-escaping="yes">&lt;/td&gt;</xsl:text>
+                    </tr>
             </xsl:for-each>
+                </table>
             
             <h2>Information about this Audit</h2>
             <p>This report was generated on <xsl:value-of select="scaninfo/datetime"/> by version <xsl:value-of select="scaninfo/version"/> of <a href="http://pentestmonkey.net/windows-privesc-check">windows-privesc-check</a>.</p>
             <p>The audit was run as the user <xsl:value-of select="scaninfo/user"/>.</p>
             <p>The following table provides information about this audit:</p>
-            <table id="customers" border="1">
+            <table id="auditinfo">
                 <tr>
                     <td>Hostname</td>
                     <td><xsl:value-of select="scaninfo/hostname"/></td>
@@ -167,6 +209,20 @@ class report():
             <xsl:for-each select="issues/issue">
                 <hr/>
                 <h3><xsl:text disable-output-escaping="yes">&lt;a name=&quot;</xsl:text><xsl:value-of select="normalize-space(title)"/><xsl:text disable-output-escaping="yes">&quot;&gt;</xsl:text><xsl:value-of select="normalize-space(title)"/><xsl:text disable-output-escaping="yes">&lt;/a&gt;</xsl:text></h3>
+                <table id="ratinginfo">
+                    <tr>
+                        <td>Impact</td>
+                        <xsl:text disable-output-escaping="yes">&lt;td class=&quot;rating</xsl:text><xsl:value-of select="normalize-space(impact_number)"/><xsl:text disable-output-escaping="yes">&quot;&gt;</xsl:text><xsl:value-of select="normalize-space(impact_text)"/><xsl:text disable-output-escaping="yes">&lt;/td&gt;</xsl:text>
+                    </tr>
+                    <tr>
+                        <td>Ease of exploitation</td>
+                        <xsl:text disable-output-escaping="yes">&lt;td class=&quot;rating</xsl:text><xsl:value-of select="normalize-space(ease_number)"/><xsl:text disable-output-escaping="yes">&quot;&gt;</xsl:text><xsl:value-of select="normalize-space(ease_text)"/><xsl:text disable-output-escaping="yes">&lt;/td&gt;</xsl:text>
+                    </tr>
+                    <tr>
+                        <td>Confidence</td>
+                        <xsl:text disable-output-escaping="yes">&lt;td class=&quot;rating</xsl:text><xsl:value-of select="normalize-space(confidence_number)"/><xsl:text disable-output-escaping="yes">&quot;&gt;</xsl:text><xsl:value-of select="normalize-space(confidence_text)"/><xsl:text disable-output-escaping="yes">&lt;/td&gt;</xsl:text>
+                    </tr>
+                </table>
                 <xsl:for-each select="section">
                     <table>
                         <tr>
@@ -221,7 +277,8 @@ class report():
     def as_xml(self):
         # TODO: Top level version for XML schema
         # TODO: Raw data about object reported (files, service, etc.) 
-        r = etree.Element('report')
+        r = etree.Element('report', xmlschemaversion = "1.0")
+        # etree.SubElement(r, 'xmlschemaversion').text = "1.0"
         s = etree.Element('scaninfo')
         for k in self.get_info().keys():
             i = etree.Element(k)

@@ -5,16 +5,18 @@ import sys
 
 def parseOptions():
     wpc.utils.print_banner()
-    usage = "%s (--dump [ dump opts] |--audit) [examine opts] [host opts] -o report-file-stem" % (sys.argv[0])
+    usage = "%s (--dump [ dump opts] | --dumptab | --audit) [examine opts] [host opts] -o report-file-stem" % (sys.argv[0])
 
     parser  = OptionParser(usage = usage, version = wpc.utils.get_version())
     examine = OptionGroup(parser, "examine opts", "At least one of these to indicate what to examine (*=not implemented)")
     host    = OptionGroup(parser, "host opts", "Optional details about a remote host (experimental).  Default is current host.")
     dump    = OptionGroup(parser, "dump opts", "Options to modify the behaviour of dump mode")
+    dumptab = OptionGroup(parser, "dumptab opts", "Options to modify the behaviour of dumptab mode")
     report  = OptionGroup(parser, "report opts", "Reporting options")
 
-    parser.add_option("--dump",  dest = "dump_mode", default = False, action = "store_true", help = "Dumps info for you to analyse manually")
-    parser.add_option("--audit", dest = "audit_mode", default = False, action = "store_true", help = "Identify and report security weaknesses")
+    parser.add_option("--dump",   dest = "dump_mode",   default = False, action = "store_true", help = "Dumps info for you to analyse manually")
+    parser.add_option("--dumptab",dest = "dumptab_mode",default = False, action = "store_true", help = "Dumps info in tab-delimited format")
+    parser.add_option("--audit",  dest = "audit_mode",  default = False, action = "store_true", help = "Identify and report security weaknesses")
 
     examine.add_option("-a", "--all",       dest = "do_all",           default = False, action = "store_true", help = "All Simple Checks (non-slow)")
     examine.add_option("-t", "--paths",     dest = "do_paths",         default = False, action = "store_true", help = "PATH")
@@ -30,6 +32,7 @@ def parseOptions():
     examine.add_option("-P", "--progfiles", dest = "do_program_files", default = False, action = "store_true", help = "Program Files Directory Tree")
     examine.add_option("-r", "--registry",  dest = "do_registry",      default = False, action = "store_true", help = "Registry Settings + Permissions")
     examine.add_option("-j", "--tasks",     dest = "do_scheduled_tasks", default = False, action = "store_true", help = "Scheduled Tasks")
+    examine.add_option("-I", "--installed_software", dest = "do_installed_software", default = False, action = "store_true", help = "Installed Software")
     examine.add_option("-U", "--users",     dest = "do_users",         default = False, action = "store_true", help = "Users")
     examine.add_option("-G", "--groups",    dest = "do_groups",        default = False, action = "store_true", help = "Groups")
     examine.add_option("-A", "--allfiles",  dest = "do_allfiles",      default = False, action = "store_true", help = "All Files and Directories (slow)")
@@ -51,6 +54,7 @@ def parseOptions():
     parser.add_option_group(examine)
     parser.add_option_group(host)
     parser.add_option_group(dump)
+    parser.add_option_group(dumptab)
     parser.add_option_group(report)
 
     (options, args) = parser.parse_args()
@@ -61,13 +65,13 @@ def parseOptions():
 
     # TODO check file is writable.
 
-    if not options.dump_mode and not options.audit_mode:
-        print "[E] Specify either --dump or --audit.  -h for help."
+    if not options.dump_mode and not options.audit_mode and not options.dumptab_mode:
+        print "[E] Specify --dump or --audit or --dumptab.  -h for help."
         sys.exit()
 
     # TODO can't use -m without -G
 
-    if not (options.do_all or options.do_services or options.do_drivers or options.do_processes or options.patchfile or options.do_reg_keys or options.do_registry or options.do_users or options.do_groups or options.do_program_files or options.do_paths or options.do_drives or options.do_eventlogs or options.do_shares or options.do_loggedin or options.do_users or options.do_groups or options.do_allfiles or options.get_modals or options.do_scheduled_tasks or options.do_nt_objects):
+    if not (options.do_all or options.do_services or options.do_drivers or options.do_processes or options.patchfile or options.do_reg_keys or options.do_registry or options.do_users or options.do_groups or options.do_program_files or options.do_paths or options.do_drives or options.do_eventlogs or options.do_shares or options.do_loggedin or options.do_users or options.do_groups or options.do_allfiles or options.get_modals or options.do_scheduled_tasks or options.do_nt_objects or options.do_installed_software):
         print "[E] Specify something to look at.  At least one of: -a, -j, -O, -t, -D, -E, -e, -H, -T, -L , -S, -k, -I, -U, -s, -d, -P, -r, -R, -U, -G, -M.  -h for help."
         sys.exit()
 

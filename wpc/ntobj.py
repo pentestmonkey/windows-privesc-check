@@ -717,3 +717,18 @@ class ntobj:
             print "get_name_no_path returning null for: %s" % self.get_path()
             return None
 
+    def as_tab(self):
+        lines = []
+        lines.append(wpc.utils.tab_line("info", self.get_type(), str(self.get_name())))
+        if self.get_sd():
+            lines.append(wpc.utils.tab_line("gotsd", self.get_type(), str(self.get_name()), "yes"))
+            lines.append(wpc.utils.tab_line("owner", self.get_type(), str(self.get_name()), str(self.get_sd().get_owner().get_fq_name())))         
+            if self.get_sd().has_dacl():
+                lines.append(wpc.utils.tab_line("hasdacl", self.get_type(), str(self.get_name()), "yes"))
+                lines.extend(self.get_sd().aces_as_tab("ace", self.get_type(), str(self.get_name())))
+            else:
+                lines.append(wpc.utils.tab_line("hasdacl", self.get_type(), str(self.get_name()), "no"))
+        else:
+            lines.append(wpc.utils.tab_line("gotsd", self.get_type(), str(self.get_name()), "no"))
+        #print lines
+        return "\n".join(lines)

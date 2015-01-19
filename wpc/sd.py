@@ -58,16 +58,16 @@ class sd(acelist):
         print self.as_text()
     
     def has_no_dacl(self):
-		if self.get_dacl():
-			return 0
-		else:
-			return 1
+        if self.get_dacl():
+            return 0
+        else:
+            return 1
 
     def has_dacl(self):
-		if self.get_dacl():
-			return 1
-		else:
-			return 0
+        if self.get_dacl():
+            return 1
+        else:
+            return 0
 
     def perms_for(self, principal):
         # TODO use all_perms above
@@ -156,6 +156,14 @@ class sd(acelist):
     def untrusted_as_text(self):
         return self._as_text(1)
 
+    def aces_as_tab(self, *fields):
+        field_list = list(fields)
+        lines = []
+        for a in self.get_aces():
+            for perm in a.as_list():
+                lines.append("\t".join(field_list + perm))
+        return lines
+    
     def _as_text(self, flag):
         s = "--- start %s security descriptor ---\n" % self.get_type()
         o = self.get_owner()

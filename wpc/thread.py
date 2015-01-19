@@ -32,9 +32,9 @@ class thread:
         #print "[D] get_sd passed th: %s" % self.get_th()
         if not self.sd:
             try:
-             secdesc = win32security.GetSecurityInfo(self.get_th(), win32security.SE_KERNEL_OBJECT, win32security.DACL_SECURITY_INFORMATION | win32security.OWNER_SECURITY_INFORMATION | win32security.GROUP_SECURITY_INFORMATION)
-             #print "[D] secdesc: %s" % secdesc
-             self.sd = sd('thread', secdesc)
+                secdesc = win32security.GetSecurityInfo(self.get_th(), win32security.SE_KERNEL_OBJECT, win32security.DACL_SECURITY_INFORMATION | win32security.OWNER_SECURITY_INFORMATION | win32security.GROUP_SECURITY_INFORMATION)
+                #print "[D] secdesc: %s" % secdesc
+                self.sd = sd('thread', secdesc)
             except:
                 pass
         #print "[D] get_sd returning: %s" % self.sd
@@ -118,3 +118,29 @@ class thread:
             t += "[None - thread not impersonating]\n"
 
         return t
+
+    def get_type(self):
+        return 'thread'
+    
+    def as_tab(self):
+        lines = []
+
+        th_int = ""
+        if self.get_token():
+            th_int = self.get_token().get_th_int()
+            lines.append(self.get_token().as_tab())
+
+        lines.append(wpc.utils.tab_line("info", self.get_type(), self.get_tid(), th_int))
+
+        if self.get_sd():
+            lines.append(wpc.utils.tab_line("gotsd", self.get_type(), str(self.get_tid()), "yes"))
+            lines.append(wpc.utils.tab_line("owner", self.get_type(), str(self.get_tid()), str(self.get_sd().get_owner().get_fq_name())))         
+            if self.get_sd().has_dacl():
+                lines.append(wpc.utils.tab_line("hasdacl", self.get_type(), str(self.get_tid()), "yes"))
+                lines.extend(self.get_sd().aces_as_tab("ace", self.get_type(), str(self.get_tid())))
+            else:
+                lines.append(wpc.utils.tab_line("hasdacl", self.get_type(), str(self.get_tid()), "no"))
+        else:
+            lines.append(wpc.utils.tab_line("gotsd", self.get_type(), str(self.get_tid()), "no"))
+
+        return "\n".join(lines)

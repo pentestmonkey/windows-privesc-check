@@ -30,7 +30,7 @@ class share:
                 # required to successfully execute the NetShareEnum function at levels 2, 502, and 503. No 
                 # special group membership is required for level 0 or level 1 calls.
                 shareinfo = win32net.NetShareGetInfo(wpc.conf.remote_server, self.get_name(), 502)
-                print shareinfo
+                #print shareinfo
                 self.description = shareinfo['reserved']
                 self.passwd = shareinfo['passwd']
                 self.current_uses = shareinfo['current_uses']
@@ -142,3 +142,19 @@ class share:
 
         t += '--- end share ---\n'
         return t
+    
+    def as_tab(self):
+        lines = []
+        lines.append(wpc.utils.tab_line("info", "share", str(self.get_name()), str(self.get_description()), str(self.get_path()), str(self.get_passwd()), str(self.get_current_uses()), str(self.get_max_uses())))
+        if self.get_sd():
+            lines.append(wpc.utils.tab_line("gotsd", "share", str(self.get_name()), "yes"))
+            lines.append(wpc.utils.tab_line("owner", "share", str(self.get_name()), str(self.get_sd().get_owner().get_fq_name())))         
+            if self.get_sd().has_dacl():
+                lines.append(wpc.utils.tab_line("hasdacl", "share", str(self.get_name()), "yes"))
+                lines.extend(self.get_sd().aces_as_tab("ace", "share", str(self.get_name())))
+            else:
+                lines.append(wpc.utils.tab_line("hasdacl", "share", str(self.get_name()), "no"))
+        else:
+            lines.append(wpc.utils.tab_line("gotsd", "share", str(self.get_name()), "no"))
+        #print lines
+        return "\n".join(lines)

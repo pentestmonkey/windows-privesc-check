@@ -108,6 +108,12 @@ class ace:
     def as_text(self):
         return self.get_type() + " " + self.get_principal().get_fq_name() + ": \n    " + "\n    ".join(self.get_perms())
 
+    def as_list(self):
+        perms = []
+        for perm in self.get_perms():
+            perms.append([self.get_type(), self.get_principal().get_fq_name(), perm])
+        return perms
+    
     def as_tab_delim(self, name):
         lines = []
         for perm in self.get_perms():

@@ -52,6 +52,25 @@ def init(options):
 
     # Use the crendentials supplied (OK to call if no creds were supplied)
     impersonate(options.remote_user, options.remote_pass, options.remote_domain)
+    
+    # calculate severity of issues from impact and ease
+    max_impact = 5
+    max_ease = 5
+    for i in wpc.conf.issue_template.keys():
+        impact = 0
+        ease = 0
+        #print wpc.conf.issue_template[i]
+        if wpc.conf.issue_template[i]['impact']:
+            impact = wpc.conf.issue_template[i]['impact']
+        if wpc.conf.issue_template[i]['ease']:
+            ease = wpc.conf.issue_template[i]['ease']
+        severity = 100 * impact * ease / (max_impact * max_ease)
+        #print "[D] setting severity of %s to %s" % (i, severity)
+        wpc.conf.issue_template[i]['severity'] = severity
+    
+
+def tab_line(*fields):
+    return "\t".join(map(str, fields))
 
 
 def get_banner():
@@ -518,21 +537,29 @@ def populate_scaninfo(report):
     os_name[4] = {}
     os_name[5] = {}
     os_name[6] = {}
+    os_name[10] = {}
     os_name[4][0] = {}
     os_name[5][0] = {}
     os_name[6][0] = {}
     os_name[5][1] = {}
     os_name[6][1] = {}
     os_name[6][2] = {}
+    os_name[6][3] = {}
+    os_name[6][4] = {}
+    os_name[10][0] = {}
     os_name[4][0][3] = "Windows NT"
     os_name[5][0][3] = "Windows 2003"
     os_name[6][0][3] = "Windows 2008"
     os_name[6][1][3] = "Windows 2008 R2"
     os_name[6][2][3] = "Windows 2012"
+    os_name[6][3][3] = "Windows 2012 R2"
     os_name[5][1][1] = "Windows XP"
     os_name[6][0][1] = "Windows Vista"
     os_name[6][1][1] = "Windows 7"
     os_name[6][2][1] = "Windows 8"
+    os_name[6][3][1] = "Windows 8.1"
+    os_name[6][4][1] = "Windows 10 Preview"
+    os_name[10][0][1] = "Windows 10"
 
     search_prod_type = prod_type
     if prod_type == 2: # domain controller
@@ -544,6 +571,7 @@ def populate_scaninfo(report):
 
     report.add_info_item('os', os_str)
     report.add_info_item('os_version', str(ver_list[0]) + "." + str(ver_list[1]) + "." + str(ver_list[2]) + " SP" + str(ver_list[5]))
+
 
 def get_system_path():
     key_string = 'SYSTEM\CurrentControlSet\Control\Session Manager\Environment'
@@ -566,22 +594,21 @@ def get_user_paths():
     except:
         return 0
     paths = []
+    import pywintypes
     subkeys = win32api.RegEnumKeyEx(keyh)
     for subkey in subkeys:
-        try:
-            subkeyh = win32api.RegOpenKeyEx(keyh, subkey[0] + "\\Environment" , 0, win32con.KEY_ENUMERATE_SUB_KEYS | win32con.KEY_QUERY_VALUE | win32con.KEY_READ)
-        except:
-            pass
-        else:
+            #print subkey
             try:
+                subkeyh = win32api.RegOpenKeyEx(keyh, subkey[0] + "\\Environment" , 0, win32con.KEY_ENUMERATE_SUB_KEYS | win32con.KEY_QUERY_VALUE | win32con.KEY_READ)
                 path, type = win32api.RegQueryValueEx(subkeyh, "PATH")
                 try:
                     user_sid  = win32security.ConvertStringSidToSid(subkey[0])
                 except:
-                    print "WARNING: Can't convert sid %s to name.  Skipping." % subkey[0]
+                    #print "WARNING: Can't convert sid %s to name.  Skipping." % subkey[0]
                     continue
-
-                paths.append(user(user_sid), path)
-            except:
+                #print "subkey: %s" % subkey[0]
+                paths.append([user(user_sid), path])
+            except pywintypes.error as e:
+                #print e
                 pass
     return paths

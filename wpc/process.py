@@ -52,6 +52,9 @@ class process:
         t.set_parent_process(self)
         self.threads.append(t)
 
+    def get_type(self):
+        return 'process'
+    
     def get_thread_ids(self):
         if not self.thread_ids:
             TH32CS_SNAPTHREAD = 0x00000004
@@ -292,3 +295,45 @@ class process:
             t += ttext
             t += "\n"
         return t
+    
+    def get_pid_and_name(self):
+        return "%s[%s]" % (self.get_pid(), self.get_short_name()) 
+
+    def as_tab(self):
+        lines = []
+        exe = ""
+        if self.get_ph():
+            if self.get_exe():
+                exe = self.get_exe().get_name()
+
+        wts_name = ""
+        if self.get_wts_sid():
+            wts_name = self.get_wts_sid().get_fq_name()
+
+        token_id = ""
+        if self.get_token():
+            token_id = self.get_token().get_th_int()
+            lines.append(self.get_token().as_tab())
+
+        lines.append(wpc.utils.tab_line("info", self.get_type(), self.get_pid(), self.get_short_name(), exe, token_id, self.is_wow64(), wts_name, self.get_wts_session_id(), self.is_in_job(), ",".join(str(x) for x in self.get_thread_ids())))
+
+        if self.get_ph():
+            for dll in self.get_dlls():
+                lines.append(wpc.utils.tab_line("info", "process_module", self.get_pid(), dll.get_name() ))            
+
+        if self.get_sd():
+            lines.append(wpc.utils.tab_line("gotsd", self.get_type(), str(self.get_pid_and_name()), "yes"))
+            lines.append(wpc.utils.tab_line("owner", self.get_type(), str(self.get_pid_and_name()), str(self.get_sd().get_owner().get_fq_name())))         
+            if self.get_sd().has_dacl():
+                lines.append(wpc.utils.tab_line("hasdacl", self.get_type(), str(self.get_pid_and_name()), "yes"))
+                lines.extend(self.get_sd().aces_as_tab("ace", self.get_type(), str(self.get_pid_and_name())))
+            else:
+                lines.append(wpc.utils.tab_line("hasdacl", self.get_type(), str(self.get_pid_and_name()), "no"))
+        else:
+            lines.append(wpc.utils.tab_line("gotsd", self.get_type(), str(self.get_pid_and_name()), "no"))
+        for td in self.get_threads():
+            #thread_obj = thread(tid)
+            #print "Dumping thread object"
+            lines.append(td.as_tab())
+        #print lines
+        return "\n".join(lines)

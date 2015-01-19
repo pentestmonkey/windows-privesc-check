@@ -30,6 +30,187 @@ import re
 import win32security
 
 # ---------------------- Define Subs ---------------------------
+def dumptab_paths():
+    paths = wpc.utils.get_user_paths()
+    for path in paths:
+        print wpc.utils.tab_line("info", "user_path", path[0].get_fq_name(), path[1])
+        #print "%s: %s" % (path[0].get_fq_name(), path[1])
+    #print paths
+    systempath = wpc.utils.get_system_path()
+    print wpc.utils.tab_line("info", "system_path", systempath)
+    
+    
+def dumptab_all_files():
+    # Record info about all directories
+    include_dirs = 1
+
+    prog_dirs = []
+    for d in drives().get_fixed_drives():
+        print wpc.utils.tab_line("info", "drive", d.get_name(), d.get_fs())
+        if d.get_fs() == 'NTFS':
+            prog_dirs.append(d.get_name())
+
+    for dir in prog_dirs:
+        #print dir
+        # Walk program files directories looking for executables
+        for filename in wpc.utils.dirwalk(dir, '*', include_dirs):
+        #    print filename
+            f = File(filename)
+            print f.as_tab()
+
+
+def dumptab_eventlogs():
+    pass
+
+
+def dumptab_misc_checks(report):
+    # Check if host is in a domain
+    in_domain = 0
+    dc_info = None
+    try:
+        dc_info = win32security.DsGetDcName(None, None, None, None, 0)
+        in_domain = 1
+    except:
+        pass
+
+    if in_domain:
+        print wpc.utils.tab_line("info", "in_domain", "yes")
+        for k in dc_info.keys():
+            print wpc.utils.tab_line("info", "dc", k, dc_info[k])
+    else:
+        print wpc.utils.tab_line("info", "in_domain", "no")
+
+    for i in ['hostname', 'datetime', 'version', 'user', 'domain', 'ipaddress', 'os', 'os_version']:
+        print wpc.utils.tab_line("info", i, report.get_info_item(i))
+        
+        
+def dumptab_shares():
+    for s in shares().get_all():
+        print s.as_tab()
+
+
+def dumptab_patches():
+    pass
+
+
+def dumptab_installed_software():
+    uninstall = regkey('HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall')
+    if uninstall.is_present():
+        for subkey in uninstall.get_subkeys():
+            name = subkey.get_value("DisplayName")
+            publisher = subkey.get_value("Publisher")
+            version = subkey.get_value("DisplayVersion")
+            date = subkey.get_value("InstallDate")
+            if name:
+                print wpc.utils.tab_line("info", "installed_software", name, publisher, version, date)
+
+
+def dumptab_loggedin():
+    resume = 0
+    try:
+        while True:
+            users, total, resume = win32net.NetWkstaUserEnum(wpc.conf.remote_server, 1 , resume , 999999 )
+            for user in users:
+                u = "%s\\%s" % (user['logon_domain'], user['username'])
+                print wpc.utils.tab_line("info", "logged_in_user", u, user['logon_server'])
+            if resume == 0:
+                break
+    except:
+        print "[E] Failed"
+
+def dumptab_services():
+    for s in services().get_services():
+        if s:
+            print s.as_tab()
+
+
+def dumptab_drivers():
+    for d in drivers().get_services():
+        print d.as_tab()
+
+
+def dumptab_drives():
+    for d in drives().get_fixed_drives():
+        print wpc.utils.tab_line("info", "drive", d.get_name(), d.get_fs())
+
+
+def dumptab_processes():
+    for p in processes().get_all():
+        print p.as_tab()
+
+
+def dumptab_program_files():
+    # Record info about all directories
+    include_dirs = 1
+
+    prog_dirs = []
+    if os.getenv('ProgramFiles'):
+        prog_dirs.append(os.environ['ProgramFiles'])
+
+    if os.getenv('ProgramFiles(x86)'):
+        prog_dirs.append(os.environ['ProgramFiles(x86)'])
+
+    for dir in prog_dirs:
+        # Walk program files directories looking for executables
+        for filename in wpc.utils.dirwalk(dir, wpc.conf.executable_file_extensions, include_dirs):
+            f = File(filename)
+            print f.as_tab()
+
+
+def dumptab_registry():
+    for r in regkey('HKLM').get_all_subkeys():
+        print r.as_tab()
+        
+
+def dumptab_reg_keys():
+    pass
+
+
+def dumptab_nt_objects():
+    root = ntobj("\\")
+    for child in root.get_all_child_objects():
+        print child.as_tab()
+
+
+def dumptab_users():
+    userlist = users()
+    for u in userlist.get_all():
+        print wpc.utils.tab_line("info", "user", u.get_fq_name(), u.get_sid_string())
+        
+    for p in u.get_effective_privileges():
+        print wpc.utils.tab_line("info", "user_effective_privilege", u.get_fq_name(), p)
+
+    for priv in u.get_privileges():
+        print wpc.utils.tab_line("info", "user_privilege", u.get_fq_name(), priv)
+
+
+def dumptab_groups():
+    grouplist = groups()
+    for g in grouplist.get_all():
+        print wpc.utils.tab_line("info", "group", g.get_fq_name(), g.get_sid_string())
+        for m in g.get_members():
+            print wpc.utils.tab_line("info", "group_member", g.get_fq_name(), m.get_fq_name())
+
+        #print "\n\t[+] Privileges of this group:"
+        for priv in g.get_privileges():
+            print wpc.utils.tab_line("info", "group_privilege", g.get_fq_name(), priv)
+
+
+def dumptab_user_modals():
+    d1 = d2 = d3 = d4 = {}
+    try:
+        d1 = win32net.NetUserModalsGet(wpc.conf.remote_server, 0)
+        d2 = win32net.NetUserModalsGet(wpc.conf.remote_server, 1)
+        d3 = win32net.NetUserModalsGet(wpc.conf.remote_server, 2)
+        d4 = win32net.NetUserModalsGet(wpc.conf.remote_server, 3)
+    except pywintypes.error as e:
+        print "[E] %s: %s" % (e[1], e[2])
+
+    for d in (d1, d2, d3, d4):
+        for k in d.keys():
+            print wpc.utils.tab_line("info", "user_modals", k, d[k])
+
+
 def dump_paths(report):
     # TODO
     print "[E] dump_paths not implemented yet.  Sorry."
@@ -81,9 +262,17 @@ def dump_patches(report):
 
 
 def dump_loggedin(report):
-    # TODO
-    print "[E] dump_loggedin not implemented yet.  Sorry."
-
+    resume = 0
+    print "\n[+] Logged in users:"
+    try:
+        while True:
+            users, total, resume = win32net.NetWkstaUserEnum(wpc.conf.remote_server, 1 , resume , 999999 )
+            for user in users:
+                print "User logged in: Logon Server=\"%s\" Logon Domain=\"%s\" Username=\"%s\"" % (user['logon_server'], user['logon_domain'], user['username'])
+            if resume == 0:
+                break
+    except:
+        print "[E] Failed"
 
 def dump_program_files(report):
     # TODO
@@ -1498,7 +1687,7 @@ if options.dump_mode:
     if options.do_all or options.do_nt_objects:
         section("dump_nt_objects")
         try:
-	        dump_nt_objects(issues)
+            dump_nt_objects(issues)
         except:
             pass
 
@@ -1520,6 +1709,121 @@ if options.dump_mode:
         section("dump_user_modals")
         try:
             dump_user_modals(issues)
+        except:
+            pass
+
+# Dump raw data if required
+if options.dumptab_mode:
+    try:
+        dumptab_misc_checks(report)
+    except:
+        pass
+
+    if options.do_all or options.do_paths:
+        try:
+            dumptab_paths()
+        except:
+            pass
+
+    if options.do_allfiles:
+        try:
+            dumptab_all_files()
+        except:
+            pass
+
+    if options.do_all or options.do_eventlogs:
+        try:
+            dumptab_eventlogs()
+        except:
+            pass
+
+    if options.do_all or options.do_shares:
+        try:
+            dumptab_shares()
+        except:
+            pass
+
+    if options.do_all or options.patchfile:
+        try:
+            dumptab_patches()
+        except:
+            pass
+
+    if options.do_all or options.do_loggedin:
+        try:
+            dumptab_loggedin()
+        except:
+            pass
+
+    if options.do_all or options.do_services:
+        try:
+            dumptab_services()
+        except:
+            pass
+
+    if options.do_all or options.do_drivers:
+        try:
+            dumptab_drivers()
+        except:
+            pass
+
+    if options.do_all or options.do_drives:
+        try:
+            dumptab_drives()
+        except:
+            pass
+
+    if options.do_all or options.do_processes:
+        try:
+            dumptab_processes()
+        except:
+            pass
+
+    if options.do_all or options.do_program_files:
+        try:
+            dumptab_program_files()
+        except:
+            pass
+
+    if options.do_all or options.do_registry:
+        try:
+            dumptab_registry()
+        except:
+            pass
+
+    if options.do_all or options.do_reg_keys:
+        try:
+            dumptab_reg_keys()
+        except:
+            pass
+
+    if options.do_all or options.do_installed_software:
+        try:
+            dumptab_installed_software()
+        except:
+            pass
+
+    if options.do_all or options.do_nt_objects:
+        try:
+            dumptab_nt_objects()
+        except:
+            pass
+
+    if options.do_all or options.do_users:
+        try:
+            dumptab_users()
+        except:
+            pass
+
+    if options.do_all or options.do_groups:
+        try:
+            dumptab_groups()
+        except:
+            pass
+
+    if options.do_all or options.get_modals:
+        try:
+            dumptab_user_modals()
         except:
             pass
 
@@ -1632,7 +1936,7 @@ if options.audit_mode:
     if options.do_all or options.do_nt_objects:
         section("audit_nt_objects")
         try:
-	        audit_nt_objects(issues)
+            audit_nt_objects(issues)
         except:
             pass
 
@@ -1647,12 +1951,11 @@ if options.audit_mode:
         printline("Audit Complete")
         print
 
-        # Don't expose XML to users as format will change shortly
-        # filename = "%s.xml" % options.report_file_stem
-        # print "[+] Saving report file %s" % filename
-        # f = open(filename, 'w')
-        # f.write(report.as_xml_string())
-        # f.close()
+        filename = "%s.xml" % options.report_file_stem
+        print "[+] Saving report file %s" % filename
+        f = open(filename, 'w')
+        f.write(report.as_xml_string())
+        f.close()
 
         filename = "%s.txt" % options.report_file_stem
         print "[+] Saving report file %s" % filename
