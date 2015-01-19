@@ -164,6 +164,14 @@ class sd(acelist):
                 lines.append("\t".join(field_list + perm))
         return lines
     
+    def dangerous_aces_as_tab(self, *fields):
+        field_list = list(fields)
+        lines = []
+        for a in self.get_acelist().get_untrusted().get_dangerous_perms().get_aces():
+            for perm in a.as_list():
+                lines.append("\t".join(field_list + perm))
+        return lines
+            
     def _as_text(self, flag):
         s = "--- start %s security descriptor ---\n" % self.get_type()
         o = self.get_owner()

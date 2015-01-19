@@ -122,7 +122,7 @@ class thread:
     def get_type(self):
         return 'thread'
     
-    def as_tab(self):
+    def as_tab(self, dangerous_only=1):
         lines = []
 
         th_int = ""
@@ -137,7 +137,10 @@ class thread:
             lines.append(wpc.utils.tab_line("owner", self.get_type(), str(self.get_tid()), str(self.get_sd().get_owner().get_fq_name())))         
             if self.get_sd().has_dacl():
                 lines.append(wpc.utils.tab_line("hasdacl", self.get_type(), str(self.get_tid()), "yes"))
-                lines.extend(self.get_sd().aces_as_tab("ace", self.get_type(), str(self.get_tid())))
+                if dangerous_only:
+                    lines.extend(self.get_sd().dangerous_aces_as_tab("ace", self.get_type(), str(self.get_tid())))
+                else:
+                    lines.extend(self.get_sd().aces_as_tab("ace", self.get_type(), str(self.get_tid())))
             else:
                 lines.append(wpc.utils.tab_line("hasdacl", self.get_type(), str(self.get_tid()), "no"))
         else:

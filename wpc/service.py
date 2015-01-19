@@ -344,7 +344,7 @@ class service:
     def removeNonAscii(self, s): 
         return "".join(i for i in s if ord(i) < 128)
     
-    def as_tab(self):
+    def as_tab(self, dangerous_only=1):
         lines = []
         lines.append(wpc.utils.tab_line("info", self.get_type_name(), str(self.get_name())))
         if self.get_sd():
@@ -352,7 +352,10 @@ class service:
             lines.append(wpc.utils.tab_line("owner", self.get_type_name(), str(self.get_name()), str(self.get_sd().get_owner().get_fq_name())))         
             if self.get_sd().has_dacl():
                 lines.append(wpc.utils.tab_line("hasdacl", self.get_type_name(), str(self.get_name()), "yes"))
-                lines.extend(self.get_sd().aces_as_tab("ace", self.get_type_name(), str(self.get_name())))
+                if dangerous_only:
+                    lines.extend(self.get_sd().dangerous_aces_as_tab("ace", self.get_type_name(), str(self.get_name())))
+                else:
+                    lines.extend(self.get_sd().aces_as_tab("ace", self.get_type_name(), str(self.get_name())))
             else:
                 lines.append(wpc.utils.tab_line("hasdacl", self.get_type_name(), str(self.get_name()), "no"))
         else:
