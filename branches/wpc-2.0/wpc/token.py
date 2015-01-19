@@ -403,7 +403,7 @@ class token:
     def get_type(self):
         return 'token'
     
-    def as_tab(self):
+    def as_tab(self, dangerous_only=1):
         lines = []
 
         info = ["info", self.get_type()]
@@ -456,7 +456,10 @@ class token:
             lines.append(wpc.utils.tab_line("owner", self.get_type(), str(self.get_th_int()), str(self.get_sd().get_owner().get_fq_name())))         
             if self.get_sd().has_dacl():
                 lines.append(wpc.utils.tab_line("hasdacl", self.get_type(), str(self.get_th_int()), "yes"))
-                lines.extend(self.get_sd().aces_as_tab("ace", self.get_type(), str(self.get_th_int())))
+                if dangerous_only:
+                    lines.extend(self.get_sd().dangerous_aces_as_tab("ace", self.get_type(), str(self.get_th_int())))
+                else:
+                    lines.extend(self.get_sd().aces_as_tab("ace", self.get_type(), str(self.get_th_int())))
             else:
                 lines.append(wpc.utils.tab_line("hasdacl", self.get_type(), str(self.get_th_int()), "no"))
         else:
