@@ -936,6 +936,16 @@ def audit_services(report):
                 else:
                     # Domain account - TODO better way to tell if acct is a domain acct?
                     report.get_by_id("WPC063").add_supporting_data('service_domain_user', [s])
+                    
+        if len(u.split("@")) == 2:
+            d = u.split("@")[1]
+            if not d in ("NT AUTHORITY", "NT Authority"):
+                if d in ("."):
+                    # Local account - TODO better way to tell if acct is a local acct?
+                    report.get_by_id("WPC064").add_supporting_data('service_domain_user', [s])
+                else:
+                    # Domain account - TODO better way to tell if acct is a domain acct?
+                    report.get_by_id("WPC063").add_supporting_data('service_domain_user', [s])
 
         if s.get_name() in ("PSEXESVC", "Abel", "fgexec"):
             report.get_by_id("WPC065").add_supporting_data('sectool_services', [s])
