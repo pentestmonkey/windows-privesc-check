@@ -29,13 +29,13 @@ import glob
 import re
 import win32security
 
-# ---------------------- Define Subs ---------------------------
+# ---------------------- Define --dumptab Subs ---------------------------
 def dumptab_paths():
     paths = wpc.utils.get_user_paths()
+
     for path in paths:
         print wpc.utils.tab_line("info", "user_path", path[0].get_fq_name(), path[1])
-        #print "%s: %s" % (path[0].get_fq_name(), path[1])
-    #print paths
+
     systempath = wpc.utils.get_system_path()
     print wpc.utils.tab_line("info", "system_path", systempath)
     
@@ -44,17 +44,16 @@ def dumptab_all_files():
     # Record info about all directories
     include_dirs = 1
 
+    #  Identify all NTFS drives
     prog_dirs = []
     for d in drives().get_fixed_drives():
         print wpc.utils.tab_line("info", "drive", d.get_name(), d.get_fs())
         if d.get_fs() == 'NTFS':
             prog_dirs.append(d.get_name())
 
-    for dir in prog_dirs:
-        #print dir
-        # Walk program files directories looking for executables
-        for filename in wpc.utils.dirwalk(dir, '*', include_dirs):
-        #    print filename
+    # Walk the directory tree of each NTFS drive
+    for directory in prog_dirs:
+        for filename in wpc.utils.dirwalk(directory, '*', include_dirs):
             f = File(filename)
             print f.as_tab()
 
@@ -73,6 +72,7 @@ def dumptab_misc_checks(report):
     except:
         pass
 
+    # DC information if available
     if in_domain:
         print wpc.utils.tab_line("info", "in_domain", "yes")
         for k in dc_info.keys():
@@ -80,6 +80,7 @@ def dumptab_misc_checks(report):
     else:
         print wpc.utils.tab_line("info", "in_domain", "no")
 
+    # misc information that appears in HTML report
     for i in ['hostname', 'datetime', 'version', 'user', 'domain', 'ipaddress', 'os', 'os_version']:
         print wpc.utils.tab_line("info", i, report.get_info_item(i))
         
@@ -109,7 +110,7 @@ def dumptab_loggedin():
     resume = 0
     try:
         while True:
-            users, total, resume = win32net.NetWkstaUserEnum(wpc.conf.remote_server, 1 , resume , 999999 )
+            users, _, resume = win32net.NetWkstaUserEnum(wpc.conf.remote_server, 1 , resume , 999999 )
             for user in users:
                 u = "%s\\%s" % (user['logon_domain'], user['username'])
                 print wpc.utils.tab_line("info", "logged_in_user", u, user['logon_server'])
@@ -150,9 +151,9 @@ def dumptab_program_files():
     if os.getenv('ProgramFiles(x86)'):
         prog_dirs.append(os.environ['ProgramFiles(x86)'])
 
-    for dir in prog_dirs:
+    for directory in prog_dirs:
         # Walk program files directories looking for executables
-        for filename in wpc.utils.dirwalk(dir, wpc.conf.executable_file_extensions, include_dirs):
+        for filename in wpc.utils.dirwalk(directory, wpc.conf.executable_file_extensions, include_dirs):
             f = File(filename)
             print f.as_tab()
 
@@ -167,8 +168,7 @@ def dumptab_reg_keys():
 
 
 def dumptab_nt_objects():
-    root = ntobj("\\")
-    for child in root.get_all_child_objects():
+    for child in ntobj("\\").get_all_child_objects():
         print child.as_tab()
 
 
@@ -191,7 +191,6 @@ def dumptab_groups():
         for m in g.get_members():
             print wpc.utils.tab_line("info", "group_member", g.get_fq_name(), m.get_fq_name())
 
-        #print "\n\t[+] Privileges of this group:"
         for priv in g.get_privileges():
             print wpc.utils.tab_line("info", "group_privilege", g.get_fq_name(), priv)
 
@@ -211,9 +210,15 @@ def dumptab_user_modals():
             print wpc.utils.tab_line("info", "user_modals", k, d[k])
 
 
+# ---------------------- Define --dump Subs ---------------------------
 def dump_paths(report):
-    # TODO
-    print "[E] dump_paths not implemented yet.  Sorry."
+    systempath = wpc.utils.get_system_path()
+    print "System path: %s" % (systempath)
+
+    paths = wpc.utils.get_user_paths()
+
+    for path in paths:
+        print "Path for user %s: %s" % (path[0].get_fq_name(), path[1])
 
 
 def dump_misc_checks(report):
@@ -266,7 +271,7 @@ def dump_loggedin(report):
     print "\n[+] Logged in users:"
     try:
         while True:
-            users, total, resume = win32net.NetWkstaUserEnum(wpc.conf.remote_server, 1 , resume , 999999 )
+            users, _, resume = win32net.NetWkstaUserEnum(wpc.conf.remote_server, 1 , resume , 999999 )
             for user in users:
                 print "User logged in: Logon Server=\"%s\" Logon Domain=\"%s\" Username=\"%s\"" % (user['logon_server'], user['logon_domain'], user['username'])
             if resume == 0:
@@ -274,9 +279,23 @@ def dump_loggedin(report):
     except:
         print "[E] Failed"
 
+
 def dump_program_files(report):
-    # TODO
-    print "[E] dump_program_files not implemented yet.  Sorry."
+    # Record info about all directories
+    include_dirs = 1
+
+    prog_dirs = []
+    if os.getenv('ProgramFiles'):
+        prog_dirs.append(os.environ['ProgramFiles'])
+
+    if os.getenv('ProgramFiles(x86)'):
+        prog_dirs.append(os.environ['ProgramFiles(x86)'])
+
+    for directory in prog_dirs:
+        # Walk program files directories looking for executables
+        for filename in wpc.utils.dirwalk(directory, wpc.conf.executable_file_extensions, include_dirs):
+            f = File(filename)
+            print f.as_text()
 
 
 def dump_services(opts):
@@ -293,7 +312,8 @@ def dump_drivers(opts):
 
 
 def dump_drives(opts):
-    print "[E] dump_drives not implemented yet.  Sorry."
+    for d in drives().get_fixed_drives():
+        print "%s: (%s)" % (d.get_name(), d.get_fs())
 
 
 def dump_processes(opts):
@@ -303,7 +323,6 @@ def dump_processes(opts):
         # When listing DLLs for a process we need to see the filesystem like they do
         if p.is_wow64():
             wpc.utils.enable_wow64()
-            # k32.Wow64EnableWow64FsRedirection(ctypes.byref(wow64))
 
         if p.get_exe():
             print "Security Descriptor for Exe File %s" % p.get_exe().get_name()
@@ -320,7 +339,6 @@ def dump_processes(opts):
 
         if p.is_wow64():
             wpc.utils.disable_wow64()
-            # k32.Wow64DisableWow64FsRedirection(ctypes.byref(wow64))
 
 
 def dump_users(opts, get_privs = 0):
@@ -360,13 +378,10 @@ def dump_groups(opts, get_privs = 0):
     for g in grouplist.get_all():
         group_name = g.get_fq_name()
 
-        #if opts.get_members:
-        #print "\n\t[+] Members:"
         for m in g.get_members():
             print "%s has member: %s" % (group_name, m.get_fq_name())
 
         if get_privs:
-            #print "\n\t[+] Privileges of this group:"
             for priv in g.get_privileges():
                 print "%s has privilege: %s" % (group_name, priv)
 
@@ -377,8 +392,8 @@ def dump_groups(opts, get_privs = 0):
 
 
 def dump_registry(opts):
-    # TODO
-    print "[!] Registry dump option not implemented yet.  Sorry."
+    for r in regkey('HKLM').get_all_subkeys():
+        print r.as_text()
 
 
 def audit_misc_checks(report):
@@ -395,6 +410,97 @@ def audit_misc_checks(report):
         report.get_by_id("WPC092").add_supporting_data('dc_info', [dc_info])
 
 
+def dump_nt_objects(report):
+    
+    #
+    # Windows stations and Desktops - TODO make is more OO: objects for windowstations and desktops.
+    #
+    
+    import win32con
+    import win32service
+    import pywintypes
+    import win32security
+    from wpc.sd import sd
+    import win32process
+    win32con.WINSTA_ALL_ACCESS = 0x0000037f
+
+    import win32ts
+    print
+    print "[-] Sessions"
+    print
+    for session in win32ts.WTSEnumerateSessions(win32ts.WTS_CURRENT_SERVER_HANDLE, 1, 0):
+        print "SessionId: %s" % session['SessionId']
+        print "\tWinStationName: %s" % session['WinStationName']
+        print "\tState: %s" % session['State']
+        print
+
+    session = win32ts.ProcessIdToSessionId(win32process.GetCurrentProcessId())
+    print
+    print "[-] Winstations in session %s" % session
+    print
+    for w in win32service.EnumWindowStations():
+        print "winstation: %s" % w
+    print
+
+    for w in win32service.EnumWindowStations():
+        print
+        print "[-] Session %s, Winstation '%s'" % (session, w)
+        print
+
+        # Get SD
+        try:
+            h = 0
+            h = win32service.OpenWindowStation(w, False, win32con.READ_CONTROL)
+            s = win32security.GetKernelObjectSecurity(h, win32security.OWNER_SECURITY_INFORMATION | win32security.GROUP_SECURITY_INFORMATION | win32security.DACL_SECURITY_INFORMATION)
+            s = sd('winstation', s)
+            print s.as_text()
+        except pywintypes.error,details:
+            print "[E] Can't get READ_CONTROL winstation handle: %s" % details
+
+        # Get Desktops
+        try:
+            h = 0
+            h = win32service.OpenWindowStation(w, False, win32con.WINSTA_ENUMDESKTOPS)
+            print "[-] Session %s, Winstation '%s' has these desktops:" % (session, w)
+            for d in h.EnumDesktops():
+                print "\t%s" % d
+            print
+        except pywintypes.error,details:
+            print "[E] Can't get WINSTA_ENUMDESKTOPS winstation handle: %s" % details
+        if h:
+            h.SetProcessWindowStation()
+            for d in h.EnumDesktops():
+                print "[-] Session %s, Winstation '%s', Desktop '%s'" % (session, w, d)
+                try:
+                    hd = win32service.OpenDesktop(d, 0, False, win32con.READ_CONTROL)
+                    s = win32security.GetKernelObjectSecurity(hd, win32security.OWNER_SECURITY_INFORMATION | win32security.GROUP_SECURITY_INFORMATION | win32security.DACL_SECURITY_INFORMATION)
+                    s = sd('desktop', s)
+                    print s.as_text()
+                except pywintypes.error,details:
+                    print "[E] Can't get READ_CONTROL desktop handle: %s" % details
+        print
+
+    #
+    # Objects
+    #
+    print
+    print "[-] Objects"
+    print
+    root = ntobj("\\")
+    for child in root.get_all_child_objects():
+        print child.as_text()
+        if (child.get_type() == "Semaphore" or child.get_type() == "Event" or child.get_type() == "Mutant" or child.get_type() == "Timer" or child.get_type() == "Section"  or child.get_type() == "Device" or child.get_type() == "SymbolicLink" or child.get_type() == "Key" or child.get_type() == "Directory") and child.get_sd():
+                print child.get_sd().as_text()
+        else:
+            print "Skipping unknown object type: %s" % child.get_type()
+            print
+
+# Type - can't open
+# Device - can open, has sd
+# SymbolicLink - can open, has sd
+
+
+# ---------------------- Define --audit Subs ---------------------------
 def audit_eventlogs(report):
     # TODO WPC009 Insecure Permissions On Event Log Registry Key
     key_string = "HKEY_LOCAL_MACHINE\\" + wpc.conf.eventlog_key_hklm
@@ -426,7 +532,6 @@ def audit_eventlogs(report):
 
 def audit_shares(report):
     for s in shares().get_all():
-        #print s.as_text()
 
         if s.get_sd():
             for a in s.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["FILE_READ_DATA"]).get_aces():
@@ -533,6 +638,7 @@ def audit_reg_keys(report):
     if v is None or v == 0:
         report.get_by_id("WPC107").add_supporting_data('reg_key_value', [r, "CWDIllegalInDllSearch", v])
 
+
 def audit_nt_objects(report):
     root = ntobj("\\")
     issue_for = {
@@ -554,7 +660,6 @@ def audit_nt_objects(report):
     print issue_for.keys()
     for child in root.get_all_child_objects():
         print child.as_text()
-        # if child.type_is_implemented() and child.get_sd():
         if child.get_sd():
             if child.get_sd().has_no_dacl():
                 report.get_by_id("WPC121").add_supporting_data('object_name_and_type', [child])
@@ -566,94 +671,6 @@ def audit_nt_objects(report):
                 else:
                     print "[W] No issue exists for object type: %s" % lc_type
 
-def dump_nt_objects(report):
-    
-    #
-    # Windows stations and Desktops - TODO make is more OO: objects for windowstations and desktops.
-    #
-    
-    import win32con
-    import win32service
-    import pywintypes
-    import win32security
-    from wpc.sd import sd
-    import win32process
-    win32con.WINSTA_ALL_ACCESS = 0x0000037f
-
-    import win32ts
-    print
-    print "[-] Sessions"
-    print
-    for session in win32ts.WTSEnumerateSessions(win32ts.WTS_CURRENT_SERVER_HANDLE, 1, 0):
-        print "SessionId: %s" % session['SessionId']
-        print "\tWinStationName: %s" % session['WinStationName']
-        print "\tState: %s" % session['State']
-        print
-
-    session = win32ts.ProcessIdToSessionId(win32process.GetCurrentProcessId())
-    print
-    print "[-] Winstations in session %s" % session
-    print
-    for w in win32service.EnumWindowStations():
-        print "winstation: %s" % w
-    print
-
-    for w in win32service.EnumWindowStations():
-        print
-        print "[-] Session %s, Winstation '%s'" % (session, w)
-        print
-
-        # Get SD
-        try:
-            h = 0
-            h = win32service.OpenWindowStation(w, False, win32con.READ_CONTROL)
-            s = win32security.GetKernelObjectSecurity(h, win32security.OWNER_SECURITY_INFORMATION | win32security.GROUP_SECURITY_INFORMATION | win32security.DACL_SECURITY_INFORMATION)
-            s = sd('winstation', s)
-            print s.as_text()
-        except pywintypes.error,details:
-            print "[E] Can't get READ_CONTROL winstation handle: %s" % details
-
-        # Get Desktops
-        try:
-            h = 0
-            h = win32service.OpenWindowStation(w, False, win32con.WINSTA_ENUMDESKTOPS)
-            print "[-] Session %s, Winstation '%s' has these desktops:" % (session, w)
-            for d in h.EnumDesktops():
-                print "\t%s" % d
-            print
-        except pywintypes.error,details:
-            print "[E] Can't get WINSTA_ENUMDESKTOPS winstation handle: %s" % details
-        if h:
-            h.SetProcessWindowStation()
-            for d in h.EnumDesktops():
-                print "[-] Session %s, Winstation '%s', Desktop '%s'" % (session, w, d)
-                try:
-                    hd = win32service.OpenDesktop(d, 0, False, win32con.READ_CONTROL)
-                    s = win32security.GetKernelObjectSecurity(hd, win32security.OWNER_SECURITY_INFORMATION | win32security.GROUP_SECURITY_INFORMATION | win32security.DACL_SECURITY_INFORMATION)
-                    s = sd('desktop', s)
-                    print s.as_text()
-                except pywintypes.error,details:
-                    print "[E] Can't get READ_CONTROL desktop handle: %s" % details
-        print
-
-    #
-    # Objects
-    #
-    print
-    print "[-] Objects"
-    print
-    root = ntobj("\\")
-    for child in root.get_all_child_objects():
-        print child.as_text()
-        if (child.get_type() == "Semaphore" or child.get_type() == "Event" or child.get_type() == "Mutant" or child.get_type() == "Timer" or child.get_type() == "Section"  or child.get_type() == "Device" or child.get_type() == "SymbolicLink" or child.get_type() == "Key" or child.get_type() == "Directory") and child.get_sd():
-                print child.get_sd().as_text()
-        else:
-            print "Skipping unknown object type: %s" % child.get_type()
-            print
-
-# Type - can't open
-# Device - can open, has sd
-# SymbolicLink - can open, has sd
 
 def audit_patches(report):
     patchfile = options.patchfile
@@ -728,19 +745,207 @@ def audit_patches(report):
 
 
 def audit_loggedin(report):
-    # TODO
-    print "[E] audit_loggedin not implemented yet.  Sorry."
+    resume = 0
+    print "\n[+] Logged in users:"
+    try:
+        while True:
+            users, _, resume = win32net.NetWkstaUserEnum(wpc.conf.remote_server, 1 , resume , 999999 )
+            for user in users:
+                report.get_by_id("WPC140").add_supporting_data('usernames', ["%s\\%s" % (user['logon_domain'], user['username'])])
+                print "User logged in: Logon Server=\"%s\" Logon Domain=\"%s\" Username=\"%s\"" % (user['logon_server'], user['logon_domain'], user['username'])
+            if resume == 0:
+                break
+    except:
+        print "[E] Failed"
 
 
 def audit_drivers(report):
-    # TODO
-    print "[E] Driver audit option not implemented yet.  Sorry."
+    for s in drivers().get_services():
+
+        if s.get_reg_key() and s.get_reg_key().get_sd():
+
+            # Check DACL set
+            if not s.get_reg_key().get_sd().get_dacl():
+                    report.get_by_id("WPC141").add_supporting_data('service_regkey', [s])
+                    
+            # Check owner
+            if not s.get_reg_key().get_sd().get_owner().is_trusted():
+                report.get_by_id("WPC142").add_supporting_data('service_exe_regkey_untrusted_ownership', [s, s.get_reg_key()])
+
+            # Untrusted users can change permissions
+            acl = s.get_reg_key().get_issue_acl_for_perms(["WRITE_OWNER", "WRITE_DAC"])
+            if acl:
+                report.get_by_id("WPC143").add_supporting_data('service_reg_perms', [s, acl])
+
+#            "KEY_SET_VALUE", # GUI "Set Value".  Required to create, delete, or set a registry value.
+            acl = s.get_reg_key().get_issue_acl_for_perms(["KEY_SET_VALUE"])
+            if acl:
+                report.get_by_id("WPC144").add_supporting_data('service_reg_perms', [s, acl])
+
+#            "KEY_CREATE_LINK", # GUI "Create Link".  Reserved for system use.
+            acl = s.get_reg_key().get_issue_acl_for_perms(["KEY_CREATE_LINK"])
+            if acl:
+                report.get_by_id("WPC145").add_supporting_data('service_reg_perms', [s, acl])
+
+#            "KEY_CREATE_SUB_KEY", # GUI "Create subkey"
+            acl = s.get_reg_key().get_issue_acl_for_perms(["KEY_CREATE_SUB_KEY"])
+            if acl:
+                report.get_by_id("WPC146").add_supporting_data('service_reg_perms', [s, acl])
+
+#            "DELETE", # GUI "Delete"
+            acl = s.get_reg_key().get_issue_acl_for_perms(["DELETE"])
+            if acl:
+                report.get_by_id("WPC147").add_supporting_data('service_reg_perms', [s, acl])
+
+            # TODO walk sub keys looking for weak perms - not necessarily a problem, but could be interesting
+
+            # TODO checks on parent keys
+            parent = s.get_reg_key().get_parent_key()
+            while parent and parent.get_sd():
+                # Untrusted user owns parent directory
+                if not parent.get_sd().get_owner().is_trusted():
+                    report.get_by_id("WPC148").add_supporting_data('service_regkey_parent_untrusted_ownership', [s, parent])
+
+                # Parent dir can have file perms changed
+                fa = parent.get_issue_acl_for_perms(["WRITE_OWNER", "WRITE_DAC"])
+                if fa:
+                    report.get_by_id("WPC149").add_supporting_data('service_regkey_parent_perms', [s, fa])
+
+                # Child allows itself to be delete, parent allows it to be replaced
+                fa_parent = parent.get_issue_acl_for_perms(["DELETE"])
+                if fa_parent:
+                    grandparent = parent.get_parent_key()
+                    if grandparent and grandparent.get_sd():
+                        # There is no "DELETE_CHILD" type permission within the registry.  Therefore for the delete+replace issue, 
+                        # we only have one combination of permissions to look for: the key allows DELETE and the parent allows either 
+                        # KEY_CREATE_SUB_KEY or KEY_CREATE_LINK
+                        fa_grandparent = grandparent.get_issue_acl_for_perms(["KEY_CREATE_SUB_KEY", "KEY_CREATE_LINK"])
+                        if fa_grandparent:
+                            report.get_by_id("WPC150").add_supporting_data('service_regkey_parent_grandparent_write_perms', [s, fa_parent, fa_grandparent])
+
+                parent = parent.get_parent_key()
+
+        # Check that the binary name is properly quoted
+        if str(s.get_exe_path_clean()).find(" ") > 0: # clean path contains a space
+            if str(s.get_exe_path()).find(str('"' + s.get_exe_path_clean()) + '"') < 0: # TODO need regexp.  Could get false positive from this.
+                report.get_by_id("WPC151").add_supporting_data('service_info', [s])
+
+        #
+        # Examine executable for service
+        #
+        if s.get_exe_file() and s.get_exe_file().get_sd():
+
+            # Check DACL set
+            if not s.get_exe_file().get_sd().get_dacl():
+                    report.get_by_id("WPC152").add_supporting_data('service_exe_no_dacl', [s])
+                    
+            # Examine parent directories
+            parent = s.get_exe_file().get_parent_dir()
+            while parent and parent.get_sd():
+                # Untrusted user owns parent directory
+                if not parent.get_sd().get_owner().is_trusted():
+                    report.get_by_id("WPC153").add_supporting_data('service_exe_parent_dir_untrusted_ownership', [s, parent])
+
+                # Parent dir can have file perms changed
+                fa = parent.get_file_acl_for_perms(["WRITE_OWNER", "WRITE_DAC"])
+                if fa:
+                    report.get_by_id("WPC154").add_supporting_data('service_exe_parent_dir_perms', [s, fa])
+
+                # Child allows itself to be delete, parent allows it to be replaced
+                fa_parent = parent.get_file_acl_for_perms(["DELETE"])
+                if fa_parent:
+                    grandparent = parent.get_parent_dir()
+                    if grandparent and grandparent.get_sd():
+                        fa_grandparent = grandparent.get_file_acl_for_perms(["FILE_ADD_SUBFOLDER"])
+                        if fa_grandparent:
+                            report.get_by_id("WPC155").add_supporting_data('service_exe_parent_grandparent_write_perms', [s, fa_parent, fa_grandparent])
+
+                # Parent allows child directory to be deleted and replaced
+                grandparent = parent.get_parent_dir()
+                if grandparent and grandparent.get_sd():
+                    fa = grandparent.get_file_acl_for_perms(["FILE_DELETE_CHILD", "FILE_ADD_SUBFOLDER"])
+                    if fa:
+                        report.get_by_id("WPC156").add_supporting_data('service_exe_parent_dir_perms', [s, fa])
+
+                parent = parent.get_parent_dir()
+
+            # Untrusted user owns exe
+            if not s.get_exe_file().get_sd().get_owner().is_trusted():
+                report.get_by_id("WPC157").add_supporting_data('service_exe_owner', [s])
+
+            # Check if exe can be appended to
+            fa = s.get_exe_file().get_file_acl_for_perms(["FILE_APPEND_DATA"])
+            if fa:
+                report.get_by_id("WPC158").add_supporting_data('service_exe_write_perms', [s, fa])
+
+            # Check if exe can be deleted and perhaps replaced
+            fa = s.get_exe_file().get_file_acl_for_perms(["DELETE"])
+            if fa:
+                # File can be delete (DoS issue)
+                report.get_by_id("WPC159").add_supporting_data('service_exe_write_perms', [s, fa])
+
+                # File can be deleted and replaced (privesc issue)
+                parent = s.get_exe_file().get_parent_dir()
+                if parent and parent.get_sd():
+                    fa_parent = parent.get_file_acl_for_perms(["FILE_ADD_FILE"])
+                    if fa_parent:
+                        report.get_by_id("WPC160").add_supporting_data('service_exe_file_parent_write_perms', [s, fa, fa_parent])
+
+            # Check for file perms allowing overwrite
+            fa = s.get_exe_file().get_file_acl_for_perms(["FILE_WRITE_DATA", "WRITE_OWNER", "WRITE_DAC"])
+            if fa:
+                report.get_by_id("WPC161").add_supporting_data('service_exe_write_perms', [s, fa])
+
+            # TODO write_file on a dir containing an exe might allow a dll to be added
+        else:
+            if not s.get_exe_file():
+                report.get_by_id("WPC162").add_supporting_data('service_no_exe', [s])
+
+        #
+        # Examine security descriptor for service
+        #
+        if s.get_sd():
+
+            # Check DACL is set
+            if not s.get_sd().get_dacl():
+                report.get_by_id("WPC171").add_supporting_data('service', [s])
+
+            # TODO all mine are owned by SYSTEM.  Maybe this issue can never occur!?
+            if not s.get_sd().get_owner().is_trusted():
+                report.get_by_id("WPC163").add_supporting_data('principals_with_service_ownership', [s, s.get_sd().get_owner()])
+
+            # SERVICE_START
+            for a in s.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["SERVICE_START"]).get_aces():
+                report.get_by_id("WPC164").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
+
+            # SERVICE_STOP
+            for a in s.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["SERVICE_STOP"]).get_aces():
+                report.get_by_id("WPC165").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
+
+            # SERVICE_PAUSE_CONTINUE
+            for a in s.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["SERVICE_PAUSE_CONTINUE"]).get_aces():
+                report.get_by_id("WPC166").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
+
+            # SERVICE_CHANGE_CONFIG
+            for a in s.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["SERVICE_CHANGE_CONFIG"]).get_aces():
+                report.get_by_id("WPC167").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
+
+            # DELETE
+            for a in s.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["DELETE"]).get_aces():
+                report.get_by_id("WPC168").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
+
+            # WRITE_DAC
+            for a in s.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["WRITE_DAC"]).get_aces():
+                report.get_by_id("WPC169").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
+
+            # WRITE_OWNER
+            for a in s.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["WRITE_OWNER"]).get_aces():
+                report.get_by_id("WPC170").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
 
 
 def audit_drives(report):
     for d in drives().get_fixed_drives():
         if d.get_fs() == 'NTFS':
-#            for a in s.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["FILE_WRITE_DATA"]).get_aces():
 
             directory = File(d.get_name())
 

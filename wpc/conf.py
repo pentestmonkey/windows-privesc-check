@@ -4301,7 +4301,456 @@ NB: This issue has only been reported for NTFS filesystems.  Other non-NTFS file
           },
        }
     },
+    'WPC140': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 5,
+       'title': "List Of Logged On Users",
+       'description': '''Some users were logged on at the time of the audit.  This is not necessarily a security problem.  However, if there are several domain admins logged in unnecessarily, this could be an deemed a security issue.''',
+       'recommendation': '''None.''',
+       'supporting_data': {
+          'usernames': {
+             'section': "description",
+             'preamble': "The following users were logged in at the time of the audit:",
+          },
+       }
+    },
+    'WPC141': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Windows Driver Registry Key Missing DACL",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'service_regkey': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC142': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Windows Driver Registry Key Untrusted Owner",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'service_exe_regkey_untrusted_ownership': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC143': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Windows Driver Registy Key Untrusted User WRITE_OWNER/WRITE_DACL",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'service_reg_perms': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC144': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Windows Driver Registry Key Untrusted User Set Key Value",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'service_reg_perms': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC145': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Windows Driver Registry Key Untrusted User KEY_CREATE_LINK",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'service_reg_perms': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC146': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Windows Driver Registry Key Untrusted User Can Create Sub Keys",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'service_reg_perms': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC147': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Windows Driver Registry Key Untrusted User DELETE",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'service_reg_perms': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC148': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Windows Driver Registry Key Parent Key Has Untrusted Owner",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'service_regkey_parent_untrusted_ownership': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC149': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Windows Driver Registry Key Parent Key Allows Untrusted User WRITE_OWNER/WRITE_DAC",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'service_regkey_parent_perms': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC150': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Windows Driver Registry Key Parent DELETE, Grandparent CREATE",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'service_regkey_parent_grandparent_write_perms': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC151': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Windows Driver File Path Not Quoted Correctly",
+       'description': '''TODO - probably isn't a valid issue.  check.''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'service_info': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC152': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Windows Driver File Missing DACL",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'service_exe_no_dacl': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC153': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Windows Driver File Parent Directory Owned By Untrusted User",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'service_exe_parent_dir_untrusted_ownership': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC154': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Windows Driver File Parent Directory Allows WRITE_OWNER/WRITE_DAC",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'service_exe_parent_dir_perms': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC155': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Windows Driver File Parent Directory Allows DELETE, Grandparent ADD_FILE",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'service_exe_parent_grandparent_write_perms': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC156': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Windows Driver File Grandparent Directory Allows DELETE_DIR and ADD_DIR",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'service_exe_parent_dir_perms': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC157': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Windows Driver File Untrusted Owner",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'service_exe_owner': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC158': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Windows Driver File APPEND_DATA",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'service_exe_write_perms': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC159': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Windows Driver File DELETE",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'service_exe_write_perms': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC160': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Windows Driver File DELETE and Replace",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'service_exe_file_parent_write_perms': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC161': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Windows Driver File WRITE_DATA/WRITE_OWNER/WRITE_DAC",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'service_exe_write_perms': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC162': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Windows Driver File Missing",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'service_no_exe': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC163': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Windows Driver Service Untrusted Owner",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'principals_with_service_ownership': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC164': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Windows Driver Service START",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'principals_with_service_perm': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC165': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Windows Driver Service STOP",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'principals_with_service_perm': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC166': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Windows Driver Service PAUSE/CONTINUE",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'principals_with_service_perm': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC167': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Windows Driver Service CHANGE_CONFIG",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'principals_with_service_perm': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC168': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Windows Driver Service DELETE",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'principals_with_service_perm': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC169': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Windows Driver Service WRITE_DAC",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'principals_with_service_perm': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC170': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Windows Driver Service WRITE_OWNER",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'principals_with_service_perm': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC171': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Windows Driver Service Missing DACL",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'service': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
 }
+
 
 rating_descriptions = {
     'impact': {
