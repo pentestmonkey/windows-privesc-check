@@ -57,6 +57,11 @@ class issue:
                     u_name = u.get_fq_name()
                 etree.SubElement(d, 'data').text = "User: %s, Reg key: %s\%s, Value: %s" % (u_name, r.get_name(), value_name, value_data)
 
+        elif data_name == 'usernames':
+            for data in self.get_supporting_data(data_name):
+                u = data[0]
+                etree.SubElement(d, 'data').text = "%s" % u
+
         elif data_name == 'reg_key_value':
             for data in self.get_supporting_data(data_name):
                 r = data[0]
@@ -103,6 +108,13 @@ class issue:
                 f = data[1]
                 etree.SubElement(d, 'data').text = " %s (%s) runs the following program as %s:\n" % (s.get_description(), s.get_name(), s.get_run_as())
                 etree.SubElement(d, 'data').text = "  %s\n" % (f.as_text())
+
+        elif data_name == 'service_regkey_parent_perms':
+            for data in self.get_supporting_data(data_name):
+                s = data[0]
+                f = data[1]
+                etree.SubElement(d, 'data').text = " %s (%s) runs the following program as %s:\n" % (s.get_description(), s.get_name(), s.get_run_as())
+                etree.SubElement(d, 'data').text = "  Weak permission on service parent registry key: %s\n" % (f.as_text())
 
         elif data_name == 'object_perms' or data_name == 'object_perms_symboliclink' or data_name == 'object_perms_directory' or data_name == 'object_perms_device' or data_name == 'object_perms_mutant' or data_name == 'object_perms_callback' or data_name == 'object_perms_keyedEvent' or data_name == 'object_perms_event' or data_name == 'object_perms_job' or data_name == 'object_perms_regkey' or data_name == 'object_perms_section' or data_name == 'object_perms_waitableport' or data_name == 'object_perms_windowstation':
             for data in self.get_supporting_data(data_name):

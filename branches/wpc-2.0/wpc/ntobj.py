@@ -241,7 +241,8 @@ class ntobj:
                 t = "directory_object"
             s = sd(t, s)
         except:
-            print "[E] can't get sd"
+            pass
+            # print "[E] can't get sd"
             
         # print "get_sd: %s" % s
         return s
@@ -653,7 +654,8 @@ class ntobj:
                     #print "return status for NtOpenTimer: %s (0 = success, non-zero = error)" % ret
                 
             else:
-                print "[E] Don't know how to open a handle to object of type: %s" % self.get_type()
+                pass
+                # print "[E] Don't know how to open a handle to object of type: %s" % self.get_type()
         return self.objh
 
     def get_child_objects(self, index=0):
