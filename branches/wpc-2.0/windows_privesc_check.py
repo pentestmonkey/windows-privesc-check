@@ -960,9 +960,6 @@ def audit_drives(report):
 
 def audit_processes(report):
     for p in processes().get_all():
-        #print p.as_text()
-
-        #print "[D] Dangerous process perms"
         # TODO check the dangerous perms aren't held by the process owner
         if p.get_sd():
             if not p.get_sd().get_dacl():
@@ -976,19 +973,14 @@ def audit_processes(report):
             if t.get_sd():
                 perms = t.get_sd().get_acelist().get_untrusted().get_dangerous_perms().get_aces()
                 for perm in perms:
-                    #print p.as_text()
                     if p.get_token() and perm.get_principal().get_fq_name() != p.get_token().get_token_user().get_fq_name() and perm.get_principal().get_fq_name() != 'NT AUTHORITY\RESTRICTED':
-                        # print t.get_sd().as_text()
                         report.get_by_id("WPC104").add_supporting_data('thread_perms', [t, perm])
-        #print "[D] End"
 
         for t in p.get_tokens():
             if t.get_sd():
                 perms = t.get_sd().get_acelist().get_untrusted().get_dangerous_perms().get_aces()
                 for perm in perms:
-                    #print p.as_text()
                     if perm.get_principal().get_fq_name() != 'NT AUTHORITY\RESTRICTED':
-                        # print t.get_sd().as_text()
                         report.get_by_id("WPC105").add_supporting_data('token_perms', [t, p, perm])
 
         # When listing DLLs for a process we need to see the filesystem like they do
@@ -998,17 +990,10 @@ def audit_processes(report):
         if p.get_exe():
             if p.get_exe().is_replaceable():
                 report.get_by_id("WPC067").add_supporting_data('process_exe', [p])
-                #print "[D] Security Descriptor for replaceable Exe File %s" % p.get_exe().get_name()
-                #if p.get_exe().get_sd():
-                #    print p.get_exe().get_sd().as_text()
-                #else:
-                #    print "[unknown]"
 
                 for dll in p.get_dlls():
                     if dll.is_replaceable():
                         report.get_by_id("WPC068").add_supporting_data('process_dll', [p, dll])
-                        #print "\nSecurity Descriptor for replaceable DLL File %s" % dll.get_name()
-                        #print dll.get_sd().as_text()
 
         if p.is_wow64():
             k32.Wow64DisableWow64FsRedirection(ctypes.byref(wow64))
@@ -1019,6 +1004,7 @@ def audit_users(report):
     for u in userlist.get_all():
         flags = u.get_flags()
         
+        # Defined in wpc/conf.py - ignore error in IDE
         if flags & win32netcon.UF_ENCRYPTED_TEXT_PASSWORD_ALLOWED:
             report.get_by_id("WPC108").add_supporting_data('username', [u])
 
@@ -1035,17 +1021,16 @@ def audit_users(report):
             if flags & win32netcon.UF_DONT_EXPIRE_PASSWD:
                 report.get_by_id("WPC112").add_supporting_data('username', [u])
 
-            if flags & win32netcon.UF_TRUSTED_FOR_DELEGATION:
+            if flags & win32netcon.UF_TRUSTED_FOR_DELEGATION: # defined in wpc/conf.py
                 report.get_by_id("WPC113").add_supporting_data('username', [u])
 
-            if flags & win32netcon.UF_TRUSTED_TO_AUTHENTICATE_FOR_DELEGATION:
+            if flags & win32netcon.UF_TRUSTED_TO_AUTHENTICATE_FOR_DELEGATION: # defined in wpc/conf.py
                 report.get_by_id("WPC114").add_supporting_data('username', [u])
 
         # TODO consider other privs too
         # TODO remove useless privs
         # TODO More efficient method that doesn't involve looping through all users?  What does secpol.msc do?
         for p in u.get_effective_privileges():
-            # print "\t%s" % p
             if p == "SeAssignPrimaryTokenPrivilege":
                 report.get_by_id("WPC070").add_supporting_data('user_powerful_priv', [u])
             if p == "SeBackupPrivilege":
@@ -1083,8 +1068,6 @@ def audit_users(report):
 def audit_groups(report):
     grouplist = groups()
     for u in grouplist.get_all():
-        #print u.get_fq_name()
-
         # TODO ignore empty groups
         # TODO consider other privs too
         # TODO remove useless privs
@@ -1400,7 +1383,6 @@ def audit_scheduled_tasks(report):
         xml_string = m.group(2).lstrip()
         xml_string = xml_string.replace("UTF-16", "UTF-8")
         xml_string = xml_string.replace("</Tasks>", "")
-        # print "xml: %s" % xml_string
         root = objectify.fromstring(xml_string)
         
         exec_command = "<none>"
@@ -1421,7 +1403,6 @@ def audit_scheduled_tasks(report):
             pass
             
         runas_user = "<none>"
-        #runas_group = "<none>"
         try:
             runas_user = root.Principals.Principal.UserId
         except:
@@ -1429,7 +1410,6 @@ def audit_scheduled_tasks(report):
         if enabled and exec_command != "<none>":
             print "------ %s -------" % name
             print "runas user: %s" % runas_user
-            #print "runas group: %s" % runas_group
             print "exec command: %s" % exec_command
             exec_command = wpc.utils.env_expand(exec_command)
             print "exec command2: %s" % exec_command
@@ -1495,7 +1475,6 @@ def audit_registry(report):
                     reg_val_files = wpc.utils.lookup_files_for_clsid(clsid)
                     for reg_val_file in reg_val_files:
                         (r, v, f) = reg_val_file
-                        # print "[D] regkey: %s, file: %s" % (r.get_name() + "\\" + v, f.get_name())
                         if not f.exists():
                             f = wpc.utils.find_in_path(f)
 
@@ -1621,10 +1600,6 @@ def audit_registry(report):
                         report.get_by_id("WPC061").add_supporting_data('regkey_ref_file', [s, v, f])
 
     for key_string in wpc.conf.reg_paths:
-        #parts = key_string.split("\\")
-        #hive = parts[0]
-        #key_string = "\\".join(parts[1:])
-
         r = regkey(key_string)
 
         if r.get_sd():
@@ -1655,16 +1630,11 @@ def audit_registry(report):
 
     print "[-] Walking registry (very slow: probably 15 mins - 1 hour)"
     for r in regkey('HKLM').get_all_subkeys():
-        #print "[D] Processing: %s" % r.get_name()
         sd = r.get_sd()
         if sd:
             set_value_aces = sd.get_acelist().get_untrusted().get_aces_with_perms(["KEY_SET_VALUE"]).get_aces()
-            #aces = r.get_dangerous_aces()
             if set_value_aces:
                 for v in r.get_values():
-                    #for a in set_value_aces:
-                    #   for line in a.as_tab_delim3(r.get_name(), v, r.get_value(v)):
-                    #        print line
                     if wpc.utils.looks_like_executable(r.get_value(v)):
                         for a in set_value_aces:
                             report.get_by_id("WPC115").add_supporting_data('regkey_value_data_perms', [r, v, repr(r.get_value(v)), a])
@@ -1709,6 +1679,7 @@ def audit_program_files(report):
                 else:
                     print "[E] Ignoring thing that isn't file or directory: " + f.get_name()
 
+# TODO is this redundant now we have --dumptab?
 def dump_all_files(report):
     # Record info about all directories
     include_dirs = 1
@@ -1727,19 +1698,9 @@ def dump_all_files(report):
             # TODO check file owner, parent paths, etc.  Maybe use is_replaceable instead?
             aces = f.get_dangerous_aces()
             count = count + 1
-#            if count > 1000:
-#                exit(1)
             for ace in aces:
                 for p in ace.get_perms():
                     print "%s\t%s\t%s\t%s\t%s" % (f.get_type(), f.get_name(), ace.get_type(), ace.get_principal().get_fq_name(), p)
-#                if f.is_dir():
-#                    report.get_by_id("WPC001").add_supporting_data('writable_dirs', [f, ace])
-#                elif f.is_file():
-#                    report.get_by_id("WPC001").add_supporting_data('writable_progs', [f, ace])    
-#                else:
-#                    print "[E] Ignoring thing that isn't file or directory: " + f.get_name()
-
-            #f.clearmem() # memory leak
 
 def audit_paths(report):
 # TODO this will be too slow.  Need some clever caching.
