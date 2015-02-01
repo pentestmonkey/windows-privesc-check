@@ -2,6 +2,7 @@
 # Just a collection of useful subs
 from wpc.cache import cache
 from wpc.file import file as File
+from wpc.process import process
 from wpc.group import group as Group
 from wpc.principal import principal
 from wpc.regkey import regkey
@@ -16,6 +17,7 @@ import win32net
 import win32security
 import wpc.conf
 import string
+import sys
 k32 = ctypes.windll.kernel32
 wow64 = ctypes.c_long(0)
 on64bitwindows = 1
@@ -48,7 +50,7 @@ def init(options):
     wpc.conf.cache = cache()
 
     # Which permissions do we NOT care about? == who do we trust?
-    define_trusted_principals()
+    define_trusted_principals(options)
 
     # Use the crendentials supplied (OK to call if no creds were supplied)
     impersonate(options.remote_user, options.remote_pass, options.remote_domain)
@@ -201,7 +203,6 @@ def enable_wow64():
     except:
         pass
 
-
 # We don't report issues about permissions being held by trusted users or groups
 # hard-coded users and groups (wpc.conf.trusted_principals_fq[]) done
 # user-defined users and groups (--ignore) TODO
@@ -210,27 +211,117 @@ def enable_wow64():
 # SIDs which don't resolve (probably only want to ignore local SIDs, not domain SIDs) TODO
 # Group that are empty (e.g. Power Users should normally be ignored because it's empty) TODO - make it an option
 # Ignore everything that the current user isn't a member of (for privescing) TODO
-def define_trusted_principals():
-    # Ignore "NT AUTHORITY\TERMINAL SERVER USER" if HKLM\System\CurrentControlSet\Control\Terminal Server\TSUserEnabled = 0 or doesn't exist
-    # See http://support.microsoft.com/kb/238965 for details
-    r = regkey(r"HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Terminal Server")
-
-    if r.is_present():
-        v = r.get_value("TSUserEnabled")
-        if v is None:
-            print "[i] TSUserEnabled registry value is absent. Excluding TERMINAL SERVER USER"
-        elif v != 0:
-            print "[i] TSUserEnabled registry value is %s. Including TERMINAL SERVER USER" % v
-            wpc.conf.trusted_principals_fq.append("NT AUTHORITY\TERMINAL SERVER USER")
-        else:
-            print "[i] TSUserEnabled registry value is 0. Excluding TERMINAL SERVER USER"
+def define_trusted_principals(options):
+    exploitable_by_fq = []
+    ignore_principals = []
+    if options.exploitable_by_list:
+        exploitable_by_fq = options.exploitable_by_list
+    if options.exploitable_by_file:
+        try:
+            exploitable_by_fq = exploitable_by_fq + [line.strip() for line in open(options.exploitable_by_file)]
+        except:
+            print "[E] Error reading from file %s" % options.exploitablebyfile
+            sys.exit()
+    if options.ignore_principal_list:
+        ignore_principals = options.ignore_principal_list
+    if options.ignore_principal_file:
+        try:
+            ignore_principals = ignore_principals + [line.strip() for line in open(options.ignoreprincipalfile)]
+        except:
+            print "[E] Error reading from file %s" % options.ignoreprincipalfile
+            sys.exit()
+            
+    # examine token, populate exploitable_by
+    if options.exploitable_by_me:
+        try:
+            p = process(os.getpid())
+            wpc.conf.exploitable_by.append(p.get_token().get_token_owner())
+            for g in p.get_token().get_token_groups():
+                if "|".join(g[1]).find("USE_FOR_DENY_ONLY") == -1:
+                    wpc.conf.exploitable_by.append(g[0])
+        except:
+            print "[E] Problem examining access token of current process"
+            sys.exit()
+    
+    # check each of the supplied users in exploitable_by and exploitable_by resolve
+    
+    if exploitable_by_fq or wpc.conf.exploitable_by:
+        wpc.conf.privesc_mode = "exploitable_by"
+        for t in exploitable_by_fq:
+            try:
+                sid, _, _ = win32security.LookupAccountName(wpc.conf.remote_server, t)
+                if sid:
+                    p = principal(sid)
+                    #print "Trusted: %s (%s) [%s]" % (p.get_fq_name(), p.get_type_string(), p.is_group_type())
+                    #print "[D] Added trusted principal %s.  is group? %s" % (p.get_fq_name(), p.is_group_type())
+                    if p.is_group_type():
+                        p = Group(p.get_sid())
+                    #    for m in p.get_members():
+                    #        print "Member: %s" % m.get_fq_name()
+                    else:
+                        p = user(p.get_sid())
+                    #    print p.get_groups()
+    
+                    wpc.conf.exploitable_by.append(p)
+    
+                else:
+                    print "[E] can't look up sid for " + t
+            except:
+                pass
+    
+        print "Only reporting privesc issues for these users/groups:"
+        for p in wpc.conf.exploitable_by:
+            print "* " + p.get_fq_name()        
+        return
     else:
-        print "[i] TSUserEnabled registry key is absent. Excluding TERMINAL SERVER USER"
-    print
+        wpc.conf.privesc_mode = "report_untrusted"
+        
+    # if user has specified list of trusted users, use only their list
+    if ignore_principals:
+        if options.ignorenoone:
+            wpc.conf.trusted_principals_fq = []
+        wpc.conf.trusted_principals_fq = wpc.conf.trusted_principals_fq + ignore_principals
+    else:
+        # otherwise the user has not specified a list of trusted users.  we intelligently tweak the list.
+        # Ignore "NT AUTHORITY\TERMINAL SERVER USER" if HKLM\System\CurrentControlSet\Control\Terminal Server\TSUserEnabled = 0 or doesn't exist
+        # See http://support.microsoft.com/kb/238965 for details
+        r = regkey(r"HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Terminal Server")
+    
+        if r.is_present():
+            v = r.get_value("TSUserEnabled")
+            if v is None:
+                print "[i] TSUserEnabled registry value is absent. Excluding TERMINAL SERVER USER"
+            elif v != 0:
+                print "[i] TSUserEnabled registry value is %s. Including TERMINAL SERVER USER" % v
+                wpc.conf.trusted_principals_fq.append("NT AUTHORITY\TERMINAL SERVER USER")
+            else:
+                print "[i] TSUserEnabled registry value is 0. Excluding TERMINAL SERVER USER"
+        else:
+            print "[i] TSUserEnabled registry key is absent. Excluding TERMINAL SERVER USER"
+        print
 
+        # TODO we only want to ignore this if it doesn't resolve
+        try:
+            # Server Operators group
+            #print "[D] converting string sid"
+            #print "%s" % win32security.ConvertStringSidToSid("S-1-5-32-549")
+            p = Group(win32security.ConvertStringSidToSid("S-1-5-32-549"))
+    
+        except:
+            wpc.conf.trusted_principals.append(p)
+    
+        # TODO this always ignored power users.  not what we want.
+        # only want to ignore when group doesn't exist.
+        try:
+            p = Group(win32security.ConvertStringSidToSid("S-1-5-32-547"))
+            wpc.conf.trusted_principals.append(p)
+        except:
+            pass
+    
+    # populate wpc.conf.trusted_principals with the objects corresponding to trusted_principals_fq
     for t in wpc.conf.trusted_principals_fq:
         try:
-            sid, name, i = win32security.LookupAccountName(wpc.conf.remote_server, t)
+            sid, _, _ = win32security.LookupAccountName(wpc.conf.remote_server, t)
             if sid:
                 p = principal(sid)
                 #print "Trusted: %s (%s) [%s]" % (p.get_fq_name(), p.get_type_string(), p.is_group_type())
@@ -249,24 +340,6 @@ def define_trusted_principals():
                 print "[E] can't look up sid for " + t
         except:
             pass
-
-    # TODO we only want to ignore this if it doesn't resolve
-    try:
-        # Server Operators group
-        #print "[D] converting string sid"
-        #print "%s" % win32security.ConvertStringSidToSid("S-1-5-32-549")
-        p = Group(win32security.ConvertStringSidToSid("S-1-5-32-549"))
-
-    except:
-        wpc.conf.trusted_principals.append(p)
-
-    # TODO this always ignored power users.  not what we want.
-    # only want to ignore when group doesn't exist.
-    try:
-        p = Group(win32security.ConvertStringSidToSid("S-1-5-32-547"))
-        wpc.conf.trusted_principals.append(p)
-    except:
-        pass
 
     print "Considering these users to be trusted:"
     for p in wpc.conf.trusted_principals:
@@ -515,6 +588,21 @@ def impersonate(username, password, domain):
 def populate_scaninfo(report):
     import socket
     import datetime
+    
+    report.add_info_item('privesc_mode', wpc.conf.privesc_mode)
+    if wpc.conf.privesc_mode == "report_untrusted":
+        report.add_info_item('exploitable_by', "N/A (running in report_untrusted mode)")
+        trusted = []
+        for t in wpc.conf.trusted_principals:
+            trusted.append(t.get_fq_name())
+        report.add_info_item('ignored_users', ",".join(trusted))
+    elif wpc.conf.privesc_mode == "exploitable_by":
+        report.add_info_item('ignored_users', "N/A (running in exploitable_by mode)")
+        exploitable_by = []
+        for e in wpc.conf.exploitable_by:
+            exploitable_by.append(e.get_fq_name())
+        report.add_info_item('exploitable_by', ",".join(exploitable_by))
+        
     report.add_info_item('hostname', socket.gethostname())
     report.add_info_item('datetime', datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
     report.add_info_item('version', wpc.utils.get_version())

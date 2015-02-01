@@ -29,6 +29,39 @@ ntsecuritycon.KEYEDEVENT_WAKE = 0x0002
 
 screensaver_max_timeout_secs = 600
 
+privesc_mode = "report_untrusted" # alternative is "exploitable_by"
+# report_untrusted: wpc will report privesc vectors accessible to all principals apart from trusted principals.  trusted principals are defined in trusted_principals_fq below.
+# --ignoreprincipal "terminal server users" --ignoreprincipal "power users" --ignoreprincipal "S-1-0-0-0"
+# --ignoreprincipalfile principals.txt
+
+# exploitable_by:   wpc will report privesc vectors accessible to a given list of principals only.  users can specify list of principals by ...
+# --exploitableby me
+# --exploitableby users --exploitableby "domain users" --exploitableby "authenticated users" --exploitableby "everyone"
+# --exploitableby someotheruser
+# --exploitablebyfile principals.txt
+
+# in exploitable_by mode, we only report issues exploitable by users/groups of interest.  it contains objects and is populated during initialisation (from --exploitableby and --exploitableme)
+exploitable_by = []
+                         
+# In "report_untrusted" (the default) we don't care if some users / groups hold dangerous permission because they're trusted
+# These have fully qualified names:
+trusted_principals_fq = [
+    "BUILTIN\\Administrators",
+    "NT SERVICE\\TrustedInstaller",
+    "NT AUTHORITY\\SYSTEM"
+]
+
+# We don't care if members of these groups hold dangerous permission because they're trusted
+# These have names without a domain:
+#trusted_principals = (
+    #"Administrators",
+    #"Domain Admins",
+    #"Enterprise Admins",
+#)
+
+# This gets auto-populated during initialisation from trusted_principals_fq and possibly --ignoreprincipal.  It contains objects, not strings like trusted_principals_fq above.
+trusted_principals = []
+
 reg_keys = {
     'Devices: Unsigned driver installation behavior': 'HKEY_LOCAL_MACHINE\Software\Microsoft\Driver Signing\Policy',
     'Recovery console: Allow automatic administrative logon ': 'HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Setup\RecoveryConsole\SecurityLevel',
@@ -1316,23 +1349,6 @@ reg_paths = (
 #    'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\RunServicesOnce',
 #    'HKEY_CURRENT_USER\Software\Microsoft\Windows NT\CurrentVersion\Windows',
 )
-
-# We don't care if some users / groups hold dangerous permission because they're trusted
-# These have fully qualified names:
-trusted_principals_fq = [
-    "BUILTIN\\Administrators",
-    "NT SERVICE\\TrustedInstaller",
-    "NT AUTHORITY\\SYSTEM"
-]
-
-# We don't care if members of these groups hold dangerous permission because they're trusted
-# These have names without a domain:
-#trusted_principals = (
-    #"Administrators",
-    #"Domain Admins",
-    #"Enterprise Admins",
-#)
-trusted_principals = []
 
 eventlog_key_hklm = 'SYSTEM\CurrentControlSet\Services\Eventlog'
 

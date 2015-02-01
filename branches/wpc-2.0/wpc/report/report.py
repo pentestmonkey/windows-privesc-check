@@ -197,9 +197,28 @@ class report():
                 <tr class="alt">
                     <td>IP Addresses</td>
                     <td>
-                        <ul>
-                            <li><xsl:value-of select="scaninfo/ipaddress"/></li>
-                        </ul>
+                            <xsl:value-of select="scaninfo/ipaddress"/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Privesc Mode</td>
+                    <td>
+                            <xsl:value-of select="scaninfo/privesc_mode"/>
+                    </td>
+                </tr>
+
+                <tr class="alt">
+                    <td>Principals considered untrusted (for exploitable_by mode)</td>
+                    <td>
+                            <xsl:value-of select="scaninfo/exploitable_by"/>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>Principals considered trusted (for report_untrusted mode)</td>
+                    <td>
+                            <xsl:value-of select="scaninfo/ignored_users"/>
                     </td>
                 </tr>
             </table> 
@@ -277,7 +296,7 @@ class report():
     def as_xml(self):
         # TODO: Top level version for XML schema
         # TODO: Raw data about object reported (files, service, etc.) 
-        r = etree.Element('report', xmlschemaversion = "1.0")
+        r = etree.Element('report', xmlschemaversion = "1.1")
         # etree.SubElement(r, 'xmlschemaversion').text = "1.0"
         s = etree.Element('scaninfo')
         for k in self.get_info().keys():

@@ -10,8 +10,7 @@ def parseOptions():
     parser  = OptionParser(usage = usage, version = wpc.utils.get_version())
     examine = OptionGroup(parser, "examine opts", "At least one of these to indicate what to examine (*=not implemented)")
     host    = OptionGroup(parser, "host opts", "Optional details about a remote host (experimental).  Default is current host.")
-    dump    = OptionGroup(parser, "dump opts", "Options to modify the behaviour of dump mode")
-    dumptab = OptionGroup(parser, "dumptab opts", "Options to modify the behaviour of dumptab mode")
+    dump    = OptionGroup(parser, "dump opts", "Options to modify the behaviour of dump/dumptab mode")
     report  = OptionGroup(parser, "report opts", "Reporting options")
 
     parser.add_option("--dump",   dest = "dump_mode",   default = False, action = "store_true", help = "Dumps info for you to analyse manually")
@@ -19,24 +18,24 @@ def parseOptions():
     parser.add_option("--audit",  dest = "audit_mode",  default = False, action = "store_true", help = "Identify and report security weaknesses")
 
     examine.add_option("-a", "--all",       dest = "do_all",           default = False, action = "store_true", help = "All Simple Checks (non-slow)")
-    examine.add_option("-t", "--paths",     dest = "do_paths",         default = False, action = "store_true", help = "PATH")
+    examine.add_option("-A", "--allfiles",  dest = "do_allfiles",      default = False, action = "store_true", help = "All Files and Directories (slow)")
     examine.add_option("-D", "--drives",    dest = "do_drives",        default = False, action = "store_true", help = "Drives*")
+    examine.add_option("-e", "--reg_keys",  dest = "do_reg_keys",      default = False, action = "store_true", help = "Misc security-related reg keys")
     examine.add_option("-E", "--eventlogs", dest = "do_eventlogs",     default = False, action = "store_true", help = "Event Log*")
+    examine.add_option("-G", "--groups",    dest = "do_groups",        default = False, action = "store_true", help = "Groups")
     examine.add_option("-H", "--shares",    dest = "do_shares",        default = False, action = "store_true", help = "Shares*")
-    examine.add_option("-T", "--patches",   dest = "patchfile",                                                help = "Patches.  Arg is filename of xlsx patch info.  Download from http://go.microsoft.com/fwlink/?LinkID=245778 or pass 'auto' to fetch automatically")
-    examine.add_option("-L", "--loggedin",  dest = "do_loggedin",      default = False, action = "store_true", help = "Logged In*")
-    examine.add_option("-S", "--services",  dest = "do_services",      default = False, action = "store_true", help = "Windows Services")
+    examine.add_option("-I", "--installed_software", dest = "do_installed_software", default = False, action = "store_true", help = "Installed Software")
+    examine.add_option("-j", "--tasks",     dest = "do_scheduled_tasks", default = False, action = "store_true", help = "Scheduled Tasks")
     examine.add_option("-k", "--drivers",   dest = "do_drivers",       default = False, action = "store_true", help = "Kernel Drivers")
-    examine.add_option("-R", "--processes", dest = "do_processes",     default = False, action = "store_true", help = "Processes")
+    examine.add_option("-L", "--loggedin",  dest = "do_loggedin",      default = False, action = "store_true", help = "Logged In*")
     examine.add_option("-O", "--ntobjects", dest = "do_nt_objects",    default = False, action = "store_true", help = "NT Objects")
     examine.add_option("-P", "--progfiles", dest = "do_program_files", default = False, action = "store_true", help = "Program Files Directory Tree")
     examine.add_option("-r", "--registry",  dest = "do_registry",      default = False, action = "store_true", help = "Registry Settings + Permissions")
-    examine.add_option("-j", "--tasks",     dest = "do_scheduled_tasks", default = False, action = "store_true", help = "Scheduled Tasks")
-    examine.add_option("-I", "--installed_software", dest = "do_installed_software", default = False, action = "store_true", help = "Installed Software")
+    examine.add_option("-R", "--processes", dest = "do_processes",     default = False, action = "store_true", help = "Processes")
+    examine.add_option("-S", "--services",  dest = "do_services",      default = False, action = "store_true", help = "Windows Services")
+    examine.add_option("-t", "--paths",     dest = "do_paths",         default = False, action = "store_true", help = "PATH")
+    examine.add_option("-T", "--patches",   dest = "patchfile",                                                help = "Patches.  Arg is filename of xlsx patch info.  Download from http://go.microsoft.com/fwlink/?LinkID=245778 or pass 'auto' to fetch automatically")
     examine.add_option("-U", "--users",     dest = "do_users",         default = False, action = "store_true", help = "Users")
-    examine.add_option("-G", "--groups",    dest = "do_groups",        default = False, action = "store_true", help = "Groups")
-    examine.add_option("-A", "--allfiles",  dest = "do_allfiles",      default = False, action = "store_true", help = "All Files and Directories (slow)")
-    examine.add_option("-e", "--reg_keys",  dest = "do_reg_keys",      default = False, action = "store_true", help = "Misc security-related reg keys")
     examine.add_option("-v", "--verbose",   dest = "verbose",          default = False, action = "store_true", help = "More verbose output on console")
 
     host.add_option("-s", "--server", dest = "remote_host",   help = "Remote host or IP")
@@ -49,19 +48,41 @@ def parseOptions():
     dump.add_option("-M", "--get_modals",     dest = "get_modals",     default = False, action = "store_true", help = "Dump password policy, etc.")
     dump.add_option("-V", "--get_privs",      dest = "get_privs",      default = False, action = "store_true", help = "Dump privileges for users/groups")
 
-    report.add_option("-o", "--report_file_stem",  dest = "report_file_stem",  default = False, help = "Filename stem for txt, html report files")
+    # Running out of letters for short options.  Here's a list of ones used
+    #    abcdefghijklmnopqrstuvwxyz
+    # uc xxxxx   xxx x xx xxxxx x  
+    # lc xx xx xxx  xx xx xxxxx x  
+    
+    report.add_option("-o", "--report_file_stem",         dest = "report_file_stem",      default = False,                       help = "Filename stem for txt, html report files")
+    report.add_option("-x", "--ignoreprincipal",          dest = "ignore_principal_list", default = [],    action = "append",    help = "Don't report privesc issues for these users/groups")
+    report.add_option("-X", "--ignoreprincipalfile",      dest = "ignore_principal_file", default = False,                       help = "Don't report privesc issues for these users/groups")
+    report.add_option("-0", "--ignorenoone",              dest = "ignorenoone",           default = False, action = "store_true",help = "No one is trusted (even Admin, SYSTEM).  hyphen zero")
+    report.add_option("-c", "--exploitablebycurrentuser", dest = "exploitable_by_me",     default = False, action = "store_true",help = "Report only privesc issues relating to current user")
+    report.add_option("-b", "--exploitableby",            dest = "exploitable_by_list",   default = [],    action = "append",    help = "Report privesc issues only for these users/groups")
+    report.add_option("-B", "--exploitablebyfile",        dest = "exploitable_by_file",   default = False,                       help = "Report privesc issues only for these user/groupss")
 
     parser.add_option_group(examine)
     parser.add_option_group(host)
     parser.add_option_group(dump)
-    parser.add_option_group(dumptab)
     parser.add_option_group(report)
 
-    (options, args) = parser.parse_args()
+    (options, _) = parser.parse_args()
 
+    if options.ignorenoone and not (options.ignore_principal_list or options.ignore_principal_file):
+        print "[W] -0 (--ignorenoone) specified without -x or -X.  This is a crazy thing to do in --audit mode.  Output of --dump/--dumptab will be huge!"
+        
     if options.audit_mode and not options.report_file_stem:
         print "[E] Specify report filename stem, e.g. '-o report-myhost'.  -h for help."
         sys.exit()
+
+    if options.exploitable_by_me and (options.ignore_principal_list or options.ignore_principal_file or options.exploitable_by_list or options.exploitable_by_file):
+        print "[E] When using -c, it doesn't make sense to use -x, -X, -b or -B"
+        sys.exit()
+        
+    if (options.ignore_principal_list or options.ignore_principal_file) and (options.exploitable_by_list or options.exploitable_by_file):
+        print "[E] When -b or -B, it doesn't make sense to use -x or -X"
+        sys.exit()
+    
 
     # TODO check file is writable.
 
