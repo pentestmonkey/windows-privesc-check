@@ -52,7 +52,6 @@ class token:
                 for tup in win32security.GetTokenInformation(self.get_th(), ntsecuritycon.TokenGroups):
                     sid = tup[0]
                     attr = tup[1]
-                    attr_str = attr
                     if attr < 0:
                         attr = 2 ** 32 + attr
                     attr_str_a = []
@@ -64,7 +63,15 @@ class token:
                         attr_str_a.append("ENABLED")
                     if attr & 8:
                         attr_str_a.append("OWNER")
-                    if attr & 0x40000000:
+                    if attr & 16:
+                        attr_str_a.append("USE_FOR_DENY_ONLY")
+                    if attr & 0x00000020:
+                        attr_str_a.append("INTEGRITY")
+                    if attr & 0x00000040:
+                        attr_str_a.append("INTEGRITY_ENABLED")
+                    if attr & 0x20000000:
+                        attr_str_a.append("RESOURCE")
+                    if attr & 0xC0000000:
                         attr_str_a.append("LOGON_ID")
                     self.token_groups.append((principal(sid), attr_str_a))
             except:
@@ -275,8 +282,6 @@ class token:
         t += "TokenElevationType: " + str(self.get_token_elevation_type()) + "\n"
         t += "TokenUIAccess: " + str(self.get_token_ui_access()) + "\n"
         t += "TokenLinkedToken: " + str(self.get_token_linked_token()) + "\n"
-        if self.get_token_linked_token():
-            t += token(self.get_token_linked_token()).as_text_no_rec2()
         t += "TokenLogonSid: " + str(self.get_token_logon_sid()) + "\n"
         t += "TokenElevation: " + str(self.get_token_elevation()) + "\n"
         t += "TokenIntegrityLevel: " + str(self.get_token_integrity_level().get_fq_name()) + "\n"
@@ -288,6 +293,8 @@ class token:
         t += "Token Groups:\n"
         for g, attr_a in self.get_token_groups():
             t += "\t%s: %s\n" % (g.get_fq_name(), "|".join(attr_a))
+        if self.get_token_linked_token():
+            t += token(self.get_token_linked_token()).as_text_no_rec2()
         t += '--- End Access Token ---\n'
         return t
 
@@ -356,7 +363,7 @@ class token:
         return t
 
     def as_text(self):
-        t = '--- start access token ---\n'
+        t = '--- Start Access Token ---\n'
 
         if self.get_th_int():
             t += "Token Handle: %s\n" % int(self.get_th_int())
@@ -373,8 +380,6 @@ class token:
         t += "TokenElevationType: " + str(self.get_token_elevation_type()) + "\n"
         t += "TokenUIAccess: " + str(self.get_token_ui_access()) + "\n"
         t += "TokenLinkedToken: " + str(self.get_token_linked_token()) + "\n"
-        if self.get_token_linked_token():
-            t += token(self.get_token_linked_token()).as_text_no_rec()
         t += "TokenLogonSid: " + str(self.get_token_logon_sid()) + "\n"
         t += "TokenElevation: " + str(self.get_token_elevation()) + "\n"
         if self.get_token_integrity_level():
@@ -395,7 +400,10 @@ class token:
         t += "\nToken Security Descriptor:\n"
         if self.get_sd():
             t += self.get_sd().as_text()
-        t += '--- end access token ---\n'
+        if self.get_token_linked_token():
+            t += "\nDumping linked access token:\n"
+            t += token(self.get_token_linked_token()).as_text_no_rec()
+        t += '--- End Access Token ---\n'
 
         #print "token: as_text returning %s" % t
         return t

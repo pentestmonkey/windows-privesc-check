@@ -58,8 +58,8 @@ class ace:
     def set_otype(self, otype):
         self.otype = otype
 
-    def set_type(self, type):
-        self.type = type
+    def set_type(self, principal_type):
+        self.type = principal_type
 
     def get_principal(self):
         return self.principal

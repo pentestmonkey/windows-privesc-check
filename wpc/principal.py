@@ -68,8 +68,8 @@ class principal:
             self.get_name()  # side effect sets domain
         return self.domain
 
-    def set_type(self, type):
-        self.type = type
+    def set_type(self, principal_type):
+        self.type = principal_type
 
     def get_type_string(self):
         return self.resolve_type(self.get_type())
@@ -106,11 +106,11 @@ class principal:
             else:
                 try:
                     #print wpc.conf.cache.LookupAccountSid(self.get_remote_server(), self.get_sid())
-                    self.name, domain, type = list(wpc.conf.cache.LookupAccountSid(self.get_remote_server(), self.get_sid()))
+                    self.name, domain, sid_type = list(wpc.conf.cache.LookupAccountSid(self.get_remote_server(), self.get_sid()))
                 except:
                     self.cant_resolve = 1
-                    self.name, domain, type = self.get_sid_string(), "[unknown]", 8
-                self.set_type(type)
+                    self.name, domain, sid_type = self.get_sid_string(), "[unknown]", 8
+                self.set_type(sid_type)
                 self.set_domain(domain)
         return self.name
 
@@ -121,44 +121,57 @@ class principal:
 #        return 0
 
     def is_trusted(self):
-#        print "Testing if %s is trusted" % self.get_fq_name()
-        if self.trusted_set:
-            #print "Cache result returned for trust of %s: %s" % (self.get_fq_name(), self.trusted)
-            return self.trusted
-
-        # TODO optimize this.  It's called a LOT!
-        if self.is_group_type() and self.get_type() == 4:
-            g = wpc.group.group(self.get_sid())
-            # Groups with zero members are trusted - i.e. not interesting
-            if len(g.get_members()) == 0:
-                self.trusted_set = 1
-                self.trusted = 1
-                #print "Ignoring empty group %s (type %s)" % (self.get_fq_name(), self.get_type())
-                return 1
-
-        for p in wpc.conf.trusted_principals:
-            # This also recurses through sub groups
-#            print "Testing if %s is in %s" % (self.get_fq_name(), p.get_fq_name())
-#            print "[D] pincipal.is_trusted: %s is group? %s" % (p.get_fq_name(), p.is_group_type())
-#            print "[D] self.is_in_group(p): %s" % (self.is_in_group(p))
-            if p.is_group_type() and self.is_in_group(p):
-#                print "Yes"
-                self.trusted_set = 1
-                self.trusted = 1
-#                print "%s is trusted.  Member of trusted group %s" % (self.get_fq_name(), p.get_fq_name())
-                return 1
-            else:
-                #print "No"
-#                print "User type"
-                if p.get_sid() == self.get_sid():
+        if wpc.conf.privesc_mode == "report_untrusted":
+    #        print "Testing if %s is trusted" % self.get_fq_name()
+            if self.trusted_set:
+                #print "Cache result returned for trust of %s: %s" % (self.get_fq_name(), self.trusted)
+                return self.trusted
+    
+            # TODO optimize this.  It's called a LOT!
+            if self.is_group_type() and self.get_type() == 4:
+                g = wpc.group.group(self.get_sid())
+                # Groups with zero members are trusted - i.e. not interesting
+                if len(g.get_members()) == 0:
                     self.trusted_set = 1
                     self.trusted = 1
-                    #print "%s is trusted.  Is trusted user %s" % (self.get_fq_name(), p.get_fq_name())
+                    #print "Ignoring empty group %s (type %s)" % (self.get_fq_name(), self.get_type())
                     return 1
-        self.trusted_set = 1
-        self.trusted = 0
-        #print "%s is not trusted" % self.get_fq_name()
-        return 0
+    
+            for p in wpc.conf.trusted_principals:
+                # This also recurses through sub groups
+    #            print "Testing if %s is in %s" % (self.get_fq_name(), p.get_fq_name())
+    #            print "[D] pincipal.is_trusted: %s is group? %s" % (p.get_fq_name(), p.is_group_type())
+    #            print "[D] self.is_in_group(p): %s" % (self.is_in_group(p))
+                if p.is_group_type() and self.is_in_group(p):
+    #                print "Yes"
+                    self.trusted_set = 1
+                    self.trusted = 1
+    #                print "%s is trusted.  Member of trusted group %s" % (self.get_fq_name(), p.get_fq_name())
+                    return 1
+                else:
+                    #print "No"
+    #                print "User type"
+                    if p.get_sid() == self.get_sid():
+                        self.trusted_set = 1
+                        self.trusted = 1
+                        #print "%s is trusted.  Is trusted user %s" % (self.get_fq_name(), p.get_fq_name())
+                        return 1
+            self.trusted_set = 1
+            self.trusted = 0
+            #print "%s is not trusted" % self.get_fq_name()
+            return 0
+        
+        # Principals on the exploitable_by list are NOT trusted.  Everyone else is.
+        if wpc.conf.privesc_mode == "exploitable_by":
+            for p in wpc.conf.exploitable_by:
+                if p.get_sid() == self.get_sid():
+                    self.trusted_set = 1
+                    self.trusted = 0
+                    return 0
+            self.trusted_set = 1
+            self.trusted = 1
+            return 1
+            
 
     def is_in_group(self, group):
         # print "is_in_group called for %s, %s" % (self.get_fq_name(), group.get_name())
