@@ -638,6 +638,79 @@ def audit_reg_keys(report):
     if v is None or v == 0:
         report.get_by_id("WPC107").add_supporting_data('reg_key_value', [r, "CWDIllegalInDllSearch", v])
 
+    # Microsoft network client: Send unencrypted password to connect to third-party SMB servers
+    r = regkey('HKLM\\System\\CurrentControlSet\\Services\\LanmanWorkstation\\Parameters')
+    v = r.get_value("EnablePlainTextPassword")
+    if v == 1:
+        report.get_by_id("WPC172").add_supporting_data('reg_key_value', [r, "EnablePlainTextPassword", v])
+
+    # TODO need to ignore this for domain controllers 
+    # Network access: Do not allow anonymous enumeration of SAM accounts
+    r = regkey('HKLM\\System\\CurrentControlSet\\Control\\Lsa')
+    v = r.get_value("RestrictAnonymousSAM")
+    if v == 0:
+        report.get_by_id("WPC173").add_supporting_data('reg_key_value', [r, "RestrictAnonymousSAM", v])
+
+    # Network access: Do not allow anonymous enumeration of SAM accounts and shares
+    r = regkey('HKLM\\System\\CurrentControlSet\\Control\\Lsa')
+    v = r.get_value("RestrictAnonymous")
+    if v is None or v == 0:
+        report.get_by_id("WPC174").add_supporting_data('reg_key_value', [r, "RestrictAnonymous", v])
+
+    # Network access: Let Everyone permissions apply to anonymous users   
+    r = regkey('HKLM\\System\\CurrentControlSet\\Control\\Lsa')
+    v = r.get_value("EveryoneIncludesAnonymous")
+    if v == 1:
+        report.get_by_id("WPC175").add_supporting_data('reg_key_value', [r, "EveryoneIncludesAnonymous", v])
+
+    # Network access: Restrict anonymous access to Named Pipes and Shares 
+    r = regkey('HKLM\\System\\CurrentControlSet\\Services\\LanManServer\\Parameters')
+    v = r.get_value("RestrictNullSessAccess")
+    if v == 0:
+        report.get_by_id("WPC176").add_supporting_data('reg_key_value', [r, "RestrictNullSessAccess", v])
+
+    # Network access: Shares that can be accessed anonymously              
+    r = regkey('HKLM\\System\\CurrentControlSet\\Services\\LanManServer\\Parameters')
+    v = r.get_value("NullSessionShares")
+    if v is not None and not v == "":
+        report.get_by_id("WPC177").add_supporting_data('reg_key_value', [r, "NullSessionShares", v])
+
+    # Network security: Configure encryption types allowed for Kerberos 
+    # TODO windows 7 / 2008 R2 or higher only 
+    r = regkey('HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\Kerberos\\Parameters')
+    v = r.get_value("SupportedEncryptionTypes")
+    if v is None or v & 1 or v & 2:
+        report.get_by_id("WPC178").add_supporting_data('reg_key_value', [r, "SupportedEncryptionTypes", v])
+
+    # Network security: Restrict NTLM: Outgoing NTLM traffic to remote servers 
+    r = regkey('HKLM\\System\\CurrentControlSet\\Control\\Lsa\\MSV1_0')
+    v = r.get_value("RestrictSendingNTLMTraffic")
+    if v is None or v != 2:
+        report.get_by_id("WPC179").add_supporting_data('reg_key_value', [r, "RestrictSendingNTLMTraffic", v])
+
+    # Network security: Restrict NTLM: Incoming NTLM traffic  
+    r = regkey('HKLM\\System\\CurrentControlSet\\Control\\Lsa\\MSV1_0')
+    v = r.get_value("RestrictReceivingNTLMTraffic")
+    if v is None or v == 0:
+        report.get_by_id("WPC180").add_supporting_data('reg_key_value', [r, "RestrictReceivingNTLMTraffic", v])
+
+    # Recovery console: Allow automatic administrative logon  
+    r = regkey('HKLM\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Setup\\RecoveryConsole')
+    v = r.get_value("SecurityLevel")
+    if v == 1:
+        report.get_by_id("WPC181").add_supporting_data('reg_key_value', [r, "SecurityLevel", v])
+
+    # System objects: Strengthen default permissions of internal system objects (e.g., Symbolic Links)
+    r = regkey('HKLM\\System\\CurrentControlSet\\Control\\Session Manager')
+    v = r.get_value("ProtectionMode")
+    if v is None or v == 0:
+        report.get_by_id("WPC182").add_supporting_data('reg_key_value', [r, "ProtectionMode", v])
+
+    # Network access: Do not allow storage of passwords and credentials for network authentication
+    r = regkey('HKLM\\System\\CurrentControlSet\\Control\\Lsa')
+    v = r.get_value("ProtectionMode")
+    if v is None or v == 0:
+        report.get_by_id("WPC183").add_supporting_data('reg_key_value', [r, "disabledomaincreds", v])
 
 def audit_nt_objects(report):
     root = ntobj("\\")
