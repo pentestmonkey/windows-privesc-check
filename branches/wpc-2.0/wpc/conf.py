@@ -4765,6 +4765,174 @@ NB: This issue has only been reported for NTFS filesystems.  Other non-NTFS file
           },
        }
     },
+    'WPC172': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Microsoft network client: Send unencrypted password to connect to third-party SMB servers => enabled",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'reg_key_value': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC173': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Network access: Do not allow anonymous enumeration of SAM accounts => disabled",
+       'description': '''TODO ignore this issue for Domain Controller.  The setting doesn't apply to DCs.''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'reg_key_value': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC174': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Network access: Do not allow anonymous enumeration of SAM accounts and shares => disabled",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'reg_key_value': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC175': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Network access: Let Everyone permissions apply to anonymous users => enabled",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'reg_key_value': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC176': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Network access: Restrict anonymous access to Named Pipes and Shares => disabled",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'reg_key_value': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC177': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Network access: Shares that can be accessed anonymously => not empty",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'reg_key_value': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC179': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Network security: Restrict NTLM: Outgoing NTLM traffic to remote servers => not Deny All",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'reg_key_value': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC178': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Network security: Configure encryption types allowed for Kerberos => weak",
+       'description': '''Includes DES / CRC or empty.  Applies to Win7/2008R2+ only - so will be false positive on earlier OSs.''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'reg_key_value': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC180': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Network security: Restrict NTLM: Incoming NTLM traffic => Allow All",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'reg_key_value': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC181': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Recovery console: Allow automatic administrative logon => enabled",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'reg_key_value': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC182': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "System objects: Strengthen default permissions of internal system objects (e.g., Symbolic Links) => disabled",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'reg_key_value': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
+    'WPC183': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Network access: Do not allow storage of passwords and credentials for network authentication => disabled",
+       'description': '''TODO''',
+       'recommendation': '''TODO''',
+       'supporting_data': {
+          'reg_key_value': {
+             'section': "description",
+             'preamble': "TODO:",
+          },
+       }
+    },
 }
 
 
