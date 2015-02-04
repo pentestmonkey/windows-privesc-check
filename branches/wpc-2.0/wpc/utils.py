@@ -510,6 +510,8 @@ def expander(mo):
     return os.environ.get(mo.group()[1:-1], 'UNKNOWN')
 
 def to_printable(s):
+    if s is None:
+        return None
     newstring = ""
     for c in s:
         if c in string.printable:

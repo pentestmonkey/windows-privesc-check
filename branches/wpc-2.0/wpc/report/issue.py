@@ -147,6 +147,14 @@ class issue:
                 etree.SubElement(d, 'data').text = "  %s\n" % (f.as_text())
                 etree.SubElement(d, 'data').text = "  %s\n" % (fp.as_text())
 
+        elif data_name == 'software':
+            for data in self.get_supporting_data(data_name):
+                name = data[0]
+                publisher = data[1]
+                version = data[2]
+                date = data[3]
+                etree.SubElement(d, 'data').text = " %s (v%s) by %s (last updated: %s)" % (name, version, publisher, date)
+
         elif data_name == 'service_exe_parent_dir_perms':
             for data in self.get_supporting_data(data_name):
                 s = data[0]

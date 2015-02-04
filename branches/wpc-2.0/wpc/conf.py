@@ -4933,6 +4933,118 @@ NB: This issue has only been reported for NTFS filesystems.  Other non-NTFS file
           },
        }
     },
+    'WPC184': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Software Installed That Is Normally Only Used By Developers",
+       'description': '''This is not necessarily a security issue.  Some software packages were installed that are normally used by developers.  This may indicate the nature of the system being audited or present ideas about how the host could be leaveraged during the security assessment.''',
+       'recommendation': '''Review the software installed and determine if it can be leaveraged for your security assessment.''',
+       'supporting_data': {
+          'software': {
+             'section': "description",
+             'preamble': "The following software was installed:",
+          },
+       }
+    },
+    'WPC185': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Software Installed That Is Normally Used By Admnistrators",
+       'description': '''This is not necessarily a security issue.  Some software packages were installed that are normally used by administrators.  This may indicate the nature of the system being audited or present ideas about how the host could be leaveraged during the security assessment.''',
+       'recommendation': '''Review the software installed and determine if it can be leaveraged for your security assessment.''',
+       'supporting_data': {
+          'software': {
+             'section': "description",
+             'preamble': "The following software was installed:",
+          },
+       }
+    },
+    'WPC186': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Software Installed That Might Enforce Security",
+       'description': '''This is not necessarily a security issue.  Some software was installed that might be acting as a security control (e.g. Anti-Virus) or might require further security auditing.''',
+       'recommendation': '''Review the installed software and determine if it poses and obstacle to your pentest or an opportunity to enhance your security audit.''',
+       'supporting_data': {
+          'software': {
+             'section': "description",
+             'preamble': "The following software was installed:",
+          },
+       }
+    },
+    'WPC187': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Software Installed That Is Not Normally Found On Production Systems",
+       'description': '''This is not necessarily a security issue.  Some of the installed software is normally omitted from production builds because it is not required.''',
+       'recommendation': '''Check if the software is really required.''',
+       'supporting_data': {
+          'software': {
+             'section': "description",
+             'preamble': "The following software was installed:",
+          },
+       }
+    },
+    'WPC188': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Software Installed That Might Indicate Further Avenues Of Attack",
+       'description': '''This is not necessarily a security issue.  Some software  (like password vaults) indicates that there might be data worth compromising on this system.''',
+       'recommendation': '''Check if the software can be used to further your pentest or enhance your security audit.''',
+       'supporting_data': {
+          'software': {
+             'section': "description",
+             'preamble': "The following software was installed:",
+          },
+       }
+    },
+    'WPC189': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Software Installed That Might Present A Client-Side Compromise Vector",
+       'description': '''This is not necessarily a security issue.  Certain clinet side software is routinely used to compromise hosts.  This issue lists some client-side software that may or may not fall into this category.''',
+       'recommendation': '''Review the software to determine if it is required and if it is vulnerable.''',
+       'supporting_data': {
+          'software': {
+             'section': "description",
+             'preamble': "The following software was installed:",
+          },
+       }
+    },
+    'WPC190': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Software Installed That Connects To Other Networks",
+       'description': '''This is not a security issue.  Some software was installed that is used to connet to other networks (e.g. VPN software).  This can be interested during pentests and security audits.''',
+       'recommendation': '''Review the software installed and determine if it can be leaveraged for your security assessment.''',
+       'supporting_data': {
+          'software': {
+             'section': "description",
+             'preamble': "The following software was installed:",
+          },
+       }
+    },
+    'WPC191': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "List Of Installed Software",
+       'description': '''This is not a security issue.  A list of installed software packages can be useful during an audit.  This list was derrived from the registry key HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall.''',
+       'recommendation': '''Review the list and determine if anything unnecessary or vulnerable is installed (version number has been included).''',
+       'supporting_data': {
+          'software': {
+             'section': "description",
+             'preamble': "The following software was installed:",
+          },
+       }
+    },
 }
 
 
