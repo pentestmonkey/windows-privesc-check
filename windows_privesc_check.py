@@ -526,14 +526,16 @@ def audit_installed_software(report):
         'issue': "WPC185",
         'names': [
             "VMware vSphere Client",
-            "IBM i Access for Windows"
+            "IBM i Access for Windows",
+            "Microsoft Baseline Security Analyzer"
         ]
     }
     software['security_product'] = {
         'issue': "WPC186",
         'names': [
             "Sophos AutoUpdate",
-            "Sophos Anti-Virus"
+            "Sophos Anti-Virus",
+            "Symantec Encryption Desktop"
         ]
     }
     software['non_production'] = {
@@ -550,7 +552,8 @@ def audit_installed_software(report):
         'issue': "WPC188",
         'names': [
             "KeePass",
-            "Gpg4win"
+            "Gpg4win",
+            "Symantec Encryption Desktop"
         ]
     }
     software['clientside_vector'] = {
@@ -564,7 +567,8 @@ def audit_installed_software(report):
             "Adobe Reader",
             "Adobe Flash Playe",
             "Mozilla Firefox",
-            "Mozilla Thunderbird"
+            "Mozilla Thunderbird",
+            "Microsoft Office"
         ]
     }
     software['other_networks'] = {
@@ -572,7 +576,9 @@ def audit_installed_software(report):
         'names': [
             "Citrix Online Launcher",
             "Juniper Networks",
-            "Array Networks SSL VPN"        
+            "Array Networks SSL VPN",
+            "OpenVPN",
+            "TAP-Windows" 
         ]
     }
     print '[+] Checking installed software'
