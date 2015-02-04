@@ -2,6 +2,7 @@ from wpc.file import file as File
 from wpc.groups import groups
 from wpc.parseOptions import parseOptions
 from wpc.processes import processes
+from wpc.process import process
 from wpc.regkey import regkey
 from wpc.report.fileAcl import fileAcl
 from wpc.report.report import report
@@ -105,6 +106,17 @@ def dumptab_installed_software():
             if name:
                 print wpc.utils.tab_line("info", "installed_software", name, publisher, version, date)
 
+        if process(os.getpid()).is_wow64():
+            print '[+] Checking installed software (WoW64 enabled)'
+            uninstall = regkey('HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall', view=64)
+            if uninstall.is_present():
+                for subkey in uninstall.get_subkeys():
+                    name = subkey.get_value("DisplayName")
+                    publisher = subkey.get_value("Publisher")
+                    version = subkey.get_value("DisplayVersion")
+                    date = subkey.get_value("InstallDate")
+                    if name:
+                        print wpc.utils.tab_line("info", "installed_software", name, publisher, version, date)
 
 def dumptab_loggedin():
     resume = 0
@@ -501,6 +513,99 @@ def dump_nt_objects(report):
 
 
 # ---------------------- Define --audit Subs ---------------------------
+def audit_installed_software(report):
+    uninstall = regkey('HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall')
+    software = {}
+    software['developer'] = {
+        'issue': "WPC184",
+        'names': [
+                  "VMware Workstation"
+        ]
+    }
+    software['administrator'] = {
+        'issue': "WPC185",
+        'names': [
+            "VMware vSphere Client",
+            "IBM i Access for Windows"
+        ]
+    }
+    software['security_product'] = {
+        'issue': "WPC186",
+        'names': [
+            "Sophos AutoUpdate",
+            "Sophos Anti-Virus"
+        ]
+    }
+    software['non_production'] = {
+        'issue': "WPC187",
+        'names': [
+            "Cain & Abel",
+            "IDA Pro Free",
+            "WinPcap",
+            "Wireshark",
+            "Netsparker"
+        ]
+    }
+    software['steal'] = {
+        'issue': "WPC188",
+        'names': [
+            "KeePass",
+            "Gpg4win"
+        ]
+    }
+    software['clientside_vector'] = {
+        'issue': "WPC189",
+        'names': [
+            "Foxit Reader",
+            "Java Auto Updater",
+            "Google Chrome",
+            "Java 8 Update",
+            "LibreOffice",
+            "Adobe Reader",
+            "Adobe Flash Playe",
+            "Mozilla Firefox",
+            "Mozilla Thunderbird"
+        ]
+    }
+    software['other_networks'] = {
+        'issue': "WPC190",
+        'names': [
+            "Citrix Online Launcher",
+            "Juniper Networks",
+            "Array Networks SSL VPN"        
+        ]
+    }
+    print '[+] Checking installed software'
+    if uninstall.is_present():
+        for subkey in uninstall.get_subkeys():
+            name = wpc.utils.to_printable(subkey.get_value("DisplayName"))
+            publisher = wpc.utils.to_printable(subkey.get_value("Publisher"))
+            version = wpc.utils.to_printable(subkey.get_value("DisplayVersion"))
+            date = wpc.utils.to_printable(subkey.get_value("InstallDate"))
+            if name is not None:
+                report.get_by_id("WPC191").add_supporting_data('software', [name, publisher, version, date])
+                for sw_category in software.keys():
+                    for sw_prefix in software[sw_category]['names']:
+                        if name.lower().find(sw_prefix.lower()) == 0:
+                            report.get_by_id(software[sw_category]['issue']).add_supporting_data('software', [name, publisher, version, date])
+
+        if wpc.conf.on64bitwindows:
+            print '[+] Checking installed software (WoW64 enabled)'
+            uninstall = regkey('HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall', view=64)
+            if uninstall.is_present():
+                for subkey in uninstall.get_subkeys():
+                    name = wpc.utils.to_printable(subkey.get_value("DisplayName"))
+                    publisher = wpc.utils.to_printable(subkey.get_value("Publisher"))
+                    version = wpc.utils.to_printable(subkey.get_value("DisplayVersion"))
+                    date = wpc.utils.to_printable(subkey.get_value("InstallDate"))
+                    if name is not None:
+                        report.get_by_id("WPC191").add_supporting_data('software', [name, publisher, version, date])
+                        for sw_category in software.keys():
+                            for sw_prefix in software[sw_category]['names']:
+                                if name.lower().find(sw_prefix.lower()) == 0:
+                                    report.get_by_id(software[sw_category]['issue']).add_supporting_data('software', [name, publisher, version, date])
+
+
 def audit_eventlogs(report):
     # TODO WPC009 Insecure Permissions On Event Log Registry Key
     key_string = "HKEY_LOCAL_MACHINE\\" + wpc.conf.eventlog_key_hklm
@@ -2195,6 +2300,13 @@ if options.audit_mode:
             audit_groups(issues)
         except:
             pass
+
+    if options.do_all or options.do_installed_software:
+        section("audit_installed_software")
+#        try:
+        audit_installed_software(issues)
+#        except:
+#            pass
 
     if options.report_file_stem:
         printline("Audit Complete")

@@ -9,7 +9,7 @@ import wpc.conf
 
 # regkeys or directories
 class regkey:
-    def __init__(self, key_string):
+    def __init__(self, key_string, **kwargs):
         # print "[D] Created regkey obj for " + name
         self.sd = None
         self.keyh = None
@@ -17,6 +17,9 @@ class regkey:
         self.path = None
         self.set_name(key_string)
         self.parent_key = None
+        self.view = None
+        if 'view' in kwargs.keys():
+            self.view = kwargs['view']   # 64 or 32 
 
     def set_name(self, key_string):
         parts = key_string.split("\\")
@@ -92,7 +95,7 @@ class regkey:
         try:
             subkeys = win32api.RegEnumKeyEx(self.get_keyh())
             for subkey in subkeys:
-                subkey_objects.append(regkey(self.get_name() + "\\" + subkey[0]))
+                subkey_objects.append(regkey(self.get_name() + "\\" + subkey[0], view=self.view))
         except:
             pass
         return subkey_objects
@@ -124,7 +127,13 @@ class regkey:
         if not self.keyh:
             try:
                 # self.keyh = win32api.RegOpenKeyEx(getattr(win32con, self.get_hive()), self.get_path(), 0, win32con.KEY_ENUMERATE_SUB_KEYS | win32con.KEY_QUERY_VALUE | win32con.KEY_READ)
-                self.keyh = win32api.RegOpenKeyEx(getattr(win32con, self.get_hive()), self.get_path(), 0, win32con.KEY_ENUMERATE_SUB_KEYS | win32con.KEY_QUERY_VALUE | ntsecuritycon.READ_CONTROL)
+                if self.view is None:
+                    self.keyh = win32api.RegOpenKeyEx(getattr(win32con, self.get_hive()), self.get_path(), 0, win32con.KEY_ENUMERATE_SUB_KEYS | win32con.KEY_QUERY_VALUE | ntsecuritycon.READ_CONTROL)
+                else:
+                    if self.view == 32:
+                        self.keyh = win32api.RegOpenKeyEx(getattr(win32con, self.get_hive()), self.get_path(), 0, win32con.KEY_ENUMERATE_SUB_KEYS | win32con.KEY_QUERY_VALUE | ntsecuritycon.READ_CONTROL | win32con.KEY_WOW64_32KEY)
+                    elif self.view == 64:
+                        self.keyh = win32api.RegOpenKeyEx(getattr(win32con, self.get_hive()), self.get_path(), 0, win32con.KEY_ENUMERATE_SUB_KEYS | win32con.KEY_QUERY_VALUE | ntsecuritycon.READ_CONTROL | win32con.KEY_WOW64_64KEY)
             except:
                 pass
                 # print "Can't open: " + self.get_name()
