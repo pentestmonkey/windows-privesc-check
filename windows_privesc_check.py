@@ -657,7 +657,7 @@ def audit_reg_keys(report):
         ss_exe     = r.get_value("SCRNSAVE.EXE")
         ss_secure  = r.get_value("ScreenSaverIsSecure")
         ss_timeout = r.get_value("ScreenSaveTimeout")
-
+    
         # Lookup username for this registry branch
         m = re.search('HKEY_USERS.(S-[\d-]+)', r.get_name())
         u = None
@@ -665,14 +665,14 @@ def audit_reg_keys(report):
             string_sid = m.group(1)
             binary_sid = win32security.GetBinarySid(string_sid)
             u = user(binary_sid)
-
+    
         # Screen saver is inactive
         if ss_active and int(ss_active) == 0:
             report.get_by_id("WPC103").add_supporting_data('user_reg_keys', [u, r, "ScreenSaveActive", ss_active])
-
+    
         # Screen saver is active
         elif ss_exe and int(ss_active) > 0:
-
+    
             if int(ss_secure) > 0:
                 # should have low timeout
                 if int(ss_timeout) > int(wpc.conf.screensaver_max_timeout_secs):
@@ -681,7 +681,23 @@ def audit_reg_keys(report):
                 # should ask for password
                 report.get_by_id("WPC090").add_supporting_data('user_reg_keys', [u, r, "ScreenSaverIsSecure", ss_secure])
 
-
+    # Windows autologon
+    r = regkey('HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon', view=64)
+    defaultuser = r.get_value("DefaultUserName")
+    password = r.get_value("DefaultPassword")
+    domain = r.get_value("DefaultDomainName")
+    aal = r.get_value("AutoAdminLogon")
+    if defaultuser is not None or password is not None or domain is not None or aal is not None:
+        if defaultuser is None:
+            defaultuser = "[not set]"
+        if password is None:
+            password = "[not set]"
+        if domain is None:
+            domain = "[not set]"
+        if aal is None:
+            aal = "[not set]"
+        report.get_by_id("WPC192").add_supporting_data('aal', ['HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon', defaultuser, password, domain, aal])
+    
     # UAC checks.  Note that we only report UAC misconfigurations when UAC is enabled.  If UAC
     #              is disabled, we just report that it's disabled.
     r = regkey('HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System')
@@ -2281,10 +2297,10 @@ if options.audit_mode:
 
     if options.do_all or options.do_reg_keys:
         section("audit_reg_keys")
-        try:
-            audit_reg_keys(issues)
-        except:
-            pass
+#        try:
+        audit_reg_keys(issues)
+#        except:
+#            pass
 
     if options.do_all or options.do_users:
         section("audit_users")
@@ -2309,10 +2325,10 @@ if options.audit_mode:
 
     if options.do_all or options.do_installed_software:
         section("audit_installed_software")
-#        try:
-        audit_installed_software(issues)
-#        except:
-#            pass
+        try:
+            audit_installed_software(issues)
+        except:
+            pass
 
     if options.report_file_stem:
         printline("Audit Complete")
