@@ -155,6 +155,15 @@ class issue:
                 date = data[3]
                 etree.SubElement(d, 'data').text = " %s (v%s) by %s (last updated: %s)" % (name, version, publisher, date)
 
+        elif data_name == 'aal':
+            for data in self.get_supporting_data(data_name):
+                keyname = data[0]
+                user = data[1]
+                password = data[2]
+                domain = data[3]
+                aal = data[4]
+                etree.SubElement(d, 'data').text = " Registry key %s had these values set: AutoAdminLogon=%s DefaultDomainName=%s DefaultUserName=%s DefaultPassword=%s" % (keyname, aal, domain, user, password)
+
         elif data_name == 'service_exe_parent_dir_perms':
             for data in self.get_supporting_data(data_name):
                 s = data[0]

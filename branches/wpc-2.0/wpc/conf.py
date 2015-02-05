@@ -5287,6 +5287,20 @@ NB: This issue has only been reported for NTFS filesystems.  Other non-NTFS file
           },
        }
     },
+    'WPC192': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Windows Autologon Registry Keys Set",
+       'description': '''One or more of the registry keys for Windows autologon was found to be set.  These can explose locally valid logon credentials in cleartext.''',
+       'recommendation': '''Review the information below and determine if is exposes sensitive information.  Avoid the use of autologin where possible.''',
+       'supporting_data': {
+          'aal': {
+             'section': "description",
+             'preamble': "The following information was retreived from the registry:",
+          },
+       }
+    },
 }
 
 
