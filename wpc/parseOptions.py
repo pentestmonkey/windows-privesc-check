@@ -13,9 +13,10 @@ def parseOptions():
     dump    = OptionGroup(parser, "dump opts", "Options to modify the behaviour of dump/dumptab mode")
     report  = OptionGroup(parser, "report opts", "Reporting options")
 
-    parser.add_option("--dump",   dest = "dump_mode",   default = False, action = "store_true", help = "Dumps info for you to analyse manually")
-    parser.add_option("--dumptab",dest = "dumptab_mode",default = False, action = "store_true", help = "Dumps info in tab-delimited format")
-    parser.add_option("--audit",  dest = "audit_mode",  default = False, action = "store_true", help = "Identify and report security weaknesses")
+    parser.add_option("--dump",     dest = "dump_mode",   default = False, action = "store_true", help = "Dumps info for you to analyse manually")
+    parser.add_option("--dumptab",  dest = "dumptab_mode",default = False, action = "store_true", help = "Dumps info in tab-delimited format")
+    parser.add_option("--audit",    dest = "audit_mode",  default = False, action = "store_true", help = "Identify and report security weaknesses")
+    parser.add_option("--pyshell",  dest = "pyshell_mode",  default = False, action = "store_true", help = "Start interactive python shell")
 
     examine.add_option("-a", "--all",       dest = "do_all",           default = False, action = "store_true", help = "All Simple Checks (non-slow)")
     examine.add_option("-A", "--allfiles",  dest = "do_allfiles",      default = False, action = "store_true", help = "All Files and Directories (slow)")
@@ -72,35 +73,35 @@ def parseOptions():
 
     (options, _) = parser.parse_args()
 
-    if not (options.do_all or options.do_services or options.do_drivers or options.do_processes or options.patchfile or options.do_reg_keys or options.do_registry or options.do_users or options.do_groups or options.do_program_files or options.do_paths or options.do_drives or options.do_eventlogs or options.do_shares or options.do_loggedin or options.do_users or options.do_groups or options.do_allfiles or options.get_modals or options.do_scheduled_tasks or options.do_nt_objects or options.do_installed_software or options.interesting_file_list or options.interesting_file_file):
-        print "[E] Specify something to look at.  At least one of: -a, -j, -O, -t, -D, -E, -e, -H, -T, -L , -S, -k, -I, -U, -s, -d, -P, -r, -R, -U, -G, -M.  -h for help."
+    if not options.dump_mode and not options.audit_mode and not options.dumptab_mode and not options.pyshell_mode:
+        print "[E] Specify mode using --dump, --audit, --dumptab or --pyshell.  -h for help."
         sys.exit()
 
-    if options.ignorenoone and not (options.ignore_principal_list or options.ignore_principal_file):
-        print "[W] -0 (--ignorenoone) specified without -x or -X.  This is a crazy thing to do in --audit mode.  Output of --dump/--dumptab will be huge!"
-        
-    if options.audit_mode and not options.report_file_stem:
-        print "[E] Specify report filename stem, e.g. '-o report-myhost'.  -h for help."
-        sys.exit()
-
-    if options.exploitable_by_me and (options.ignore_principal_list or options.ignore_principal_file or options.exploitable_by_list or options.exploitable_by_file):
-        print "[E] When using -c, it doesn't make sense to use -x, -X, -b or -B"
-        sys.exit()
-        
-    if (options.ignore_principal_list or options.ignore_principal_file) and (options.exploitable_by_list or options.exploitable_by_file):
-        print "[E] When using -b or -B, it doesn't make sense to use -x or -X"
-        sys.exit()
+    if options.dump_mode or options.audit_mode or options.dumptab_mode:
+        if not (options.do_all or options.do_services or options.do_drivers or options.do_processes or options.patchfile or options.do_reg_keys or options.do_registry or options.do_users or options.do_groups or options.do_program_files or options.do_paths or options.do_drives or options.do_eventlogs or options.do_shares or options.do_loggedin or options.do_users or options.do_groups or options.do_allfiles or options.get_modals or options.do_scheduled_tasks or options.do_nt_objects or options.do_installed_software or options.interesting_file_list or options.interesting_file_file):
+            print "[E] Specify something to look at.  At least one of: -a, -j, -O, -t, -D, -E, -e, -H, -T, -L , -S, -k, -I, -U, -s, -d, -P, -r, -R, -U, -G, -M.  -h for help."
+            sys.exit()
     
-    # TODO check file is writable.
-
-    if not options.dump_mode and not options.audit_mode and not options.dumptab_mode:
-        print "[E] Specify --dump or --audit or --dumptab.  -h for help."
-        sys.exit()
-
-    # TODO can't use -m without -G
-
-    if (options.do_interesting_files or options.do_unreadable_if) and not (options.do_allfiles or options.interesting_file_list or options.interesting_file_file):
-        print "[E] -n/-N are meaningless without -A, -f or -F.  -h for help."
-        sys.exit()
+        if options.ignorenoone and not (options.ignore_principal_list or options.ignore_principal_file):
+            print "[W] -0 (--ignorenoone) specified without -x or -X.  This is a crazy thing to do in --audit mode.  Output of --dump/--dumptab will be huge!"
+            
+        if options.audit_mode and not options.report_file_stem:
+            print "[E] Specify report filename stem, e.g. '-o report-myhost'.  -h for help."
+            sys.exit()
+    
+        if options.exploitable_by_me and (options.ignore_principal_list or options.ignore_principal_file or options.exploitable_by_list or options.exploitable_by_file):
+            print "[E] When using -c, it doesn't make sense to use -x, -X, -b or -B"
+            sys.exit()
+            
+        if (options.ignore_principal_list or options.ignore_principal_file) and (options.exploitable_by_list or options.exploitable_by_file):
+            print "[E] When using -b or -B, it doesn't make sense to use -x or -X"
+            sys.exit()
+        
+        # TODO check file is writable.
+        # TODO can't use -m without -G
+    
+        if (options.do_interesting_files or options.do_unreadable_if) and not (options.do_allfiles or options.interesting_file_list or options.interesting_file_file):
+            print "[E] -n/-N are meaningless without -A, -f or -F.  -h for help."
+            sys.exit()
 
     return options

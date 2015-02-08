@@ -2029,6 +2029,14 @@ report = report()
 wpc.utils.populate_scaninfo(report)
 issues = report.get_issues()
 
+printline("Python Shell - to exit do CTRL-z or type exit()")
+print
+
+if options.pyshell_mode:
+    import code
+    code.interact()
+    sys.exit()
+
 printline("Starting Audit")
 
 # Dump raw data if required
