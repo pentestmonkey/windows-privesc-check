@@ -88,6 +88,16 @@ class file:
         except:
             return []
 
+    def get_dangerous_aces_read(self):
+        try:
+            #print "[D] File: " + self.get_name()
+            #print "[D] ACE: "
+            #for a in self.get_sd().get_acelist().get_dangerous_perms().get_aces():
+            #    print a.as_text()
+            return self.get_sd().get_acelist().get_untrusted().get_dangerous_perms_read().get_aces()
+        except:
+            return []
+
     # Can an untrusted user replace this file/dir? TODO unused
     def is_replaceable(self):
         if not self.exists():

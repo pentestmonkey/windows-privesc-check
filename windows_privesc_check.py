@@ -29,6 +29,7 @@ import wpc.utils
 import glob
 import re
 import win32security
+import sys
 
 # ---------------------- Define --dumptab Subs ---------------------------
 def dumptab_paths():
@@ -1879,6 +1880,74 @@ def audit_program_files(report):
                 else:
                     print "[E] Ignoring thing that isn't file or directory: " + f.get_name()
 
+
+def audit_all_files(options, report):
+    # Record info about all directories
+    include_dirs = 1
+    prog_dirs = []
+    
+    # If user did not specify directory trees to descend with -f/-F, then do all fixed drives
+    if options.interesting_file_list == [] and options.interesting_file_file is False:
+        #  Identify all NTFS drives
+        for d in drives().get_fixed_drives():
+            prog_dirs.append(d.get_name())
+    else:
+        if options.interesting_file_list:
+            prog_dirs = options.interesting_file_list
+        if options.interesting_file_file:
+            try:
+                prog_dirs = prog_dirs + [line.strip() for line in open(options.interesting_file_list)]
+            except:
+                print "[E] Error reading from file %s" % options.interesting_file_list
+                sys.exit()
+    
+    print "[-] Processing the following directory trees:"
+    for d in prog_dirs:
+        print "[-] * %s" % d
+        
+    # Walk the directory tree of each NTFS drive
+    for directory in prog_dirs:
+        for filename in wpc.utils.dirwalk(directory, '*', include_dirs):
+            # if we are only reporting readable interesting files, test for untrusted read access
+            if not options.do_unreadable_if:
+                try:
+                    file_obj = File(filename)
+                    aces = file_obj.get_dangerous_aces_read()
+                    if not aces:
+                        continue
+                except:
+                    continue
+#            for ace in aces:
+#                for p in ace.get_perms():
+#                    print "%s\t%s\t%s\t%s\t%s" % (f.get_type(), f.get_name(), ace.get_type(), ace.get_principal().get_fq_name(), p)
+            #print "[D] Processing %s (%s)" % (filename, readable)
+            f = os.path.basename(filename).lower()
+            for check in wpc.conf.interesting_files['filename_exact_match']:
+                for check_file in check['filenames']:
+                    if check_file.lower() == f:
+                        report.get_by_id(check['issue']).add_supporting_data('filename_string', [filename])
+                        
+            for check in wpc.conf.interesting_files['filename_regex_match']:
+                if re.search(check['regex'], f, re.IGNORECASE):
+                    report.get_by_id(check['issue']).add_supporting_data('filename_string', [filename])
+                        
+            for check in wpc.conf.interesting_files['filename_content_regex_match']:
+                if re.search(check['filename_regex'], f, re.IGNORECASE):
+                    try:
+                        # we need to apply the regex line-wize in case it's massive.  regex's need the whole string in memory.
+                        for line in open(filename, 'r'):
+                            #print "[D] line from %s: %s" % (filename, line)
+                            if re.search(check['filename_content_regex'], line, re.IGNORECASE):
+                                report.get_by_id(check['issue']).add_supporting_data('filename_string', [filename])
+                                break
+                    except:
+                        pass
+            #if is_interesting:
+            #    print "[D] Interesting file %s:" % filename
+            #    for ace in aces:
+            #        print ace.as_text()
+    # TODO cleverly compile a summary of where weak permissions are
+
 # TODO is this redundant now we have --dumptab?
 def dump_all_files(report):
     # Record info about all directories
@@ -2297,10 +2366,10 @@ if options.audit_mode:
 
     if options.do_all or options.do_reg_keys:
         section("audit_reg_keys")
-#        try:
-        audit_reg_keys(issues)
-#        except:
-#            pass
+        try:
+            audit_reg_keys(issues)
+        except:
+            pass
 
     if options.do_all or options.do_users:
         section("audit_users")
@@ -2327,6 +2396,13 @@ if options.audit_mode:
         section("audit_installed_software")
         try:
             audit_installed_software(issues)
+        except:
+            pass
+
+    if options.do_allfiles or options.interesting_file_list or options.interesting_file_file:
+        section("audit_all_files (slow!)")
+        try:
+            audit_all_files(options, issues)
         except:
             pass
 

@@ -13,6 +13,7 @@ class ace:
         self.set_flags(ace[0][1])
         self.set_sid(ace[2])
         self.set_dperms([])
+        self.set_dpermsread([])
         self.set_principal(principal(ace[2]))
         self.set_perms(self.resolve_perms())
 
@@ -42,6 +43,9 @@ class ace:
 
     def set_dperms(self, dperms):
         self.dperms = dperms
+
+    def set_dpermsread(self, dpermsread):
+        self.dpermsread = dpermsread
 
     def set_sid(self, sid):
         self.sid = sid
@@ -104,6 +108,15 @@ class ace:
                         if p in wpc.conf.dangerous_perms_write[self.get_otype()][k]:
                             self.dperms.append(p)
         return self.dperms
+
+    def get_perms_dangerous_read(self):
+        if self.dpermsread == []:
+            if self.get_type() == "ALLOW":  # we ignore DENY aces - mostly correct TODO they're actually checked before ALLOWs.  False negatives if user is blocked by DENY
+                for p in self.get_perms():
+                    for k in wpc.conf.dangerous_perms_read[self.get_otype()]:
+                        if p in wpc.conf.dangerous_perms_read[self.get_otype()][k]:
+                            self.dpermsread.append(p)
+        return self.dpermsread
 
     def as_text(self):
         return self.get_type() + " " + self.get_principal().get_fq_name() + ": \n    " + "\n    ".join(self.get_perms())
