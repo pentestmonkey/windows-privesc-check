@@ -155,6 +155,11 @@ class issue:
                 date = data[3]
                 etree.SubElement(d, 'data').text = " %s (v%s) by %s (last updated: %s)" % (name, version, publisher, date)
 
+        elif data_name == 'filename_string':
+            for data in self.get_supporting_data(data_name):
+                f = data[0]
+                etree.SubElement(d, 'data').text = " %s" % (f)
+
         elif data_name == 'aal':
             for data in self.get_supporting_data(data_name):
                 keyname = data[0]

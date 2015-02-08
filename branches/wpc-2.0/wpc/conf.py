@@ -62,6 +62,75 @@ trusted_principals_fq = [
 # This gets auto-populated during initialisation from trusted_principals_fq and possibly --ignoreprincipal.  It contains objects, not strings like trusted_principals_fq above.
 trusted_principals = []
 
+interesting_files = {
+    'filename_exact_match': [
+        {
+            'issue': 'WPC193',
+            'filenames': [
+                 'Drives.xml',
+                 'Groups.xml',
+                 'ScheduledTasks.xml',
+                 'Services.xml',
+                 'DataSources.xml',    
+                 'jmx-console-users.properties',
+                 'passwd',
+                 'shadow',
+                 'web.config',
+                 'unattend.xml',
+                 'security.xml',
+                 'boot.properties',
+                 'tomcat-users.xml',
+                 'snmpd.conf',
+                 'secring.gpg',
+                 
+            ]
+        },
+    ],
+    'filename_regex_match': [
+        {
+            'issue': 'WPC193',
+            'regex': r'.*password.*\.(txt|xls|xlsx|doc|docx)$'
+        },
+        {
+            'issue': 'WPC193',
+            'regex': r'^(auto)?unattend\..*'
+        },
+        {
+            'issue': 'WPC193',
+            'regex': r'htpasswd$'
+        },
+        {
+            'issue': 'WPC193',
+            'regex': r'\.jks$'
+        },
+        {
+            'issue': 'WPC193',
+            'regex': r'netrc$'
+        },
+        {
+            'issue': 'WPC193',
+            'regex': r'^id_[rd]sa'
+        },
+    ],
+    'filename_content_regex_match': [
+        {
+            'issue': 'WPC194',
+            'filename_regex': r'^(Drives|Groups|ScheduledTasks|Services|DataSources)\.xml$',
+            'filename_content_regex': r'cpassword',
+        },
+        {
+            'issue': 'WPC194',
+            'filename_regex': r'^web\.config$',
+            'filename_content_regex': r'<connectionStrings>',
+        },
+        {
+            'issue': 'WPC194',
+            'filename_regex': r'^unattend\.xml$',
+            'filename_content_regex': r'<AdministratorPassword>',
+        },
+    ],
+}
+
 reg_keys = {
     'Devices: Unsigned driver installation behavior': 'HKEY_LOCAL_MACHINE\Software\Microsoft\Driver Signing\Policy',
     'Recovery console: Allow automatic administrative logon ': 'HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Setup\RecoveryConsole\SecurityLevel',
@@ -1713,6 +1782,44 @@ sid_type = {
     ntsecuritycon.SidTypeUnknown: "unknown",
     ntsecuritycon.SidTypeComputer: "computer",
     ntsecuritycon.SidTypeLabel: "label"
+}
+
+dangerous_perms_read = {
+    # http://www.tek-tips.com/faqs.cfm?fid
+    'share': {
+        ntsecuritycon: (
+            "FILE_READ_DATA",
+            #"FILE_WRITE_DATA",
+            #"FILE_APPEND_DATA",
+            #"FILE_READ_EA",
+            #"FILE_WRITE_EA",
+            #"FILE_EXECUTE",
+            #"FILE_READ_ATTRIBUTES",
+            #"FILE_WRITE_ATTRIBUTES",
+            #"DELETE",
+            #"READ_CONTROL",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            #"SYNCHRONIZE",
+        )
+    },
+    'file': {
+        ntsecuritycon: (
+            "FILE_READ_DATA",
+            #"FILE_WRITE_DATA",
+            #"FILE_APPEND_DATA",  # probably not dangerous for .exe files, but could be dangerous for .bat (or other script) files
+            #"FILE_READ_EA",
+            #"FILE_WRITE_EA",
+            #"FILE_EXECUTE",
+            #"FILE_READ_ATTRIBUTES",
+            #"FILE_WRITE_ATTRIBUTES",
+            #"DELETE",
+            #"READ_CONTROL",
+            "WRITE_DAC",
+            "WRITE_OWNER",
+            #"SYNCHRONIZE",
+        )
+    },
 }
 
 dangerous_perms_write = {
@@ -5301,8 +5408,35 @@ NB: This issue has only been reported for NTFS filesystems.  Other non-NTFS file
           },
        }
     },
+    'WPC193': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 3,
+       'title': "Interesting File Found (based on filename)",
+       'description': '''Some files were found that (based on their filename) may contain interesting information.  This is not necessarily a security issue, but may be of interest to pentesters looking for further their access to systems or auditor seeking to determine if sensitive information has been well protected.''',
+       'recommendation': '''Review the file list for sensistive information, ACLs and approriate use of encryption.''',
+       'supporting_data': {
+          'filename_string': {
+             'section': "description",
+             'preamble': "The following files were affected:",
+          },
+       }
+    },
+    'WPC194': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 4,
+       'title': "Interesting File Found (based on filename and contents)",
+       'description': '''Some files were found that (based on their filename and a regex match on the file contents) may contain interesting information.  This is not necessarily a security issue, but may be of interest to pentesters looking for further their access to systems or auditor seeking to determine if sensitive information has been well protected.''',
+       'recommendation': '''Review the file list for sensistive information, ACLs and approriate use of encryption.''',
+       'supporting_data': {
+          'filename_string': {
+             'section': "description",
+             'preamble': "The following files were affected:",
+          },
+       }
+    },
 }
-
 
 rating_descriptions = {
     'impact': {

@@ -22,6 +22,8 @@ def parseOptions():
     examine.add_option("-D", "--drives",    dest = "do_drives",        default = False, action = "store_true", help = "Drives*")
     examine.add_option("-e", "--reg_keys",  dest = "do_reg_keys",      default = False, action = "store_true", help = "Misc security-related reg keys")
     examine.add_option("-E", "--eventlogs", dest = "do_eventlogs",     default = False, action = "store_true", help = "Event Log*")
+    examine.add_option("-f", "--interestingfiledir", dest = "interesting_file_list", default = [],    action = "append",    help = "Changes -A behaviour.  Look here INSTEAD")
+    examine.add_option("-F", "--interestingfilefile",dest = "interesting_file_file", default = False,                       help = "Changes -A behaviour.  Look here INSTEAD.  On dir per line")
     examine.add_option("-G", "--groups",    dest = "do_groups",        default = False, action = "store_true", help = "Groups")
     examine.add_option("-H", "--shares",    dest = "do_shares",        default = False, action = "store_true", help = "Shares*")
     examine.add_option("-I", "--installed_software", dest = "do_installed_software", default = False, action = "store_true", help = "Installed Software")
@@ -29,6 +31,8 @@ def parseOptions():
     examine.add_option("-k", "--drivers",   dest = "do_drivers",       default = False, action = "store_true", help = "Kernel Drivers")
     examine.add_option("-L", "--loggedin",  dest = "do_loggedin",      default = False, action = "store_true", help = "Logged In*")
     examine.add_option("-O", "--ntobjects", dest = "do_nt_objects",    default = False, action = "store_true", help = "NT Objects")
+    examine.add_option("-n", "--nointerestingfiles", dest = "do_interesting_files",default = True, action = "store_false", help = "Changes -A/-f/-F behaviour.  Don't report interesting files")
+    examine.add_option("-N", "--nounreadableif",     dest = "do_unreadable_if",    default = True, action = "store_false", help = "Changes -A/-f/-F behaviour.  Report only interesting files readable by untrsuted users (see -x, -X, -b, -B)")
     examine.add_option("-P", "--progfiles", dest = "do_program_files", default = False, action = "store_true", help = "Program Files Directory Tree")
     examine.add_option("-r", "--registry",  dest = "do_registry",      default = False, action = "store_true", help = "Registry Settings + Permissions")
     examine.add_option("-R", "--processes", dest = "do_processes",     default = False, action = "store_true", help = "Processes")
@@ -50,8 +54,8 @@ def parseOptions():
 
     # Running out of letters for short options.  Here's a list of ones used
     #    abcdefghijklmnopqrstuvwxyz
-    # uc xxxxx   xxx x xx xxxxx x  
-    # lc xx xx xxx  xx xx xxxxx x  
+    # uc xxxxxx  xxx xxxx xxxxx x  
+    # lc xx xxxxxx  xxxxx xxxxx x  
     
     report.add_option("-o", "--report_file_stem",         dest = "report_file_stem",      default = False,                       help = "Filename stem for txt, html report files")
     report.add_option("-x", "--ignoreprincipal",          dest = "ignore_principal_list", default = [],    action = "append",    help = "Don't report privesc issues for these users/groups")
@@ -68,6 +72,10 @@ def parseOptions():
 
     (options, _) = parser.parse_args()
 
+    if not (options.do_all or options.do_services or options.do_drivers or options.do_processes or options.patchfile or options.do_reg_keys or options.do_registry or options.do_users or options.do_groups or options.do_program_files or options.do_paths or options.do_drives or options.do_eventlogs or options.do_shares or options.do_loggedin or options.do_users or options.do_groups or options.do_allfiles or options.get_modals or options.do_scheduled_tasks or options.do_nt_objects or options.do_installed_software or options.interesting_file_list or options.interesting_file_file):
+        print "[E] Specify something to look at.  At least one of: -a, -j, -O, -t, -D, -E, -e, -H, -T, -L , -S, -k, -I, -U, -s, -d, -P, -r, -R, -U, -G, -M.  -h for help."
+        sys.exit()
+
     if options.ignorenoone and not (options.ignore_principal_list or options.ignore_principal_file):
         print "[W] -0 (--ignorenoone) specified without -x or -X.  This is a crazy thing to do in --audit mode.  Output of --dump/--dumptab will be huge!"
         
@@ -80,10 +88,9 @@ def parseOptions():
         sys.exit()
         
     if (options.ignore_principal_list or options.ignore_principal_file) and (options.exploitable_by_list or options.exploitable_by_file):
-        print "[E] When -b or -B, it doesn't make sense to use -x or -X"
+        print "[E] When using -b or -B, it doesn't make sense to use -x or -X"
         sys.exit()
     
-
     # TODO check file is writable.
 
     if not options.dump_mode and not options.audit_mode and not options.dumptab_mode:
@@ -92,8 +99,8 @@ def parseOptions():
 
     # TODO can't use -m without -G
 
-    if not (options.do_all or options.do_services or options.do_drivers or options.do_processes or options.patchfile or options.do_reg_keys or options.do_registry or options.do_users or options.do_groups or options.do_program_files or options.do_paths or options.do_drives or options.do_eventlogs or options.do_shares or options.do_loggedin or options.do_users or options.do_groups or options.do_allfiles or options.get_modals or options.do_scheduled_tasks or options.do_nt_objects or options.do_installed_software):
-        print "[E] Specify something to look at.  At least one of: -a, -j, -O, -t, -D, -E, -e, -H, -T, -L , -S, -k, -I, -U, -s, -d, -P, -r, -R, -U, -G, -M.  -h for help."
+    if (options.do_interesting_files or options.do_unreadable_if) and not (options.do_allfiles or options.interesting_file_list or options.interesting_file_file):
+        print "[E] -n/-N are meaningless without -A, -f or -F.  -h for help."
         sys.exit()
 
     return options

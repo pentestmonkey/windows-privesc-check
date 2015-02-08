@@ -45,6 +45,15 @@ class acelist:
                 a.add(newace)
         return a
 
+    def get_dangerous_perms_read(self):
+        a = acelist()
+        for ace in self.get_aces():
+            if not ace.get_perms_dangerous_read() == []:
+                newace = ace.copy()
+                newace.set_perms(newace.get_perms_dangerous_read())
+                a.add(newace)
+        return a
+
     def get_aces_with_perms(self, perms):
         a = acelist()
         for ace in self.get_aces():
