@@ -82,6 +82,8 @@ interesting_files = {
                  'tomcat-users.xml',
                  'snmpd.conf',
                  'secring.gpg',
+                 'sysprep.inf',
+                 'sysprep.xml',
                  
             ]
         },
