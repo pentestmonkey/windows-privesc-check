@@ -702,3 +702,9 @@ def get_user_paths():
                 #print e
                 pass
     return paths
+
+def dump_options(options):
+    print "[+] Runtime Options Dump"
+    for k in sorted(options.__dict__.keys()):
+        print " %s: %s" % (k, options.__dict__[k])
+    
