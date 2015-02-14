@@ -100,8 +100,4 @@ def parseOptions():
         # TODO check file is writable.
         # TODO can't use -m without -G
     
-        if (options.do_interesting_files or options.do_unreadable_if) and not (options.do_allfiles or options.interesting_file_list or options.interesting_file_file):
-            print "[E] -n/-N are meaningless without -A, -f or -F.  -h for help."
-            sys.exit()
-
     return options
