@@ -2029,10 +2029,9 @@ report = report()
 wpc.utils.populate_scaninfo(report)
 issues = report.get_issues()
 
-printline("Python Shell - to exit do CTRL-z or type exit()")
-print
-
 if options.pyshell_mode:
+    printline("Python Shell - to exit do CTRL-z or type exit()")
+    print
     import code
     code.interact()
     sys.exit()
