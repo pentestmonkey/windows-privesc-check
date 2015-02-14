@@ -18,6 +18,8 @@ from wpc.exploit import exploit as exploit2
 from wpc.ntobj import ntobj
 import pywintypes
 import win32net
+import datetime
+import time
 import subprocess
 from lxml import objectify
 import win32netcon
@@ -2036,7 +2038,8 @@ if options.pyshell_mode:
     code.interact()
     sys.exit()
 
-printline("Starting Audit")
+printline("Starting Audit at %s" % datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S'))
+start_time = time.time()
 
 # Dump raw data if required
 if options.dump_mode:
@@ -2414,9 +2417,11 @@ if options.audit_mode:
             pass
 
     if options.report_file_stem:
-        printline("Audit Complete")
+        printline("Audit Complete at %s" % datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S'))
         print
-
+        print "[+] Runtime: %.1f seconds" % int(time.time() - start_time)
+        print
+        
         filename = "%s.xml" % options.report_file_stem
         print "[+] Saving report file %s" % filename
         f = open(filename, 'w')
