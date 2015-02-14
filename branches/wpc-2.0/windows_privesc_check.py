@@ -2038,6 +2038,8 @@ if options.pyshell_mode:
     code.interact()
     sys.exit()
 
+wpc.utils.dump_options(options)
+
 printline("Starting Audit at %s" % datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S'))
 start_time = time.time()
 
