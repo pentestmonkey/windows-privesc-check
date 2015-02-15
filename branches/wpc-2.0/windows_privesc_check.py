@@ -518,72 +518,6 @@ def dump_nt_objects(report):
 # ---------------------- Define --audit Subs ---------------------------
 def audit_installed_software(report):
     uninstall = regkey('HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall')
-    software = {}
-    software['developer'] = {
-        'issue': "WPC184",
-        'names': [
-                  "VMware Workstation"
-        ]
-    }
-    software['administrator'] = {
-        'issue': "WPC185",
-        'names': [
-            "VMware vSphere Client",
-            "IBM i Access for Windows",
-            "Microsoft Baseline Security Analyzer"
-        ]
-    }
-    software['security_product'] = {
-        'issue': "WPC186",
-        'names': [
-            "Sophos AutoUpdate",
-            "Sophos Anti-Virus",
-            "Symantec Encryption Desktop"
-        ]
-    }
-    software['non_production'] = {
-        'issue': "WPC187",
-        'names': [
-            "Cain & Abel",
-            "IDA Pro Free",
-            "WinPcap",
-            "Wireshark",
-            "Netsparker"
-        ]
-    }
-    software['steal'] = {
-        'issue': "WPC188",
-        'names': [
-            "KeePass",
-            "Gpg4win",
-            "Symantec Encryption Desktop"
-        ]
-    }
-    software['clientside_vector'] = {
-        'issue': "WPC189",
-        'names': [
-            "Foxit Reader",
-            "Java Auto Updater",
-            "Google Chrome",
-            "Java 8 Update",
-            "LibreOffice",
-            "Adobe Reader",
-            "Adobe Flash Playe",
-            "Mozilla Firefox",
-            "Mozilla Thunderbird",
-            "Microsoft Office"
-        ]
-    }
-    software['other_networks'] = {
-        'issue': "WPC190",
-        'names': [
-            "Citrix Online Launcher",
-            "Juniper Networks",
-            "Array Networks SSL VPN",
-            "OpenVPN",
-            "TAP-Windows" 
-        ]
-    }
     print '[+] Checking installed software'
     if uninstall.is_present():
         for subkey in uninstall.get_subkeys():
@@ -593,10 +527,10 @@ def audit_installed_software(report):
             date = wpc.utils.to_printable(subkey.get_value("InstallDate"))
             if name is not None:
                 report.get_by_id("WPC191").add_supporting_data('software', [name, publisher, version, date])
-                for sw_category in software.keys():
-                    for sw_prefix in software[sw_category]['names']:
+                for sw_category in wpc.conf.software.keys():
+                    for sw_prefix in wpc.conf.software[sw_category]['names']:
                         if name.lower().find(sw_prefix.lower()) == 0:
-                            report.get_by_id(software[sw_category]['issue']).add_supporting_data('software', [name, publisher, version, date])
+                            report.get_by_id(wpc.conf.software[sw_category]['issue']).add_supporting_data('software', [name, publisher, version, date])
 
         if wpc.conf.on64bitwindows:
             print '[+] Checking installed software (WoW64 enabled)'
@@ -609,10 +543,10 @@ def audit_installed_software(report):
                     date = wpc.utils.to_printable(subkey.get_value("InstallDate"))
                     if name is not None:
                         report.get_by_id("WPC191").add_supporting_data('software', [name, publisher, version, date])
-                        for sw_category in software.keys():
-                            for sw_prefix in software[sw_category]['names']:
+                        for sw_category in wpc.conf.software.keys():
+                            for sw_prefix in wpc.conf.software[sw_category]['names']:
                                 if name.lower().find(sw_prefix.lower()) == 0:
-                                    report.get_by_id(software[sw_category]['issue']).add_supporting_data('software', [name, publisher, version, date])
+                                    report.get_by_id(wpc.conf.software[sw_category]['issue']).add_supporting_data('software', [name, publisher, version, date])
 
 
 def audit_eventlogs(report):

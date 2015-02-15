@@ -133,6 +133,73 @@ interesting_files = {
     ],
 }
 
+software = {}
+software['developer'] = {
+    'issue': "WPC184",
+    'names': [
+              "VMware Workstation"
+    ]
+}
+software['administrator'] = {
+    'issue': "WPC185",
+    'names': [
+        "VMware vSphere Client",
+        "IBM i Access for Windows",
+        "Microsoft Baseline Security Analyzer"
+    ]
+}
+software['security_product'] = {
+    'issue': "WPC186",
+    'names': [
+        "Sophos AutoUpdate",
+        "Sophos Anti-Virus",
+        "Symantec Encryption Desktop"
+    ]
+}
+software['non_production'] = {
+    'issue': "WPC187",
+    'names': [
+        "Cain & Abel",
+        "IDA Pro Free",
+        "WinPcap",
+        "Wireshark",
+        "Netsparker"
+    ]
+}
+software['steal'] = {
+    'issue': "WPC188",
+    'names': [
+        "KeePass",
+        "Gpg4win",
+        "Symantec Encryption Desktop"
+    ]
+}
+software['clientside_vector'] = {
+    'issue': "WPC189",
+    'names': [
+        "Foxit Reader",
+        "Java Auto Updater",
+        "Google Chrome",
+        "Java 8 Update",
+        "LibreOffice",
+        "Adobe Reader",
+        "Adobe Flash Playe",
+        "Mozilla Firefox",
+        "Mozilla Thunderbird",
+        "Microsoft Office"
+    ]
+}
+software['other_networks'] = {
+    'issue': "WPC190",
+    'names': [
+        "Citrix Online Launcher",
+        "Juniper Networks",
+        "Array Networks SSL VPN",
+        "OpenVPN",
+        "TAP-Windows" 
+    ]
+}
+
 reg_keys = {
     'Devices: Unsigned driver installation behavior': 'HKEY_LOCAL_MACHINE\Software\Microsoft\Driver Signing\Policy',
     'Recovery console: Allow automatic administrative logon ': 'HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Setup\RecoveryConsole\SecurityLevel',
