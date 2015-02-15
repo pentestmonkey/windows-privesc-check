@@ -708,10 +708,24 @@ def dump_options(options):
     optdict = options.__dict__ 
     optdict["privesc_mode"] = wpc.conf.privesc_mode
     for k in sorted(optdict.keys()):
-        if k == "ignore_principal_list":
-            print " %s: %s" % (k, wpc.conf.trusted_principals_fq)
-        elif k == "exploitable_by_list":
-            print " %s: %s" % (k, wpc.conf.exploitable_by)
-        else:
-            print " %s: %s" % (k, optdict[k])
+        if k == "dump_mode" and optdict[k] == True:
+            print " mode: dump"
+        if k == "dumptab_mode" and optdict[k] == True:
+            print " mode: dumptab"
+        if k == "audit_mode" and optdict[k] == True:
+            print " mode: audit"
+    for k in sorted(optdict.keys()):
+        if k == "privesc_mode" or k.find("_mode") == -1:
+            if k == "ignore_principal_list":
+                print " %s: %s" % (k, wpc.conf.trusted_principals_fq)
+            elif k == "exploitable_by_list":
+                print " %s: %s" % (k, wpc.conf.exploitable_by)
+            elif k.find("interesting") != -1 and optdict['do_allfiles'] == False:
+                pass
+            elif k.find("exploitable_by") != -1 and optdict['privesc_mode'] != 'exploitable_by':
+                pass
+            elif k.find("get_") != -1 and optdict['audit_mode'] == True:
+                pass
+            else:
+                print " %s: %s" % (k, optdict[k])
     

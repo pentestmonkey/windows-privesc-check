@@ -48,15 +48,13 @@ def parseOptions():
     host.add_option("-p", "--pass",   dest = "remote_pass",   help = "Remote password")
     host.add_option("-d", "--domain", dest = "remote_domain", help = "Remote domain")
 
-    dump.add_option("-i", "--ignore_trusted", dest = "ignore_trusted", default = False, action = "store_true", help = "Ignore ACEs for Trusted Users")
-    dump.add_option("-m", "--get_members",    dest = "get_members",    default = False, action = "store_true", help = "Dump group members (use with -G)")
     dump.add_option("-M", "--get_modals",     dest = "get_modals",     default = False, action = "store_true", help = "Dump password policy, etc.")
     dump.add_option("-V", "--get_privs",      dest = "get_privs",      default = False, action = "store_true", help = "Dump privileges for users/groups")
 
     # Running out of letters for short options.  Here's a list of ones used
     #    abcdefghijklmnopqrstuvwxyz
     # uc xxxxxx  xxx xxxx xxxxx x  
-    # lc xx xxxxxx  xxxxx xxxxx x  
+    # lc xx xxxxx   x xxx xxxxx x  
     
     report.add_option("-o", "--report_file_stem",         dest = "report_file_stem",      default = False,                       help = "Filename stem for txt, html report files")
     report.add_option("-x", "--ignoreprincipal",          dest = "ignore_principal_list", default = [],    action = "append",    help = "Don't report privesc issues for these users/groups")
