@@ -705,6 +705,13 @@ def get_user_paths():
 
 def dump_options(options):
     print "[+] Runtime Options Dump"
-    for k in sorted(options.__dict__.keys()):
-        print " %s: %s" % (k, options.__dict__[k])
+    optdict = options.__dict__ 
+    optdict["privesc_mode"] = wpc.conf.privesc_mode
+    for k in sorted(optdict.keys()):
+        if k == "ignore_principal_list":
+            print " %s: %s" % (k, wpc.conf.trusted_principals_fq)
+        elif k == "exploitable_by_list":
+            print " %s: %s" % (k, wpc.conf.exploitable_by)
+        else:
+            print " %s: %s" % (k, optdict[k])
     
