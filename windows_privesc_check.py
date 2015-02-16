@@ -2218,139 +2218,43 @@ if options.dumptab_mode:
         except:
             pass
 
+def print_major(message, *args):
+    indent = 0
+    if args:
+        indent = args[0]
+    print "%s[+] %s" % (" " * indent, message)
+    
+def run_sub(name, condition, sub, *args):
+    if condition:
+        section(name)
+        try:
+            sub(*list(args))
+        except:
+            print "[E] Errors occurred but were supressed.  Some checks might have been missed.  Probably a bug."
+        finally:
+            print_major("Checks completed", 1)
+        
 # Identify security issues
 if options.audit_mode:
-    section("audit_misc_checks")
-    try:
-        audit_misc_checks(issues)
-    except:
-        pass
-
-    if options.do_all or options.do_paths:
-        section("audit_paths")
-        try:
-            audit_paths(issues)
-        except:
-            pass
-
-    if options.do_all or options.do_eventlogs:
-        section("audit_eventlogs")
-        try:
-            audit_eventlogs(issues)
-        except:
-            pass
-
-    if options.do_all or options.do_shares:
-        section("audit_shares")
-        try:
-            audit_shares(issues)
-        except:
-            pass
-
-    if options.do_all or options.patchfile:
-        section("audit_patches")
-        try:
-            audit_patches(issues)
-        except:
-            pass
-
-    if options.do_all or options.do_loggedin:
-        section("audit_loggedin")
-        try:
-            audit_loggedin(issues)
-        except:
-            pass
-
-    if options.do_all or options.do_services:
-        section("audit_services")
-        try:
-            audit_services(issues)
-        except:
-            pass
-
-    if options.do_all or options.do_drivers:
-        section("audit_drivers")
-        try:
-            audit_drivers(issues)
-        except:
-            pass
-
-    if options.do_all or options.do_drives:
-        section("audit_drives")
-        try:
-            audit_drives(issues)
-        except:
-            pass
-
-    if options.do_all or options.do_processes:
-        section("audit_processes")
-        try:
-            audit_processes(issues)
-        except:
-            pass
-
-    if options.do_all or options.do_program_files:
-        section("audit_program_files")
-        try:
-            audit_program_files(issues)
-        except:
-            pass
-
-    if options.do_all or options.do_registry:
-        section("audit_registry")
-        try:
-            audit_registry(issues)
-        except:
-            pass
-
-    if options.do_all or options.do_scheduled_tasks:
-        section("audit_scheduled_tasks")
-        try:
-            audit_scheduled_tasks(issues)
-        except:
-            pass
-
-    if options.do_all or options.do_reg_keys:
-        section("audit_reg_keys")
-        try:
-            audit_reg_keys(issues)
-        except:
-            pass
-
-    if options.do_all or options.do_users:
-        section("audit_users")
-        try:
-            audit_users(issues)
-        except:
-            pass
-
-    if options.do_all or options.do_nt_objects:
-        section("audit_nt_objects")
-        try:
-            audit_nt_objects(issues)
-        except:
-            pass
-
-    if options.do_all or options.do_groups:
-        section("audit_groups")
-        try:
-            audit_groups(issues)
-        except:
-            pass
-
-    if options.do_all or options.do_installed_software:
-        section("audit_installed_software")
-        try:
-            audit_installed_software(issues)
-        except:
-            pass
-
-    if options.do_allfiles or options.interesting_file_list or options.interesting_file_file:
-        section("audit_all_files (slow!)")
-        try:
-            audit_all_files(options, issues)
-        except:
-            pass
+    run_sub("audit_misc_checks", 1, audit_misc_checks, issues)
+    run_sub("audit_paths", options.do_all or options.do_paths, audit_paths, issues)
+    run_sub("audit_eventlogs", options.do_all or options.do_eventlogs, audit_eventlogs, issues)
+    run_sub("audit_shares", options.do_all or options.do_shares, audit_shares, issues)
+    run_sub("audit_patches", options.do_all or options.patchfile, audit_patches, issues)
+    run_sub("audit_loggedin", options.do_all or options.do_loggedin, audit_loggedin, issues)
+    run_sub("audit_services", options.do_all or options.do_services, audit_services, issues)
+    run_sub("audit_drivers", options.do_all or options.do_drivers, audit_drivers, issues)
+    run_sub("audit_drives", options.do_all or options.do_drives, audit_drives, issues)
+    run_sub("audit_processes", options.do_all or options.do_processes, audit_processes, issues)
+    run_sub("audit_program_files", options.do_all or options.do_program_files, audit_program_files, issues)
+    run_sub("audit_registry", options.do_all or options.do_registry, audit_registry, issues)
+    run_sub("audit_scheduled_tasks", options.do_all or options.do_scheduled_tasks, audit_scheduled_tasks, issues)
+    run_sub("audit_reg_keys", options.do_all or options.do_reg_keys, audit_reg_keys, issues)
+    run_sub("audit_users", options.do_all or options.do_users, audit_users,issues)
+    run_sub("audit_nt_objects", options.do_all or options.do_nt_objects, audit_nt_objects, issues)
+    run_sub("audit_groups", options.do_all or options.do_groups, audit_groups, issues)
+    run_sub("audit_installed_software", options.do_all or options.do_installed_software, audit_installed_software, issues)
+    run_sub("audit_all_files (slow!)", options.do_allfiles or options.interesting_file_list or options.interesting_file_file, audit_all_files, options, issues)
 
     if options.report_file_stem:
         printline("Audit Complete at %s" % datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S'))
