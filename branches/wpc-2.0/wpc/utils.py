@@ -729,3 +729,16 @@ def dump_options(options):
             else:
                 print " %s: %s" % (k, optdict[k])
     
+
+def print_major(message, *args):
+    indent = 0
+    if args:
+        indent = args[0]
+    print "%s[+] %s" % (" " * indent, message)
+    
+
+def printline(message):
+    print "\n============ %s ============" % message
+
+def section(message):
+    print "\n[+] Running: %s" % message
