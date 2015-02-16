@@ -1946,6 +1946,26 @@ def audit_path_for_issue(report, mypath, issueid):
         # TODO properly check perms with is_replaceable
 
 
+def print_major(message, *args):
+    indent = 0
+    if args:
+        indent = args[0]
+    print "%s[+] %s" % (" " * indent, message)
+    
+
+def run_sub(name, condition, sub, *args):
+    if condition:
+        if name:
+            section(name)
+        try:
+            sub(*list(args))
+        except:
+            print "[E] Errors occurred but were supressed.  Some checks might have been missed.  Probably a bug."
+        finally:
+            if name:
+                print_major("Checks completed", 1)
+        
+
 def printline(message):
     print "\n============ %s ============" % message
 
@@ -1979,282 +1999,68 @@ start_time = time.time()
 
 # Dump raw data if required
 if options.dump_mode:
-    section("dump_misc_checks")
-    try:
-        dump_misc_checks(issues)
-    except:
-        pass
-
-    if options.do_all or options.do_paths:
-        section("dump_paths")
-        try:
-            dump_paths(issues)
-        except:
-            pass
-
-    if options.do_allfiles:
-        section("dump_all_files")
-        try:
-            dump_all_files(issues)
-        except:
-            pass
-
-    if options.do_all or options.do_eventlogs:
-        section("dump_eventlogs")
-        try:
-            dump_eventlogs(issues)
-        except:
-            pass
-
-    if options.do_all or options.do_shares:
-        section("dump_shares")
-        try:
-            dump_shares(issues)
-        except:
-            pass
-
-    if options.do_all or options.patchfile:
-        section("dump_patches")
-        try:
-            dump_patches(issues)
-        except:
-            pass
-
-    if options.do_all or options.do_loggedin:
-        section("dump_loggedin")
-        try:
-            dump_loggedin(issues)
-        except:
-            pass
-
-    if options.do_all or options.do_services:
-        section("dump_services")
-        try:
-            dump_services(issues)
-        except:
-            pass
-
-    if options.do_all or options.do_drivers:
-        section("dump_drivers")
-        try:
-            dump_drivers(issues)
-        except:
-            pass
-
-    if options.do_all or options.do_drives:
-        section("dump_drives")
-        try:
-            dump_drives(issues)
-        except:
-            pass
-
-    if options.do_all or options.do_processes:
-        section("dump_processes")
-        try:
-            dump_processes(issues)
-        except:
-            pass
-
-    if options.do_all or options.do_program_files:
-        section("dump_program_files")
-        try:
-            dump_program_files(issues)
-        except:
-            pass
-
-    if options.do_all or options.do_registry:
-        section("dump_registry")
-        try:
-            dump_registry(issues)
-        except:
-            pass
-
-    if options.do_all or options.do_reg_keys:
-        section("dump_reg_keys")
-        try:
-            dump_reg_keys(issues)
-        except:
-            pass
-    if options.do_all or options.do_nt_objects:
-        section("dump_nt_objects")
-        try:
-            dump_nt_objects(issues)
-        except:
-            pass
-
-    if options.do_all or options.do_users:
-        section("dump_users")
-        try:
-            dump_users(issues, options.get_privs)
-        except:
-            pass
-
-    if options.do_all or options.do_groups:
-        section("dump_groups")
-        try:
-            dump_groups(issues, options.get_privs)
-        except:
-            pass
-
-    if options.do_all or options.get_modals:
-        section("dump_user_modals")
-        try:
-            dump_user_modals(issues)
-        except:
-            pass
+    run_sub("dump_misc_checks",   1,                                          dump_misc_checks,   issues)
+    run_sub("dump_paths",         options.do_all or options.do_paths,         dump_paths,         issues)
+    run_sub("dump_all_files",     options.do_allfiles,                        dump_all_files,     issues)
+    run_sub("dump_eventlogs",     options.do_all or options.do_eventlogs,     dump_eventlogs,     issues)
+    run_sub("dump_shares",        options.do_all or options.do_shares,        dump_shares,        issues)
+    run_sub("dump_patches",       options.do_all or options.patchfile,        dump_patches,       issues)
+    run_sub("dump_loggedin",      options.do_all or options.do_loggedin,      dump_loggedin,      issues)
+    run_sub("dump_services",      options.do_all or options.do_services,      dump_services,      issues)
+    run_sub("dump_drivers",       options.do_all or options.do_drivers,       dump_drivers,       issues)
+    run_sub("dump_drives",        options.do_all or options.do_drives,        dump_drives,        issues)
+    run_sub("dump_processes",     options.do_all or options.do_processes,     dump_processes,     issues)
+    run_sub("dump_program_files", options.do_all or options.do_program_files, dump_program_files, issues)
+    run_sub("dump_registry",      options.do_all or options.do_registry,      dump_registry,      issues)
+    run_sub("dump_reg_keys",      options.do_all or options.do_reg_keys,      dump_reg_keys,      issues)
+    run_sub("dump_nt_objects",    options.do_all or options.do_nt_objects,    dump_nt_objects,    issues)
+    run_sub("dump_users",         options.do_all or options.do_users,         dump_users,         issues)
+    run_sub("dump_groups",        options.do_all or options.do_groups,        dump_groups,        issues)
+    run_sub("dump_user_modals",   options.do_all or options.get_modals,       dump_user_modals,   issues)
 
 # Dump raw data if required
 if options.dumptab_mode:
-    try:
-        dumptab_misc_checks(report)
-    except:
-        pass
+    run_sub("", 1,                                               dumptab_misc_checks)
+    run_sub("", options.do_all or options.do_paths,              dumptab_paths)
+    run_sub("", options.do_allfiles,                             dumptab_all_files)
+    run_sub("", options.do_all or options.do_eventlogs,          dumptab_eventlogs)
+    run_sub("", options.do_all or options.do_shares,             dumptab_shares)
+    run_sub("", options.do_all or options.patchfile,             dumptab_patches)
+    run_sub("", options.do_all or options.do_loggedin,           dumptab_loggedin)
+    run_sub("", options.do_all or options.do_services,           dumptab_services)
+    run_sub("", options.do_all or options.do_drivers,            dumptab_drivers)
+    run_sub("", options.do_all or options.do_drives,             dumptab_drives)
+    run_sub("", options.do_all or options.do_processes,          dumptab_processes)
+    run_sub("", options.do_all or options.do_program_files,      dumptab_program_files)
+    run_sub("", options.do_all or options.do_registry,           dumptab_registry)
+    run_sub("", options.do_all or options.do_reg_keys,           dumptab_reg_keys)
+    run_sub("", options.do_all or options.do_installed_software, dumptab_installed_software)
+    run_sub("", options.do_all or options.do_nt_objects,         dumptab_nt_objects)
+    run_sub("", options.do_all or options.do_users,              dumptab_users)
+    run_sub("", options.do_all or options.do_groups,             dumptab_groups)
+    run_sub("", options.do_all or options.get_modals,            dumptab_user_modals)
 
-    if options.do_all or options.do_paths:
-        try:
-            dumptab_paths()
-        except:
-            pass
-
-    if options.do_allfiles:
-        try:
-            dumptab_all_files()
-        except:
-            pass
-
-    if options.do_all or options.do_eventlogs:
-        try:
-            dumptab_eventlogs()
-        except:
-            pass
-
-    if options.do_all or options.do_shares:
-        try:
-            dumptab_shares()
-        except:
-            pass
-
-    if options.do_all or options.patchfile:
-        try:
-            dumptab_patches()
-        except:
-            pass
-
-    if options.do_all or options.do_loggedin:
-        try:
-            dumptab_loggedin()
-        except:
-            pass
-
-    if options.do_all or options.do_services:
-        try:
-            dumptab_services()
-        except:
-            pass
-
-    if options.do_all or options.do_drivers:
-        try:
-            dumptab_drivers()
-        except:
-            pass
-
-    if options.do_all or options.do_drives:
-        try:
-            dumptab_drives()
-        except:
-            pass
-
-    if options.do_all or options.do_processes:
-        try:
-            dumptab_processes()
-        except:
-            pass
-
-    if options.do_all or options.do_program_files:
-        try:
-            dumptab_program_files()
-        except:
-            pass
-
-    if options.do_all or options.do_registry:
-        try:
-            dumptab_registry()
-        except:
-            pass
-
-    if options.do_all or options.do_reg_keys:
-        try:
-            dumptab_reg_keys()
-        except:
-            pass
-
-    if options.do_all or options.do_installed_software:
-        try:
-            dumptab_installed_software()
-        except:
-            pass
-
-    if options.do_all or options.do_nt_objects:
-        try:
-            dumptab_nt_objects()
-        except:
-            pass
-
-    if options.do_all or options.do_users:
-        try:
-            dumptab_users()
-        except:
-            pass
-
-    if options.do_all or options.do_groups:
-        try:
-            dumptab_groups()
-        except:
-            pass
-
-    if options.do_all or options.get_modals:
-        try:
-            dumptab_user_modals()
-        except:
-            pass
-
-def print_major(message, *args):
-    indent = 0
-    if args:
-        indent = args[0]
-    print "%s[+] %s" % (" " * indent, message)
-    
-def run_sub(name, condition, sub, *args):
-    if condition:
-        section(name)
-        try:
-            sub(*list(args))
-        except:
-            print "[E] Errors occurred but were supressed.  Some checks might have been missed.  Probably a bug."
-        finally:
-            print_major("Checks completed", 1)
-        
 # Identify security issues
 if options.audit_mode:
-    run_sub("audit_misc_checks", 1, audit_misc_checks, issues)
-    run_sub("audit_paths", options.do_all or options.do_paths, audit_paths, issues)
-    run_sub("audit_eventlogs", options.do_all or options.do_eventlogs, audit_eventlogs, issues)
-    run_sub("audit_shares", options.do_all or options.do_shares, audit_shares, issues)
-    run_sub("audit_patches", options.do_all or options.patchfile, audit_patches, issues)
-    run_sub("audit_loggedin", options.do_all or options.do_loggedin, audit_loggedin, issues)
-    run_sub("audit_services", options.do_all or options.do_services, audit_services, issues)
-    run_sub("audit_drivers", options.do_all or options.do_drivers, audit_drivers, issues)
-    run_sub("audit_drives", options.do_all or options.do_drives, audit_drives, issues)
-    run_sub("audit_processes", options.do_all or options.do_processes, audit_processes, issues)
-    run_sub("audit_program_files", options.do_all or options.do_program_files, audit_program_files, issues)
-    run_sub("audit_registry", options.do_all or options.do_registry, audit_registry, issues)
-    run_sub("audit_scheduled_tasks", options.do_all or options.do_scheduled_tasks, audit_scheduled_tasks, issues)
-    run_sub("audit_reg_keys", options.do_all or options.do_reg_keys, audit_reg_keys, issues)
-    run_sub("audit_users", options.do_all or options.do_users, audit_users,issues)
-    run_sub("audit_nt_objects", options.do_all or options.do_nt_objects, audit_nt_objects, issues)
-    run_sub("audit_groups", options.do_all or options.do_groups, audit_groups, issues)
+    run_sub("audit_misc_checks",        1,                                               audit_misc_checks,        issues)
+    run_sub("audit_paths",              options.do_all or options.do_paths,              audit_paths,              issues)
+    run_sub("audit_eventlogs",          options.do_all or options.do_eventlogs,          audit_eventlogs,          issues)
+    run_sub("audit_shares",             options.do_all or options.do_shares,             audit_shares,             issues)
+    run_sub("audit_patches",            options.do_all or options.patchfile,             audit_patches,            issues)
+    run_sub("audit_loggedin",           options.do_all or options.do_loggedin,           audit_loggedin,           issues)
+    run_sub("audit_services",           options.do_all or options.do_services,           audit_services,           issues)
+    run_sub("audit_drivers",            options.do_all or options.do_drivers,            audit_drivers,            issues)
+    run_sub("audit_drives",             options.do_all or options.do_drives,             audit_drives,             issues)
+    run_sub("audit_processes",          options.do_all or options.do_processes,          audit_processes,          issues)
+    run_sub("audit_program_files",      options.do_all or options.do_program_files,      audit_program_files,      issues)
+    run_sub("audit_registry",           options.do_all or options.do_registry,           audit_registry,           issues)
+    run_sub("audit_scheduled_tasks",    options.do_all or options.do_scheduled_tasks,    audit_scheduled_tasks,    issues)
+    run_sub("audit_reg_keys",           options.do_all or options.do_reg_keys,           audit_reg_keys,           issues)
+    run_sub("audit_users",              options.do_all or options.do_users,              audit_users,              issues)
+    run_sub("audit_nt_objects",         options.do_all or options.do_nt_objects,         audit_nt_objects,         issues)
+    run_sub("audit_groups",             options.do_all or options.do_groups,             audit_groups,             issues)
     run_sub("audit_installed_software", options.do_all or options.do_installed_software, audit_installed_software, issues)
-    run_sub("audit_all_files (slow!)", options.do_allfiles or options.interesting_file_list or options.interesting_file_file, audit_all_files, options, issues)
+    run_sub("audit_all_files (slow!)",  options.do_allfiles or options.interesting_file_list or options.interesting_file_file, audit_all_files, options, issues)
 
     if options.report_file_stem:
         printline("Audit Complete at %s" % datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S'))
