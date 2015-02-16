@@ -514,6 +514,29 @@ def dump_nt_objects(report):
 # Device - can open, has sd
 # SymbolicLink - can open, has sd
 
+# TODO is this redundant now we have --dumptab?
+def dump_all_files(report):
+    # Record info about all directories
+    include_dirs = 1
+
+    # TODO other drives too
+
+    prog_dirs = []
+    prog_dirs.append('c:\\')
+
+    count = 0
+    for dir in prog_dirs:
+        # Walk program files directories looking for executables
+        for filename in wpc.utils.dirwalk(dir, '*', include_dirs):
+            f = File(filename)
+            #print "[D] Processing %s" % f.get_name()
+            # TODO check file owner, parent paths, etc.  Maybe use is_replaceable instead?
+            aces = f.get_dangerous_aces()
+            count = count + 1
+            for ace in aces:
+                for p in ace.get_perms():
+                    print "%s\t%s\t%s\t%s\t%s" % (f.get_type(), f.get_name(), ace.get_type(), ace.get_principal().get_fq_name(), p)
+
 
 # ---------------------- Define --audit Subs ---------------------------
 def audit_installed_software(report):
@@ -1883,29 +1906,6 @@ def audit_all_files(options, report):
             #    for ace in aces:
             #        print ace.as_text()
     # TODO cleverly compile a summary of where weak permissions are
-
-# TODO is this redundant now we have --dumptab?
-def dump_all_files(report):
-    # Record info about all directories
-    include_dirs = 1
-
-    # TODO other drives too
-
-    prog_dirs = []
-    prog_dirs.append('c:\\')
-
-    count = 0
-    for dir in prog_dirs:
-        # Walk program files directories looking for executables
-        for filename in wpc.utils.dirwalk(dir, '*', include_dirs):
-            f = File(filename)
-            #print "[D] Processing %s" % f.get_name()
-            # TODO check file owner, parent paths, etc.  Maybe use is_replaceable instead?
-            aces = f.get_dangerous_aces()
-            count = count + 1
-            for ace in aces:
-                for p in ace.get_perms():
-                    print "%s\t%s\t%s\t%s\t%s" % (f.get_type(), f.get_name(), ace.get_type(), ace.get_principal().get_fq_name(), p)
 
 def audit_paths(report):
 # TODO this will be too slow.  Need some clever caching.
