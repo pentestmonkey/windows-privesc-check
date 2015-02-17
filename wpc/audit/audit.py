@@ -33,28 +33,28 @@ class audit(auditbase):
         self.issues = issues
 
     def run(self):
-        self.run_sub("audit_misc_checks",        1,                                                         self.audit_misc_checks,        self.issues)
-        self.run_sub("audit_paths",              self.options.do_all or self.options.do_paths,              self.audit_paths,              self.issues)
-        self.run_sub("audit_eventlogs",          self.options.do_all or self.options.do_eventlogs,          self.audit_eventlogs,          self.issues)
-        self.run_sub("audit_shares",             self.options.do_all or self.options.do_shares,             self.audit_shares,             self.issues)
-        self.run_sub("audit_patches",            self.options.do_all or self.options.patchfile,             self.audit_patches,            self.issues)
-        self.run_sub("audit_loggedin",           self.options.do_all or self.options.do_loggedin,           self.audit_loggedin,           self.issues)
-        self.run_sub("audit_services",           self.options.do_all or self.options.do_services,           self.audit_services,           self.issues)
-        self.run_sub("audit_drivers",            self.options.do_all or self.options.do_drivers,            self.audit_drivers,            self.issues)
-        self.run_sub("audit_drives",             self.options.do_all or self.options.do_drives,             self.audit_drives,             self.issues)
-        self.run_sub("audit_processes",          self.options.do_all or self.options.do_processes,          self.audit_processes,          self.issues)
-        self.run_sub("audit_program_files",      self.options.do_all or self.options.do_program_files,      self.audit_program_files,      self.issues)
-        self.run_sub("audit_registry",           self.options.do_all or self.options.do_registry,           self.audit_registry,           self.issues)
-        self.run_sub("audit_scheduled_tasks",    self.options.do_all or self.options.do_scheduled_tasks,    self.audit_scheduled_tasks,    self.issues)
-        self.run_sub("audit_reg_keys",           self.options.do_all or self.options.do_reg_keys,           self.audit_reg_keys,           self.issues)
-        self.run_sub("audit_users",              self.options.do_all or self.options.do_users,              self.audit_users,              self.issues)
-        self.run_sub("audit_nt_objects",         self.options.do_all or self.options.do_nt_objects,         self.audit_nt_objects,         self.issues)
-        self.run_sub("audit_groups",             self.options.do_all or self.options.do_groups,             self.audit_groups,             self.issues)
-        self.run_sub("audit_installed_software", self.options.do_all or self.options.do_installed_software, self.audit_installed_software, self.issues)
-        self.run_sub("audit_all_files (slow!)",  self.options.do_allfiles or self.options.interesting_file_list or self.options.interesting_file_file, self.audit_all_files, self.options, self.issues)
+        self.run_sub("audit_misc_checks",        1,                                                         self.audit_misc_checks)
+        self.run_sub("audit_paths",              self.options.do_all or self.options.do_paths,              self.audit_paths)
+        self.run_sub("audit_eventlogs",          self.options.do_all or self.options.do_eventlogs,          self.audit_eventlogs)
+        self.run_sub("audit_shares",             self.options.do_all or self.options.do_shares,             self.audit_shares)
+        self.run_sub("audit_patches",            self.options.do_all or self.options.patchfile,             self.audit_patches)
+        self.run_sub("audit_loggedin",           self.options.do_all or self.options.do_loggedin,           self.audit_loggedin)
+        self.run_sub("audit_services",           self.options.do_all or self.options.do_services,           self.audit_services)
+        self.run_sub("audit_drivers",            self.options.do_all or self.options.do_drivers,            self.audit_drivers)
+        self.run_sub("audit_drives",             self.options.do_all or self.options.do_drives,             self.audit_drives)
+        self.run_sub("audit_processes",          self.options.do_all or self.options.do_processes,          self.audit_processes)
+        self.run_sub("audit_program_files",      self.options.do_all or self.options.do_program_files,      self.audit_program_files)
+        self.run_sub("audit_registry",           self.options.do_all or self.options.do_registry,           self.audit_registry)
+        self.run_sub("audit_scheduled_tasks",    self.options.do_all or self.options.do_scheduled_tasks,    self.audit_scheduled_tasks)
+        self.run_sub("audit_reg_keys",           self.options.do_all or self.options.do_reg_keys,           self.audit_reg_keys)
+        self.run_sub("audit_users",              self.options.do_all or self.options.do_users,              self.audit_users)
+        self.run_sub("audit_nt_objects",         self.options.do_all or self.options.do_nt_objects,         self.audit_nt_objects)
+        self.run_sub("audit_groups",             self.options.do_all or self.options.do_groups,             self.audit_groups)
+        self.run_sub("audit_installed_software", self.options.do_all or self.options.do_installed_software, self.audit_installed_software)
+        self.run_sub("audit_all_files (slow!)",  self.options.do_allfiles or self.options.interesting_file_list or self.options.interesting_file_file, self.audit_all_files, self.options)
     
     # ---------------------- Define --audit Subs ---------------------------
-    def audit_misc_checks(self, report):
+    def audit_misc_checks(self):
         # Check if host is in a domain
         in_domain = 0
         dc_info = None
@@ -65,10 +65,10 @@ class audit(auditbase):
             pass
     
         if in_domain:
-            report.get_by_id("WPC092").add_supporting_data('dc_info', [dc_info])
+            self.issues.get_by_id("WPC092").add_supporting_data('dc_info', [dc_info])
     
     
-    def audit_installed_software(self, report):
+    def audit_installed_software(self):
         uninstall = regkey('HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall')
         print '[+] Checking installed software'
         if uninstall.is_present():
@@ -78,11 +78,11 @@ class audit(auditbase):
                 version = wpc.utils.to_printable(subkey.get_value("DisplayVersion"))
                 date = wpc.utils.to_printable(subkey.get_value("InstallDate"))
                 if name is not None:
-                    report.get_by_id("WPC191").add_supporting_data('software', [name, publisher, version, date])
+                    self.issues.get_by_id("WPC191").add_supporting_data('software', [name, publisher, version, date])
                     for sw_category in wpc.conf.software.keys():
                         for sw_prefix in wpc.conf.software[sw_category]['names']:
                             if name.lower().find(sw_prefix.lower()) == 0:
-                                report.get_by_id(wpc.conf.software[sw_category]['issue']).add_supporting_data('software', [name, publisher, version, date])
+                                self.issues.get_by_id(wpc.conf.software[sw_category]['issue']).add_supporting_data('software', [name, publisher, version, date])
     
             if wpc.conf.on64bitwindows:
                 print '[+] Checking installed software (WoW64 enabled)'
@@ -94,14 +94,14 @@ class audit(auditbase):
                         version = wpc.utils.to_printable(subkey.get_value("DisplayVersion"))
                         date = wpc.utils.to_printable(subkey.get_value("InstallDate"))
                         if name is not None:
-                            report.get_by_id("WPC191").add_supporting_data('software', [name, publisher, version, date])
+                            self.issues.get_by_id("WPC191").add_supporting_data('software', [name, publisher, version, date])
                             for sw_category in wpc.conf.software.keys():
                                 for sw_prefix in wpc.conf.software[sw_category]['names']:
                                     if name.lower().find(sw_prefix.lower()) == 0:
-                                        report.get_by_id(wpc.conf.software[sw_category]['issue']).add_supporting_data('software', [name, publisher, version, date])
+                                        self.issues.get_by_id(wpc.conf.software[sw_category]['issue']).add_supporting_data('software', [name, publisher, version, date])
     
     
-    def audit_eventlogs(self, report):
+    def audit_eventlogs(self):
         # TODO WPC009 Insecure Permissions On Event Log Registry Key
         key_string = "HKEY_LOCAL_MACHINE\\" + wpc.conf.eventlog_key_hklm
         eventlogkey = regkey(key_string)
@@ -112,7 +112,7 @@ class audit(auditbase):
                 if filename:
                     f = File(wpc.utils.env_expand(filename))
                     if f.is_replaceable():
-                        report.get_by_id("WPC008").add_supporting_data('writable_eventlog_dll', [subkey, f])
+                        self.issues.get_by_id("WPC008").add_supporting_data('writable_eventlog_dll', [subkey, f])
     
                     # WPC007 Insecure Permissions On Event Log File
                     # TODO should check for read access too
@@ -121,24 +121,24 @@ class audit(auditbase):
                         f = File(wpc.utils.env_expand(filename))
                         # Check for write access
                         if f.is_replaceable():
-                            report.get_by_id("WPC007").add_supporting_data('writable_eventlog_file', [subkey, f])
+                            self.issues.get_by_id("WPC007").add_supporting_data('writable_eventlog_file', [subkey, f])
     
                         # Check for read access
                         sd = f.get_sd()
                         if sd:
                             for a in sd.get_acelist().get_untrusted().get_aces_with_perms(["FILE_READ_DATA"]).get_aces():
-                                report.get_by_id("WPC088").add_supporting_data('file_read', [f, a.get_principal()])
+                                self.issues.get_by_id("WPC088").add_supporting_data('file_read', [f, a.get_principal()])
     
     
-    def audit_shares(self, report):
+    def audit_shares(self):
         for s in shares().get_all():
     
             if s.get_sd():
                 for a in s.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["FILE_READ_DATA"]).get_aces():
-                    report.get_by_id("WPC086").add_supporting_data('share_perms', [s, a.get_principal()])
+                    self.issues.get_by_id("WPC086").add_supporting_data('share_perms', [s, a.get_principal()])
     
     
-    def audit_reg_keys(self, report):
+    def audit_reg_keys(self):
         r_root = regkey('HKEY_USERS')
         for r_user in r_root.get_subkeys():
             r = regkey(r_user.get_name() + '\\Control Panel\\Desktop')
@@ -157,7 +157,7 @@ class audit(auditbase):
         
             # Screen saver is inactive
             if ss_active and int(ss_active) == 0:
-                report.get_by_id("WPC103").add_supporting_data('user_reg_keys', [u, r, "ScreenSaveActive", ss_active])
+                self.issues.get_by_id("WPC103").add_supporting_data('user_reg_keys', [u, r, "ScreenSaveActive", ss_active])
         
             # Screen saver is active
             elif ss_exe and int(ss_active) > 0:
@@ -165,10 +165,10 @@ class audit(auditbase):
                 if int(ss_secure) > 0:
                     # should have low timeout
                     if int(ss_timeout) > int(wpc.conf.screensaver_max_timeout_secs):
-                        report.get_by_id("WPC091").add_supporting_data('user_reg_keys', [u, r, "ScreenSaveTimeout", ss_timeout])
+                        self.issues.get_by_id("WPC091").add_supporting_data('user_reg_keys', [u, r, "ScreenSaveTimeout", ss_timeout])
                 else:
                     # should ask for password
-                    report.get_by_id("WPC090").add_supporting_data('user_reg_keys', [u, r, "ScreenSaverIsSecure", ss_secure])
+                    self.issues.get_by_id("WPC090").add_supporting_data('user_reg_keys', [u, r, "ScreenSaverIsSecure", ss_secure])
     
         # Windows autologon
         r = regkey('HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon', view=64)
@@ -185,7 +185,7 @@ class audit(auditbase):
                 domain = "[not set]"
             if aal is None:
                 aal = "[not set]"
-            report.get_by_id("WPC192").add_supporting_data('aal', ['HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon', defaultuser, password, domain, aal])
+            self.issues.get_by_id("WPC192").add_supporting_data('aal', ['HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon', defaultuser, password, domain, aal])
         
         # UAC checks.  Note that we only report UAC misconfigurations when UAC is enabled.  If UAC
         #              is disabled, we just report that it's disabled.
@@ -193,142 +193,142 @@ class audit(auditbase):
         v = r.get_value("EnableLUA")
         if v is not None:
             if v == 0:
-                report.get_by_id("WPC096").add_supporting_data('reg_key_value', [r, "EnableLUA", v])
+                self.issues.get_by_id("WPC096").add_supporting_data('reg_key_value', [r, "EnableLUA", v])
             else:
                 r = regkey('HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System')
                 v = r.get_value("ConsentPromptBehaviorAdmin")
                 if v is not None:
                     if v == 0 or v == 5:
-                        report.get_by_id("WPC094").add_supporting_data('reg_key_value', [r, "ConsentPromptBehaviorAdmin", v])
+                        self.issues.get_by_id("WPC094").add_supporting_data('reg_key_value', [r, "ConsentPromptBehaviorAdmin", v])
     
                 r = regkey('HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System')
                 v = r.get_value("FilterAdministratorToken")
                 if v is not None:
                     if v == 0:
-                        report.get_by_id("WPC095").add_supporting_data('reg_key_value', [r, "FilterAdministratorToken", v])
+                        self.issues.get_by_id("WPC095").add_supporting_data('reg_key_value', [r, "FilterAdministratorToken", v])
     
                 r = regkey('HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System')
                 v = r.get_value("PromptOnSecureDesktop")
                 if v is not None:
                     if v == 0:
-                        report.get_by_id("WPC097").add_supporting_data('reg_key_value', [r, "PromptOnSecureDesktop", v])
+                        self.issues.get_by_id("WPC097").add_supporting_data('reg_key_value', [r, "PromptOnSecureDesktop", v])
     
         r = regkey('HKLM\\SYSTEM\\CurrentControlSet\\Control\\Lsa')
         v = r.get_value("LmCompatibilityLevel")
         if v is not None:
             if v != 5:
-                report.get_by_id("WPC098").add_supporting_data('reg_key_value', [r, "LmCompatibilityLevel", v])
+                self.issues.get_by_id("WPC098").add_supporting_data('reg_key_value', [r, "LmCompatibilityLevel", v])
     
         r = regkey('HKLM\\System\\CurrentControlSet\\Control\\Lsa')
         v = r.get_value("NoLMHash")
         if v is not None:
             if v != 1:
-                report.get_by_id("WPC099").add_supporting_data('reg_key_value', [r, "NoLMHash", v])
+                self.issues.get_by_id("WPC099").add_supporting_data('reg_key_value', [r, "NoLMHash", v])
     
         r = regkey('HKLM\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon')
         v = r.get_value("CachedLogonsCount")
         if v is not None:
             if v != 1:
-                report.get_by_id("WPC100").add_supporting_data('reg_key_value', [r, "CachedLogonsCount", v])
+                self.issues.get_by_id("WPC100").add_supporting_data('reg_key_value', [r, "CachedLogonsCount", v])
     
         r = regkey('HKLM\\System\\CurrentControlSet\\Services\\LanManServer\\Parameters')
         v = r.get_value("RequireSecuritySignature")
         if v is not None:
             if v != 1:
-                report.get_by_id("WPC101").add_supporting_data('reg_key_value', [r, "RequireSecuritySignature", v])
+                self.issues.get_by_id("WPC101").add_supporting_data('reg_key_value', [r, "RequireSecuritySignature", v])
     
         r = regkey('HKLM\\System\\CurrentControlSet\\Services\\LanmanWorkstation\\Parameters')
         v = r.get_value("RequireSecuritySignature")
         if v is not None:
             if v != 1:
-                report.get_by_id("WPC102").add_supporting_data('reg_key_value', [r, "RequireSecuritySignature", v])
+                self.issues.get_by_id("WPC102").add_supporting_data('reg_key_value', [r, "RequireSecuritySignature", v])
     
         r = regkey('HKLM\\System\\CurrentControlSet\\Control\\Terminal Server')
         v = r.get_value("TSUserEnabled")
         if v is not None:
             if v == 1:
-                report.get_by_id("WPC106").add_supporting_data('reg_key_value', [r, "TSUserEnabled", v])
+                self.issues.get_by_id("WPC106").add_supporting_data('reg_key_value', [r, "TSUserEnabled", v])
     
         r = regkey('HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager')
         v = r.get_value("CWDIllegalInDllSearch")
         if v is None or v == 0:
-            report.get_by_id("WPC107").add_supporting_data('reg_key_value', [r, "CWDIllegalInDllSearch", v])
+            self.issues.get_by_id("WPC107").add_supporting_data('reg_key_value', [r, "CWDIllegalInDllSearch", v])
     
         # Microsoft network client: Send unencrypted password to connect to third-party SMB servers
         r = regkey('HKLM\\System\\CurrentControlSet\\Services\\LanmanWorkstation\\Parameters')
         v = r.get_value("EnablePlainTextPassword")
         if v == 1:
-            report.get_by_id("WPC172").add_supporting_data('reg_key_value', [r, "EnablePlainTextPassword", v])
+            self.issues.get_by_id("WPC172").add_supporting_data('reg_key_value', [r, "EnablePlainTextPassword", v])
     
         # TODO need to ignore this for domain controllers 
         # Network access: Do not allow anonymous enumeration of SAM accounts
         r = regkey('HKLM\\System\\CurrentControlSet\\Control\\Lsa')
         v = r.get_value("RestrictAnonymousSAM")
         if v == 0:
-            report.get_by_id("WPC173").add_supporting_data('reg_key_value', [r, "RestrictAnonymousSAM", v])
+            self.issues.get_by_id("WPC173").add_supporting_data('reg_key_value', [r, "RestrictAnonymousSAM", v])
     
         # Network access: Do not allow anonymous enumeration of SAM accounts and shares
         r = regkey('HKLM\\System\\CurrentControlSet\\Control\\Lsa')
         v = r.get_value("RestrictAnonymous")
         if v is None or v == 0:
-            report.get_by_id("WPC174").add_supporting_data('reg_key_value', [r, "RestrictAnonymous", v])
+            self.issues.get_by_id("WPC174").add_supporting_data('reg_key_value', [r, "RestrictAnonymous", v])
     
         # Network access: Let Everyone permissions apply to anonymous users   
         r = regkey('HKLM\\System\\CurrentControlSet\\Control\\Lsa')
         v = r.get_value("EveryoneIncludesAnonymous")
         if v == 1:
-            report.get_by_id("WPC175").add_supporting_data('reg_key_value', [r, "EveryoneIncludesAnonymous", v])
+            self.issues.get_by_id("WPC175").add_supporting_data('reg_key_value', [r, "EveryoneIncludesAnonymous", v])
     
         # Network access: Restrict anonymous access to Named Pipes and Shares 
         r = regkey('HKLM\\System\\CurrentControlSet\\Services\\LanManServer\\Parameters')
         v = r.get_value("RestrictNullSessAccess")
         if v == 0:
-            report.get_by_id("WPC176").add_supporting_data('reg_key_value', [r, "RestrictNullSessAccess", v])
+            self.issues.get_by_id("WPC176").add_supporting_data('reg_key_value', [r, "RestrictNullSessAccess", v])
     
         # Network access: Shares that can be accessed anonymously              
         r = regkey('HKLM\\System\\CurrentControlSet\\Services\\LanManServer\\Parameters')
         v = r.get_value("NullSessionShares")
         if v is not None and not v == "":
-            report.get_by_id("WPC177").add_supporting_data('reg_key_value', [r, "NullSessionShares", v])
+            self.issues.get_by_id("WPC177").add_supporting_data('reg_key_value', [r, "NullSessionShares", v])
     
         # Network security: Configure encryption types allowed for Kerberos 
         # TODO windows 7 / 2008 R2 or higher only 
         r = regkey('HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\Kerberos\\Parameters')
         v = r.get_value("SupportedEncryptionTypes")
         if v is None or v & 1 or v & 2:
-            report.get_by_id("WPC178").add_supporting_data('reg_key_value', [r, "SupportedEncryptionTypes", v])
+            self.issues.get_by_id("WPC178").add_supporting_data('reg_key_value', [r, "SupportedEncryptionTypes", v])
     
         # Network security: Restrict NTLM: Outgoing NTLM traffic to remote servers 
         r = regkey('HKLM\\System\\CurrentControlSet\\Control\\Lsa\\MSV1_0')
         v = r.get_value("RestrictSendingNTLMTraffic")
         if v is None or v != 2:
-            report.get_by_id("WPC179").add_supporting_data('reg_key_value', [r, "RestrictSendingNTLMTraffic", v])
+            self.issues.get_by_id("WPC179").add_supporting_data('reg_key_value', [r, "RestrictSendingNTLMTraffic", v])
     
         # Network security: Restrict NTLM: Incoming NTLM traffic  
         r = regkey('HKLM\\System\\CurrentControlSet\\Control\\Lsa\\MSV1_0')
         v = r.get_value("RestrictReceivingNTLMTraffic")
         if v is None or v == 0:
-            report.get_by_id("WPC180").add_supporting_data('reg_key_value', [r, "RestrictReceivingNTLMTraffic", v])
+            self.issues.get_by_id("WPC180").add_supporting_data('reg_key_value', [r, "RestrictReceivingNTLMTraffic", v])
     
         # Recovery console: Allow automatic administrative logon  
         r = regkey('HKLM\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Setup\\RecoveryConsole')
         v = r.get_value("SecurityLevel")
         if v == 1:
-            report.get_by_id("WPC181").add_supporting_data('reg_key_value', [r, "SecurityLevel", v])
+            self.issues.get_by_id("WPC181").add_supporting_data('reg_key_value', [r, "SecurityLevel", v])
     
         # System objects: Strengthen default permissions of internal system objects (e.g., Symbolic Links)
         r = regkey('HKLM\\System\\CurrentControlSet\\Control\\Session Manager')
         v = r.get_value("ProtectionMode")
         if v is None or v == 0:
-            report.get_by_id("WPC182").add_supporting_data('reg_key_value', [r, "ProtectionMode", v])
+            self.issues.get_by_id("WPC182").add_supporting_data('reg_key_value', [r, "ProtectionMode", v])
     
         # Network access: Do not allow storage of passwords and credentials for network authentication
         r = regkey('HKLM\\System\\CurrentControlSet\\Control\\Lsa')
         v = r.get_value("ProtectionMode")
         if v is None or v == 0:
-            report.get_by_id("WPC183").add_supporting_data('reg_key_value', [r, "disabledomaincreds", v])
+            self.issues.get_by_id("WPC183").add_supporting_data('reg_key_value', [r, "disabledomaincreds", v])
     
-    def audit_nt_objects(self, report):
+    def audit_nt_objects(self):
         root = ntobj("\\")
         issue_for = {
             'symboliclink': 'WPC122',
@@ -351,17 +351,17 @@ class audit(auditbase):
             print child.as_text()
             if child.get_sd():
                 if child.get_sd().has_no_dacl():
-                    report.get_by_id("WPC121").add_supporting_data('object_name_and_type', [child])
+                    self.issues.get_by_id("WPC121").add_supporting_data('object_name_and_type', [child])
     
                 for a in child.get_sd().get_acelist().get_untrusted().get_dangerous_perms().get_aces():
                     lc_type = child.get_type().lower()
                     if lc_type in issue_for.keys():
-                        report.get_by_id(issue_for[lc_type]).add_supporting_data('object_perms', [child, a])
+                        self.issues.get_by_id(issue_for[lc_type]).add_supporting_data('object_perms', [child, a])
                     else:
                         print "[W] No issue exists for object type: %s" % lc_type
     
     
-    def audit_patches(self, report):
+    def audit_patches(self):
         patchfile = self.options.patchfile
     
         if patchfile == 'auto':
@@ -426,21 +426,21 @@ class audit(auditbase):
                         exploit_count = exploit_count + 1
                         if self.options.verbose:
                             print e.as_string()
-                        report.get_by_id("WPC089").add_supporting_data('exploit_list', [e])
+                        self.issues.get_by_id("WPC089").add_supporting_data('exploit_list', [e])
                 else:
                     if self.options.verbose:
                         print "[-] Not vulnerable.  %s did not affect '%s'" % (e.get_msno(), os_string)
         print "[-] Found %s exploits potentially affecting this system" % exploit_count
     
     
-    def audit_loggedin(self, report):
+    def audit_loggedin(self):
         resume = 0
         print "\n[+] Logged in users:"
         try:
             while True:
                 users, _, resume = win32net.NetWkstaUserEnum(wpc.conf.remote_server, 1 , resume , 999999 )
                 for user in users:
-                    report.get_by_id("WPC140").add_supporting_data('usernames', ["%s\\%s" % (user['logon_domain'], user['username'])])
+                    self.issues.get_by_id("WPC140").add_supporting_data('usernames', ["%s\\%s" % (user['logon_domain'], user['username'])])
                     print "User logged in: Logon Server=\"%s\" Logon Domain=\"%s\" Username=\"%s\"" % (user['logon_server'], user['logon_domain'], user['username'])
                 if resume == 0:
                     break
@@ -448,43 +448,43 @@ class audit(auditbase):
             print "[E] Failed"
     
     
-    def audit_drivers(self, report):
+    def audit_drivers(self):
         for s in drivers().get_services():
     
             if s.get_reg_key() and s.get_reg_key().get_sd():
     
                 # Check DACL set
                 if not s.get_reg_key().get_sd().get_dacl():
-                        report.get_by_id("WPC141").add_supporting_data('service_regkey', [s])
+                        self.issues.get_by_id("WPC141").add_supporting_data('service_regkey', [s])
                         
                 # Check owner
                 if not s.get_reg_key().get_sd().get_owner().is_trusted():
-                    report.get_by_id("WPC142").add_supporting_data('service_exe_regkey_untrusted_ownership', [s, s.get_reg_key()])
+                    self.issues.get_by_id("WPC142").add_supporting_data('service_exe_regkey_untrusted_ownership', [s, s.get_reg_key()])
     
                 # Untrusted users can change permissions
                 acl = s.get_reg_key().get_issue_acl_for_perms(["WRITE_OWNER", "WRITE_DAC"])
                 if acl:
-                    report.get_by_id("WPC143").add_supporting_data('service_reg_perms', [s, acl])
+                    self.issues.get_by_id("WPC143").add_supporting_data('service_reg_perms', [s, acl])
     
     #            "KEY_SET_VALUE", # GUI "Set Value".  Required to create, delete, or set a registry value.
                 acl = s.get_reg_key().get_issue_acl_for_perms(["KEY_SET_VALUE"])
                 if acl:
-                    report.get_by_id("WPC144").add_supporting_data('service_reg_perms', [s, acl])
+                    self.issues.get_by_id("WPC144").add_supporting_data('service_reg_perms', [s, acl])
     
     #            "KEY_CREATE_LINK", # GUI "Create Link".  Reserved for system use.
                 acl = s.get_reg_key().get_issue_acl_for_perms(["KEY_CREATE_LINK"])
                 if acl:
-                    report.get_by_id("WPC145").add_supporting_data('service_reg_perms', [s, acl])
+                    self.issues.get_by_id("WPC145").add_supporting_data('service_reg_perms', [s, acl])
     
     #            "KEY_CREATE_SUB_KEY", # GUI "Create subkey"
                 acl = s.get_reg_key().get_issue_acl_for_perms(["KEY_CREATE_SUB_KEY"])
                 if acl:
-                    report.get_by_id("WPC146").add_supporting_data('service_reg_perms', [s, acl])
+                    self.issues.get_by_id("WPC146").add_supporting_data('service_reg_perms', [s, acl])
     
     #            "DELETE", # GUI "Delete"
                 acl = s.get_reg_key().get_issue_acl_for_perms(["DELETE"])
                 if acl:
-                    report.get_by_id("WPC147").add_supporting_data('service_reg_perms', [s, acl])
+                    self.issues.get_by_id("WPC147").add_supporting_data('service_reg_perms', [s, acl])
     
                 # TODO walk sub keys looking for weak perms - not necessarily a problem, but could be interesting
     
@@ -493,12 +493,12 @@ class audit(auditbase):
                 while parent and parent.get_sd():
                     # Untrusted user owns parent directory
                     if not parent.get_sd().get_owner().is_trusted():
-                        report.get_by_id("WPC148").add_supporting_data('service_regkey_parent_untrusted_ownership', [s, parent])
+                        self.issues.get_by_id("WPC148").add_supporting_data('service_regkey_parent_untrusted_ownership', [s, parent])
     
                     # Parent dir can have file perms changed
                     fa = parent.get_issue_acl_for_perms(["WRITE_OWNER", "WRITE_DAC"])
                     if fa:
-                        report.get_by_id("WPC149").add_supporting_data('service_regkey_parent_perms', [s, fa])
+                        self.issues.get_by_id("WPC149").add_supporting_data('service_regkey_parent_perms', [s, fa])
     
                     # Child allows itself to be delete, parent allows it to be replaced
                     fa_parent = parent.get_issue_acl_for_perms(["DELETE"])
@@ -510,14 +510,14 @@ class audit(auditbase):
                             # KEY_CREATE_SUB_KEY or KEY_CREATE_LINK
                             fa_grandparent = grandparent.get_issue_acl_for_perms(["KEY_CREATE_SUB_KEY", "KEY_CREATE_LINK"])
                             if fa_grandparent:
-                                report.get_by_id("WPC150").add_supporting_data('service_regkey_parent_grandparent_write_perms', [s, fa_parent, fa_grandparent])
+                                self.issues.get_by_id("WPC150").add_supporting_data('service_regkey_parent_grandparent_write_perms', [s, fa_parent, fa_grandparent])
     
                     parent = parent.get_parent_key()
     
             # Check that the binary name is properly quoted
             if str(s.get_exe_path_clean()).find(" ") > 0: # clean path contains a space
                 if str(s.get_exe_path()).find(str('"' + s.get_exe_path_clean()) + '"') < 0: # TODO need regexp.  Could get false positive from this.
-                    report.get_by_id("WPC151").add_supporting_data('service_info', [s])
+                    self.issues.get_by_id("WPC151").add_supporting_data('service_info', [s])
     
             #
             # Examine executable for service
@@ -526,19 +526,19 @@ class audit(auditbase):
     
                 # Check DACL set
                 if not s.get_exe_file().get_sd().get_dacl():
-                        report.get_by_id("WPC152").add_supporting_data('service_exe_no_dacl', [s])
+                        self.issues.get_by_id("WPC152").add_supporting_data('service_exe_no_dacl', [s])
                         
                 # Examine parent directories
                 parent = s.get_exe_file().get_parent_dir()
                 while parent and parent.get_sd():
                     # Untrusted user owns parent directory
                     if not parent.get_sd().get_owner().is_trusted():
-                        report.get_by_id("WPC153").add_supporting_data('service_exe_parent_dir_untrusted_ownership', [s, parent])
+                        self.issues.get_by_id("WPC153").add_supporting_data('service_exe_parent_dir_untrusted_ownership', [s, parent])
     
                     # Parent dir can have file perms changed
                     fa = parent.get_file_acl_for_perms(["WRITE_OWNER", "WRITE_DAC"])
                     if fa:
-                        report.get_by_id("WPC154").add_supporting_data('service_exe_parent_dir_perms', [s, fa])
+                        self.issues.get_by_id("WPC154").add_supporting_data('service_exe_parent_dir_perms', [s, fa])
     
                     # Child allows itself to be delete, parent allows it to be replaced
                     fa_parent = parent.get_file_acl_for_perms(["DELETE"])
@@ -547,48 +547,48 @@ class audit(auditbase):
                         if grandparent and grandparent.get_sd():
                             fa_grandparent = grandparent.get_file_acl_for_perms(["FILE_ADD_SUBFOLDER"])
                             if fa_grandparent:
-                                report.get_by_id("WPC155").add_supporting_data('service_exe_parent_grandparent_write_perms', [s, fa_parent, fa_grandparent])
+                                self.issues.get_by_id("WPC155").add_supporting_data('service_exe_parent_grandparent_write_perms', [s, fa_parent, fa_grandparent])
     
                     # Parent allows child directory to be deleted and replaced
                     grandparent = parent.get_parent_dir()
                     if grandparent and grandparent.get_sd():
                         fa = grandparent.get_file_acl_for_perms(["FILE_DELETE_CHILD", "FILE_ADD_SUBFOLDER"])
                         if fa:
-                            report.get_by_id("WPC156").add_supporting_data('service_exe_parent_dir_perms', [s, fa])
+                            self.issues.get_by_id("WPC156").add_supporting_data('service_exe_parent_dir_perms', [s, fa])
     
                     parent = parent.get_parent_dir()
     
                 # Untrusted user owns exe
                 if not s.get_exe_file().get_sd().get_owner().is_trusted():
-                    report.get_by_id("WPC157").add_supporting_data('service_exe_owner', [s])
+                    self.issues.get_by_id("WPC157").add_supporting_data('service_exe_owner', [s])
     
                 # Check if exe can be appended to
                 fa = s.get_exe_file().get_file_acl_for_perms(["FILE_APPEND_DATA"])
                 if fa:
-                    report.get_by_id("WPC158").add_supporting_data('service_exe_write_perms', [s, fa])
+                    self.issues.get_by_id("WPC158").add_supporting_data('service_exe_write_perms', [s, fa])
     
                 # Check if exe can be deleted and perhaps replaced
                 fa = s.get_exe_file().get_file_acl_for_perms(["DELETE"])
                 if fa:
                     # File can be delete (DoS issue)
-                    report.get_by_id("WPC159").add_supporting_data('service_exe_write_perms', [s, fa])
+                    self.issues.get_by_id("WPC159").add_supporting_data('service_exe_write_perms', [s, fa])
     
                     # File can be deleted and replaced (privesc issue)
                     parent = s.get_exe_file().get_parent_dir()
                     if parent and parent.get_sd():
                         fa_parent = parent.get_file_acl_for_perms(["FILE_ADD_FILE"])
                         if fa_parent:
-                            report.get_by_id("WPC160").add_supporting_data('service_exe_file_parent_write_perms', [s, fa, fa_parent])
+                            self.issues.get_by_id("WPC160").add_supporting_data('service_exe_file_parent_write_perms', [s, fa, fa_parent])
     
                 # Check for file perms allowing overwrite
                 fa = s.get_exe_file().get_file_acl_for_perms(["FILE_WRITE_DATA", "WRITE_OWNER", "WRITE_DAC"])
                 if fa:
-                    report.get_by_id("WPC161").add_supporting_data('service_exe_write_perms', [s, fa])
+                    self.issues.get_by_id("WPC161").add_supporting_data('service_exe_write_perms', [s, fa])
     
                 # TODO write_file on a dir containing an exe might allow a dll to be added
             else:
                 if not s.get_exe_file():
-                    report.get_by_id("WPC162").add_supporting_data('service_no_exe', [s])
+                    self.issues.get_by_id("WPC162").add_supporting_data('service_no_exe', [s])
     
             #
             # Examine security descriptor for service
@@ -597,80 +597,80 @@ class audit(auditbase):
     
                 # Check DACL is set
                 if not s.get_sd().get_dacl():
-                    report.get_by_id("WPC171").add_supporting_data('service', [s])
+                    self.issues.get_by_id("WPC171").add_supporting_data('service', [s])
     
                 # TODO all mine are owned by SYSTEM.  Maybe this issue can never occur!?
                 if not s.get_sd().get_owner().is_trusted():
-                    report.get_by_id("WPC163").add_supporting_data('principals_with_service_ownership', [s, s.get_sd().get_owner()])
+                    self.issues.get_by_id("WPC163").add_supporting_data('principals_with_service_ownership', [s, s.get_sd().get_owner()])
     
                 # SERVICE_START
                 for a in s.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["SERVICE_START"]).get_aces():
-                    report.get_by_id("WPC164").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
+                    self.issues.get_by_id("WPC164").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
     
                 # SERVICE_STOP
                 for a in s.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["SERVICE_STOP"]).get_aces():
-                    report.get_by_id("WPC165").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
+                    self.issues.get_by_id("WPC165").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
     
                 # SERVICE_PAUSE_CONTINUE
                 for a in s.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["SERVICE_PAUSE_CONTINUE"]).get_aces():
-                    report.get_by_id("WPC166").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
+                    self.issues.get_by_id("WPC166").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
     
                 # SERVICE_CHANGE_CONFIG
                 for a in s.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["SERVICE_CHANGE_CONFIG"]).get_aces():
-                    report.get_by_id("WPC167").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
+                    self.issues.get_by_id("WPC167").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
     
                 # DELETE
                 for a in s.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["DELETE"]).get_aces():
-                    report.get_by_id("WPC168").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
+                    self.issues.get_by_id("WPC168").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
     
                 # WRITE_DAC
                 for a in s.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["WRITE_DAC"]).get_aces():
-                    report.get_by_id("WPC169").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
+                    self.issues.get_by_id("WPC169").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
     
                 # WRITE_OWNER
                 for a in s.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["WRITE_OWNER"]).get_aces():
-                    report.get_by_id("WPC170").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
+                    self.issues.get_by_id("WPC170").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
     
     
-    def audit_drives(self, report):
+    def audit_drives(self):
         for d in drives().get_fixed_drives():
             if d.get_fs() == 'NTFS':
     
                 directory = File(d.get_name())
     
                 for a in directory.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["FILE_ADD_FILE"]).get_aces():
-                    report.get_by_id("WPC010").add_supporting_data('dir_add_file', [directory, a])
+                    self.issues.get_by_id("WPC010").add_supporting_data('dir_add_file', [directory, a])
     
                 for a in directory.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["FILE_ADD_SUBDIRECTORY"]).get_aces():
-                    report.get_by_id("WPC087").add_supporting_data('dir_add_dir', [directory, a])
+                    self.issues.get_by_id("WPC087").add_supporting_data('dir_add_dir', [directory, a])
             else:
-                report.get_by_id("WPC011").add_supporting_data('drive_and_fs_list', [d])
+                self.issues.get_by_id("WPC011").add_supporting_data('drive_and_fs_list', [d])
     
     
-    def audit_processes(self, report):
+    def audit_processes(self):
         for p in processes().get_all():
             # TODO check the dangerous perms aren't held by the process owner
             if p.get_sd():
                 if not p.get_sd().get_dacl():
-                        report.get_by_id("WPC136").add_supporting_data('process', [p])
+                        self.issues.get_by_id("WPC136").add_supporting_data('process', [p])
                 perms = p.get_sd().get_acelist().get_untrusted().get_dangerous_perms().get_aces()
                 for perm in perms:
                     if p.get_token() and perm.get_principal().get_fq_name() != p.get_token().get_token_user().get_fq_name() and perm.get_principal().get_fq_name() != 'NT AUTHORITY\RESTRICTED':
-                        report.get_by_id("WPC069").add_supporting_data('process_perms', [p, perm])
+                        self.issues.get_by_id("WPC069").add_supporting_data('process_perms', [p, perm])
     
             for t in p.get_threads():
                 if t.get_sd():
                     perms = t.get_sd().get_acelist().get_untrusted().get_dangerous_perms().get_aces()
                     for perm in perms:
                         if p.get_token() and perm.get_principal().get_fq_name() != p.get_token().get_token_user().get_fq_name() and perm.get_principal().get_fq_name() != 'NT AUTHORITY\RESTRICTED':
-                            report.get_by_id("WPC104").add_supporting_data('thread_perms', [t, perm])
+                            self.issues.get_by_id("WPC104").add_supporting_data('thread_perms', [t, perm])
     
             for t in p.get_tokens():
                 if t.get_sd():
                     perms = t.get_sd().get_acelist().get_untrusted().get_dangerous_perms().get_aces()
                     for perm in perms:
                         if perm.get_principal().get_fq_name() != 'NT AUTHORITY\RESTRICTED':
-                            report.get_by_id("WPC105").add_supporting_data('token_perms', [t, p, perm])
+                            self.issues.get_by_id("WPC105").add_supporting_data('token_perms', [t, p, perm])
     
             # When listing DLLs for a process we need to see the filesystem like they do
             if p.is_wow64():
@@ -678,83 +678,83 @@ class audit(auditbase):
     
             if p.get_exe():
                 if p.get_exe().is_replaceable():
-                    report.get_by_id("WPC067").add_supporting_data('process_exe', [p])
+                    self.issues.get_by_id("WPC067").add_supporting_data('process_exe', [p])
     
                     for dll in p.get_dlls():
                         if dll.is_replaceable():
-                            report.get_by_id("WPC068").add_supporting_data('process_dll', [p, dll])
+                            self.issues.get_by_id("WPC068").add_supporting_data('process_dll', [p, dll])
     
             if p.is_wow64():
                 k32.Wow64DisableWow64FsRedirection(ctypes.byref(wow64))
     
     
-    def audit_users(self, report):
+    def audit_users(self):
         userlist = users()
         for u in userlist.get_all():
             flags = u.get_flags()
             
             # Defined in wpc/conf.py - ignore error in IDE
             if flags & win32netcon.UF_ENCRYPTED_TEXT_PASSWORD_ALLOWED:
-                report.get_by_id("WPC108").add_supporting_data('username', [u])
+                self.issues.get_by_id("WPC108").add_supporting_data('username', [u])
     
             if not (flags & win32netcon.UF_ACCOUNTDISABLE or flags & win32netcon.UF_LOCKOUT):
                 if u.get_password_age() > wpc.conf.max_password_age:
-                    report.get_by_id("WPC109").add_supporting_data('password_age', [u])
+                    self.issues.get_by_id("WPC109").add_supporting_data('password_age', [u])
     
                 if flags & win32netcon.UF_PASSWD_NOTREQD:
-                    report.get_by_id("WPC110").add_supporting_data('username', [u])
+                    self.issues.get_by_id("WPC110").add_supporting_data('username', [u])
     
                 if flags & win32netcon.UF_PASSWD_CANT_CHANGE:
-                    report.get_by_id("WPC111").add_supporting_data('username', [u])
+                    self.issues.get_by_id("WPC111").add_supporting_data('username', [u])
     
                 if flags & win32netcon.UF_DONT_EXPIRE_PASSWD:
-                    report.get_by_id("WPC112").add_supporting_data('username', [u])
+                    self.issues.get_by_id("WPC112").add_supporting_data('username', [u])
     
                 if flags & win32netcon.UF_TRUSTED_FOR_DELEGATION: # defined in wpc/conf.py
-                    report.get_by_id("WPC113").add_supporting_data('username', [u])
+                    self.issues.get_by_id("WPC113").add_supporting_data('username', [u])
     
                 if flags & win32netcon.UF_TRUSTED_TO_AUTHENTICATE_FOR_DELEGATION: # defined in wpc/conf.py
-                    report.get_by_id("WPC114").add_supporting_data('username', [u])
+                    self.issues.get_by_id("WPC114").add_supporting_data('username', [u])
     
             # TODO consider other privs too
             # TODO remove useless privs
             # TODO More efficient method that doesn't involve looping through all users?  What does secpol.msc do?
             for p in u.get_effective_privileges():
                 if p == "SeAssignPrimaryTokenPrivilege":
-                    report.get_by_id("WPC070").add_supporting_data('user_powerful_priv', [u])
+                    self.issues.get_by_id("WPC070").add_supporting_data('user_powerful_priv', [u])
                 if p == "SeBackupPrivilege":
-                    report.get_by_id("WPC071").add_supporting_data('user_powerful_priv', [u])
+                    self.issues.get_by_id("WPC071").add_supporting_data('user_powerful_priv', [u])
                 if p == "SeCreatePagefilePrivilege":
-                    report.get_by_id("WPC072").add_supporting_data('user_powerful_priv', [u])
+                    self.issues.get_by_id("WPC072").add_supporting_data('user_powerful_priv', [u])
                 if p == "SeCreateTokenPrivilege":
-                    report.get_by_id("WPC073").add_supporting_data('user_powerful_priv', [u])
+                    self.issues.get_by_id("WPC073").add_supporting_data('user_powerful_priv', [u])
                 if p == "SeDebugPrivilege":
-                    report.get_by_id("WPC074").add_supporting_data('user_powerful_priv', [u])
+                    self.issues.get_by_id("WPC074").add_supporting_data('user_powerful_priv', [u])
                 if p == "SeEnableDelegationPrivilege":
-                    report.get_by_id("WPC075").add_supporting_data('user_powerful_priv', [u])
+                    self.issues.get_by_id("WPC075").add_supporting_data('user_powerful_priv', [u])
                 if p == "SeLoadDriverPrivilege":
-                    report.get_by_id("WPC076").add_supporting_data('user_powerful_priv', [u])
+                    self.issues.get_by_id("WPC076").add_supporting_data('user_powerful_priv', [u])
                 if p == "SeMachineAccountPrivilege":
-                    report.get_by_id("WPC077").add_supporting_data('user_powerful_priv', [u])
+                    self.issues.get_by_id("WPC077").add_supporting_data('user_powerful_priv', [u])
                 if p == "SeManageVolumePrivilege":
-                    report.get_by_id("WPC078").add_supporting_data('user_powerful_priv', [u])
+                    self.issues.get_by_id("WPC078").add_supporting_data('user_powerful_priv', [u])
                 if p == "SeRelabelPrivilege":
-                    report.get_by_id("WPC079").add_supporting_data('user_powerful_priv', [u])
+                    self.issues.get_by_id("WPC079").add_supporting_data('user_powerful_priv', [u])
                 if p == "SeRestorePrivilege":
-                    report.get_by_id("WPC080").add_supporting_data('user_powerful_priv', [u])
+                    self.issues.get_by_id("WPC080").add_supporting_data('user_powerful_priv', [u])
                 if p == "SeShutdownPrivilege":
-                    report.get_by_id("WPC081").add_supporting_data('user_powerful_priv', [u])
+                    self.issues.get_by_id("WPC081").add_supporting_data('user_powerful_priv', [u])
                 if p == "SeSyncAgentPrivilege":
-                    report.get_by_id("WPC082").add_supporting_data('user_powerful_priv', [u])
+                    self.issues.get_by_id("WPC082").add_supporting_data('user_powerful_priv', [u])
                 if p == "SeTakeOwnershipPrivilege":
-                    report.get_by_id("WPC083").add_supporting_data('user_powerful_priv', [u])
+                    self.issues.get_by_id("WPC083").add_supporting_data('user_powerful_priv', [u])
                 if p == "SeTcbPrivilege":
-                    report.get_by_id("WPC084").add_supporting_data('user_powerful_priv', [u])
+                    self.issues.get_by_id("WPC084").add_supporting_data('user_powerful_priv', [u])
                 if p == "SeTrustedCredManAccessPrivilege":
-                    report.get_by_id("WPC085").add_supporting_data('user_powerful_priv', [u])
+                    self.issues.get_by_id("WPC085").add_supporting_data('user_powerful_priv', [u])
     
     
-    def audit_groups(self, report):
+    def audit_groups(self):
         grouplist = groups()
         for u in grouplist.get_all():
             # TODO ignore empty groups
@@ -764,40 +764,40 @@ class audit(auditbase):
             for p in u.get_privileges():
                 # print "\t%s" % p
                 if p == "SeAssignPrimaryTokenPrivilege":
-                    report.get_by_id("WPC070").add_supporting_data('group_powerful_priv', [u])
+                    self.issues.get_by_id("WPC070").add_supporting_data('group_powerful_priv', [u])
                 if p == "SeBackupPrivilege":
-                    report.get_by_id("WPC071").add_supporting_data('group_powerful_priv', [u])
+                    self.issues.get_by_id("WPC071").add_supporting_data('group_powerful_priv', [u])
                 if p == "SeCreatePagefilePrivilege":
-                    report.get_by_id("WPC072").add_supporting_data('group_powerful_priv', [u])
+                    self.issues.get_by_id("WPC072").add_supporting_data('group_powerful_priv', [u])
                 if p == "SeCreateTokenPrivilege":
-                    report.get_by_id("WPC073").add_supporting_data('group_powerful_priv', [u])
+                    self.issues.get_by_id("WPC073").add_supporting_data('group_powerful_priv', [u])
                 if p == "SeDebugPrivilege":
-                    report.get_by_id("WPC074").add_supporting_data('group_powerful_priv', [u])
+                    self.issues.get_by_id("WPC074").add_supporting_data('group_powerful_priv', [u])
                 if p == "SeEnableDelegationPrivilege":
-                    report.get_by_id("WPC075").add_supporting_data('group_powerful_priv', [u])
+                    self.issues.get_by_id("WPC075").add_supporting_data('group_powerful_priv', [u])
                 if p == "SeLoadDriverPrivilege":
-                    report.get_by_id("WPC076").add_supporting_data('group_powerful_priv', [u])
+                    self.issues.get_by_id("WPC076").add_supporting_data('group_powerful_priv', [u])
                 if p == "SeMachineAccountPrivilege":
-                    report.get_by_id("WPC077").add_supporting_data('group_powerful_priv', [u])
+                    self.issues.get_by_id("WPC077").add_supporting_data('group_powerful_priv', [u])
                 if p == "SeManageVolumePrivilege":
-                    report.get_by_id("WPC078").add_supporting_data('group_powerful_priv', [u])
+                    self.issues.get_by_id("WPC078").add_supporting_data('group_powerful_priv', [u])
                 if p == "SeRelabelPrivilege":
-                    report.get_by_id("WPC079").add_supporting_data('group_powerful_priv', [u])
+                    self.issues.get_by_id("WPC079").add_supporting_data('group_powerful_priv', [u])
                 if p == "SeRestorePrivilege":
-                    report.get_by_id("WPC080").add_supporting_data('group_powerful_priv', [u])
+                    self.issues.get_by_id("WPC080").add_supporting_data('group_powerful_priv', [u])
                 if p == "SeShutdownPrivilege":
-                    report.get_by_id("WPC081").add_supporting_data('group_powerful_priv', [u])
+                    self.issues.get_by_id("WPC081").add_supporting_data('group_powerful_priv', [u])
                 if p == "SeSyncAgentPrivilege":
-                    report.get_by_id("WPC082").add_supporting_data('group_powerful_priv', [u])
+                    self.issues.get_by_id("WPC082").add_supporting_data('group_powerful_priv', [u])
                 if p == "SeTakeOwnershipPrivilege":
-                    report.get_by_id("WPC083").add_supporting_data('group_powerful_priv', [u])
+                    self.issues.get_by_id("WPC083").add_supporting_data('group_powerful_priv', [u])
                 if p == "SeTcbPrivilege":
-                    report.get_by_id("WPC084").add_supporting_data('group_powerful_priv', [u])
+                    self.issues.get_by_id("WPC084").add_supporting_data('group_powerful_priv', [u])
                 if p == "SeTrustedCredManAccessPrivilege":
-                    report.get_by_id("WPC085").add_supporting_data('group_powerful_priv', [u])
+                    self.issues.get_by_id("WPC085").add_supporting_data('group_powerful_priv', [u])
     
     
-    def audit_services(self, report):
+    def audit_services(self):
         for s in services().get_services():
     
             #
@@ -809,25 +809,25 @@ class audit(auditbase):
                 if not d in ("NT AUTHORITY", "NT Authority"):
                     if d in ("."):
                         # Local account - TODO better way to tell if acct is a local acct?
-                        report.get_by_id("WPC064").add_supporting_data('service_domain_user', [s])
+                        self.issues.get_by_id("WPC064").add_supporting_data('service_domain_user', [s])
                     else:
                         # Domain account - TODO better way to tell if acct is a domain acct?
-                        report.get_by_id("WPC063").add_supporting_data('service_domain_user', [s])
+                        self.issues.get_by_id("WPC063").add_supporting_data('service_domain_user', [s])
                         
             if len(u.split("@")) == 2:
                 d = u.split("@")[1]
                 if not d in ("NT AUTHORITY", "NT Authority"):
                     if d in ("."):
                         # Local account - TODO better way to tell if acct is a local acct?
-                        report.get_by_id("WPC064").add_supporting_data('service_domain_user', [s])
+                        self.issues.get_by_id("WPC064").add_supporting_data('service_domain_user', [s])
                     else:
                         # Domain account - TODO better way to tell if acct is a domain acct?
-                        report.get_by_id("WPC063").add_supporting_data('service_domain_user', [s])
+                        self.issues.get_by_id("WPC063").add_supporting_data('service_domain_user', [s])
     
             if s.get_name() in ("PSEXESVC", "Abel", "fgexec"):
-                report.get_by_id("WPC065").add_supporting_data('sectool_services', [s])
+                self.issues.get_by_id("WPC065").add_supporting_data('sectool_services', [s])
             elif s.get_description() in ("PsExec", "Abel", "fgexec"):
-                report.get_by_id("WPC065").add_supporting_data('sectool_services', [s])
+                self.issues.get_by_id("WPC065").add_supporting_data('sectool_services', [s])
             # TODO check for the presence of files - but not from here 
             #
             # Check if pentest/audit tools have accidentally been left running
@@ -854,36 +854,36 @@ class audit(auditbase):
     
                 # Check DACL set
                 if not s.get_reg_key().get_sd().get_dacl():
-                        report.get_by_id("WPC138").add_supporting_data('service_regkey', [s])
+                        self.issues.get_by_id("WPC138").add_supporting_data('service_regkey', [s])
                         
                 # Check owner
                 if not s.get_reg_key().get_sd().get_owner().is_trusted():
-                    report.get_by_id("WPC035").add_supporting_data('service_exe_regkey_untrusted_ownership', [s, s.get_reg_key()])
+                    self.issues.get_by_id("WPC035").add_supporting_data('service_exe_regkey_untrusted_ownership', [s, s.get_reg_key()])
     
                 # Untrusted users can change permissions
                 acl = s.get_reg_key().get_issue_acl_for_perms(["WRITE_OWNER", "WRITE_DAC"])
                 if acl:
-                    report.get_by_id("WPC036").add_supporting_data('service_reg_perms', [s, acl])
+                    self.issues.get_by_id("WPC036").add_supporting_data('service_reg_perms', [s, acl])
     
     #            "KEY_SET_VALUE", # GUI "Set Value".  Required to create, delete, or set a registry value.
                 acl = s.get_reg_key().get_issue_acl_for_perms(["KEY_SET_VALUE"])
                 if acl:
-                    report.get_by_id("WPC037").add_supporting_data('service_reg_perms', [s, acl])
+                    self.issues.get_by_id("WPC037").add_supporting_data('service_reg_perms', [s, acl])
     
     #            "KEY_CREATE_LINK", # GUI "Create Link".  Reserved for system use.
                 acl = s.get_reg_key().get_issue_acl_for_perms(["KEY_CREATE_LINK"])
                 if acl:
-                    report.get_by_id("WPC038").add_supporting_data('service_reg_perms', [s, acl])
+                    self.issues.get_by_id("WPC038").add_supporting_data('service_reg_perms', [s, acl])
     
     #            "KEY_CREATE_SUB_KEY", # GUI "Create subkey"
                 acl = s.get_reg_key().get_issue_acl_for_perms(["KEY_CREATE_SUB_KEY"])
                 if acl:
-                    report.get_by_id("WPC039").add_supporting_data('service_reg_perms', [s, acl])
+                    self.issues.get_by_id("WPC039").add_supporting_data('service_reg_perms', [s, acl])
     
     #            "DELETE", # GUI "Delete"
                 acl = s.get_reg_key().get_issue_acl_for_perms(["DELETE"])
                 if acl:
-                    report.get_by_id("WPC040").add_supporting_data('service_reg_perms', [s, acl])
+                    self.issues.get_by_id("WPC040").add_supporting_data('service_reg_perms', [s, acl])
     
                 # TODO walk sub keys looking for weak perms - not necessarily a problem, but could be interesting
     
@@ -894,19 +894,19 @@ class audit(auditbase):
                         f = File(wpc.utils.env_expand(v))
                         if f.exists():
                             if f.is_replaceable():
-                                report.get_by_id("WPC052").add_supporting_data('service_dll', [s, pkey, f])
+                                self.issues.get_by_id("WPC052").add_supporting_data('service_dll', [s, pkey, f])
     
                 # TODO checks on parent keys
                 parent = s.get_reg_key().get_parent_key()
                 while parent and parent.get_sd():
                     # Untrusted user owns parent directory
                     if not parent.get_sd().get_owner().is_trusted():
-                        report.get_by_id("WPC041").add_supporting_data('service_regkey_parent_untrusted_ownership', [s, parent])
+                        self.issues.get_by_id("WPC041").add_supporting_data('service_regkey_parent_untrusted_ownership', [s, parent])
     
                     # Parent dir can have file perms changed
                     fa = parent.get_issue_acl_for_perms(["WRITE_OWNER", "WRITE_DAC"])
                     if fa:
-                        report.get_by_id("WPC042").add_supporting_data('service_regkey_parent_perms', [s, fa])
+                        self.issues.get_by_id("WPC042").add_supporting_data('service_regkey_parent_perms', [s, fa])
     
                     # Child allows itself to be delete, parent allows it to be replaced
                     fa_parent = parent.get_issue_acl_for_perms(["DELETE"])
@@ -918,14 +918,14 @@ class audit(auditbase):
                             # KEY_CREATE_SUB_KEY or KEY_CREATE_LINK
                             fa_grandparent = grandparent.get_issue_acl_for_perms(["KEY_CREATE_SUB_KEY", "KEY_CREATE_LINK"])
                             if fa_grandparent:
-                                report.get_by_id("WPC043").add_supporting_data('service_regkey_parent_grandparent_write_perms', [s, fa_parent, fa_grandparent])
+                                self.issues.get_by_id("WPC043").add_supporting_data('service_regkey_parent_grandparent_write_perms', [s, fa_parent, fa_grandparent])
     
                     parent = parent.get_parent_key()
     
             # Check that the binary name is properly quoted
             if str(s.get_exe_path_clean()).find(" ") > 0: # clean path contains a space
                 if str(s.get_exe_path()).find(str('"' + s.get_exe_path_clean()) + '"') < 0: # TODO need regexp.  Could get false positive from this.
-                    report.get_by_id("WPC051").add_supporting_data('service_info', [s])
+                    self.issues.get_by_id("WPC051").add_supporting_data('service_info', [s])
     
             #
             # Examine executable for service
@@ -934,19 +934,19 @@ class audit(auditbase):
     
                 # Check DACL set
                 if not s.get_exe_file().get_sd().get_dacl():
-                        report.get_by_id("WPC139").add_supporting_data('service_exe_no_dacl', [s])
+                        self.issues.get_by_id("WPC139").add_supporting_data('service_exe_no_dacl', [s])
                         
                 # Examine parent directories
                 parent = s.get_exe_file().get_parent_dir()
                 while parent and parent.get_sd():
                     # Untrusted user owns parent directory
                     if not parent.get_sd().get_owner().is_trusted():
-                        report.get_by_id("WPC033").add_supporting_data('service_exe_parent_dir_untrusted_ownership', [s, parent])
+                        self.issues.get_by_id("WPC033").add_supporting_data('service_exe_parent_dir_untrusted_ownership', [s, parent])
     
                     # Parent dir can have file perms changed
                     fa = parent.get_file_acl_for_perms(["WRITE_OWNER", "WRITE_DAC"])
                     if fa:
-                        report.get_by_id("WPC032").add_supporting_data('service_exe_parent_dir_perms', [s, fa])
+                        self.issues.get_by_id("WPC032").add_supporting_data('service_exe_parent_dir_perms', [s, fa])
     
                     # Child allows itself to be delete, parent allows it to be replaced
                     fa_parent = parent.get_file_acl_for_perms(["DELETE"])
@@ -955,48 +955,48 @@ class audit(auditbase):
                         if grandparent and grandparent.get_sd():
                             fa_grandparent = grandparent.get_file_acl_for_perms(["FILE_ADD_SUBFOLDER"])
                             if fa_grandparent:
-                                report.get_by_id("WPC031").add_supporting_data('service_exe_parent_grandparent_write_perms', [s, fa_parent, fa_grandparent])
+                                self.issues.get_by_id("WPC031").add_supporting_data('service_exe_parent_grandparent_write_perms', [s, fa_parent, fa_grandparent])
     
                     # Parent allows child directory to be deleted and replaced
                     grandparent = parent.get_parent_dir()
                     if grandparent and grandparent.get_sd():
                         fa = grandparent.get_file_acl_for_perms(["FILE_DELETE_CHILD", "FILE_ADD_SUBFOLDER"])
                         if fa:
-                            report.get_by_id("WPC030").add_supporting_data('service_exe_parent_dir_perms', [s, fa])
+                            self.issues.get_by_id("WPC030").add_supporting_data('service_exe_parent_dir_perms', [s, fa])
     
                     parent = parent.get_parent_dir()
     
                 # Untrusted user owns exe
                 if not s.get_exe_file().get_sd().get_owner().is_trusted():
-                    report.get_by_id("WPC029").add_supporting_data('service_exe_owner', [s])
+                    self.issues.get_by_id("WPC029").add_supporting_data('service_exe_owner', [s])
     
                 # Check if exe can be appended to
                 fa = s.get_exe_file().get_file_acl_for_perms(["FILE_APPEND_DATA"])
                 if fa:
-                    report.get_by_id("WPC027").add_supporting_data('service_exe_write_perms', [s, fa])
+                    self.issues.get_by_id("WPC027").add_supporting_data('service_exe_write_perms', [s, fa])
     
                 # Check if exe can be deleted and perhaps replaced
                 fa = s.get_exe_file().get_file_acl_for_perms(["DELETE"])
                 if fa:
                     # File can be delete (DoS issue)
-                    report.get_by_id("WPC026").add_supporting_data('service_exe_write_perms', [s, fa])
+                    self.issues.get_by_id("WPC026").add_supporting_data('service_exe_write_perms', [s, fa])
     
                     # File can be deleted and replaced (privesc issue)
                     parent = s.get_exe_file().get_parent_dir()
                     if parent and parent.get_sd():
                         fa_parent = parent.get_file_acl_for_perms(["FILE_ADD_FILE"])
                         if fa_parent:
-                            report.get_by_id("WPC034").add_supporting_data('service_exe_file_parent_write_perms', [s, fa, fa_parent])
+                            self.issues.get_by_id("WPC034").add_supporting_data('service_exe_file_parent_write_perms', [s, fa, fa_parent])
     
                 # Check for file perms allowing overwrite
                 fa = s.get_exe_file().get_file_acl_for_perms(["FILE_WRITE_DATA", "WRITE_OWNER", "WRITE_DAC"])
                 if fa:
-                    report.get_by_id("WPC028").add_supporting_data('service_exe_write_perms', [s, fa])
+                    self.issues.get_by_id("WPC028").add_supporting_data('service_exe_write_perms', [s, fa])
     
                 # TODO write_file on a dir containing an exe might allow a dll to be added
             else:
                 if not s.get_exe_file():
-                    report.get_by_id("WPC062").add_supporting_data('service_no_exe', [s])
+                    self.issues.get_by_id("WPC062").add_supporting_data('service_no_exe', [s])
     
             #
             # Examine security descriptor for service
@@ -1005,42 +1005,42 @@ class audit(auditbase):
     
                 # Check DACL is set
                 if not s.get_sd().get_dacl():
-                    report.get_by_id("WPC137").add_supporting_data('service', [s])
+                    self.issues.get_by_id("WPC137").add_supporting_data('service', [s])
     
                 # TODO all mine are owned by SYSTEM.  Maybe this issue can never occur!?
                 if not s.get_sd().get_owner().is_trusted():
-                    report.get_by_id("WPC025").add_supporting_data('principals_with_service_ownership', [s, s.get_sd().get_owner()])
+                    self.issues.get_by_id("WPC025").add_supporting_data('principals_with_service_ownership', [s, s.get_sd().get_owner()])
     
                 # SERVICE_START
                 for a in s.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["SERVICE_START"]).get_aces():
-                    report.get_by_id("WPC018").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
+                    self.issues.get_by_id("WPC018").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
     
                 # SERVICE_STOP
                 for a in s.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["SERVICE_STOP"]).get_aces():
-                    report.get_by_id("WPC019").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
+                    self.issues.get_by_id("WPC019").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
     
                 # SERVICE_PAUSE_CONTINUE
                 for a in s.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["SERVICE_PAUSE_CONTINUE"]).get_aces():
-                    report.get_by_id("WPC020").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
+                    self.issues.get_by_id("WPC020").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
     
                 # SERVICE_CHANGE_CONFIG
                 for a in s.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["SERVICE_CHANGE_CONFIG"]).get_aces():
-                    report.get_by_id("WPC021").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
+                    self.issues.get_by_id("WPC021").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
     
                 # DELETE
                 for a in s.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["DELETE"]).get_aces():
-                    report.get_by_id("WPC022").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
+                    self.issues.get_by_id("WPC022").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
     
                 # WRITE_DAC
                 for a in s.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["WRITE_DAC"]).get_aces():
-                    report.get_by_id("WPC023").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
+                    self.issues.get_by_id("WPC023").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
     
                 # WRITE_OWNER
                 for a in s.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["WRITE_OWNER"]).get_aces():
-                    report.get_by_id("WPC024").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
+                    self.issues.get_by_id("WPC024").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
     
     
-    def csv_registry(self, report):
+    def csv_registry(self):
         print "[D] Walking registry"
         for r in regkey('HKLM').get_all_subkeys():
             aces = r.get_dangerous_aces()
@@ -1052,7 +1052,7 @@ class audit(auditbase):
                         for line in a.as_tab_delim3(r.get_name(), v, r.get_value(v)):
                             print line
     
-    def audit_scheduled_tasks(self, report):
+    def audit_scheduled_tasks(self):
         try:
             content = subprocess.check_output("schtasks /query /xml", stderr = open(os.devnull, 'w'))
         except:
@@ -1106,12 +1106,12 @@ class audit(auditbase):
                 if f.is_replaceable():
                     print "[D] Weak perms for: %s" % f.get_name()
                     for a in f.get_dangerous_aces():
-                        report.get_by_id("WPC120").add_supporting_data('scheduled_task_exe_perms', [name, f, a])
+                        self.issues.get_by_id("WPC120").add_supporting_data('scheduled_task_exe_perms', [name, f, a])
                 print "exec args: %s" % exec_args
                 print
     
     
-    def audit_registry(self, report):
+    def audit_registry(self):
     
         #
         # Shell Extensions
@@ -1169,7 +1169,7 @@ class audit(auditbase):
     
                             if f and f.is_replaceable():
                                 name = s.get_name().split("\\")[-1]
-                                report.get_by_id(check_id).add_supporting_data('regkey_ref_replacable_file', [check_type, name, clsid, f, s])
+                                self.issues.get_by_id(check_id).add_supporting_data('regkey_ref_replacable_file', [check_type, name, clsid, f, s])
     
         #
         # Run, RunOnce, RunServices, RunServicesOnce
@@ -1204,7 +1204,7 @@ class audit(auditbase):
                     if imagepath:
                         f = File(wpc.utils.get_exe_path_clean(imagepath))
                         if f and f.is_replaceable():
-                            report.get_by_id(issueid).add_supporting_data('regkey_ref_file', [rk, v, f])
+                            self.issues.get_by_id(issueid).add_supporting_data('regkey_ref_file', [rk, v, f])
     
         #
         # KnownDlls
@@ -1232,7 +1232,7 @@ class audit(auditbase):
                     if os.path.exists(d + "\\" + file_str):
                         f = File(d + "\\" + file_str)
                         if f.is_replaceable():
-                            report.get_by_id("WPC060").add_supporting_data('regkey_ref_file', [r, v, f])
+                            self.issues.get_by_id("WPC060").add_supporting_data('regkey_ref_file', [r, v, f])
     
         #
         # All CLSIDs (experimental)
@@ -1286,7 +1286,7 @@ class audit(auditbase):
                             pass
     
                         if f and f.is_replaceable():
-                            report.get_by_id("WPC061").add_supporting_data('regkey_ref_file', [s, v, f])
+                            self.issues.get_by_id("WPC061").add_supporting_data('regkey_ref_file', [s, v, f])
     
         for key_string in wpc.conf.reg_paths:
             r = regkey(key_string)
@@ -1295,27 +1295,27 @@ class audit(auditbase):
     
                 # Check owner
                 if not r.get_sd().get_owner().is_trusted():
-                    report.get_by_id("WPC046").add_supporting_data('regkey_program_untrusted_ownership', [r])
+                    self.issues.get_by_id("WPC046").add_supporting_data('regkey_program_untrusted_ownership', [r])
     
                 # Untrusted users can change permissions
                 acl = r.get_issue_acl_for_perms(["WRITE_OWNER", "WRITE_DAC"])
                 if acl:
-                    report.get_by_id("WPC047").add_supporting_data('regkey_perms', [r, acl])
+                    self.issues.get_by_id("WPC047").add_supporting_data('regkey_perms', [r, acl])
     
     #            "KEY_SET_VALUE", # GUI "Set Value".  Required to create, delete, or set a registry value.
                 acl = r.get_issue_acl_for_perms(["KEY_SET_VALUE"])
                 if acl:
-                    report.get_by_id("WPC048").add_supporting_data('regkey_perms', [r, acl])
+                    self.issues.get_by_id("WPC048").add_supporting_data('regkey_perms', [r, acl])
     
     #            "KEY_CREATE_LINK", # GUI "Create Link".  Reserved for system use.
                 acl = r.get_issue_acl_for_perms(["KEY_CREATE_LINK", "KEY_CREATE_SUB_KEY"])
                 if acl:
-                    report.get_by_id("WPC049").add_supporting_data('regkey_perms', [r, acl])
+                    self.issues.get_by_id("WPC049").add_supporting_data('regkey_perms', [r, acl])
     
     #            "DELETE", # GUI "Delete"
                 acl = r.get_issue_acl_for_perms(["DELETE"])
                 if acl:
-                    report.get_by_id("WPC050").add_supporting_data('regkey_perms', [r, acl])
+                    self.issues.get_by_id("WPC050").add_supporting_data('regkey_perms', [r, acl])
     
         print "[-] Walking registry (very slow: probably 15 mins - 1 hour)"
         for r in regkey('HKLM').get_all_subkeys():
@@ -1326,23 +1326,23 @@ class audit(auditbase):
                     for v in r.get_values():
                         if wpc.utils.looks_like_executable(r.get_value(v)):
                             for a in set_value_aces:
-                                report.get_by_id("WPC115").add_supporting_data('regkey_value_data_perms', [r, v, repr(r.get_value(v)), a])
+                                self.issues.get_by_id("WPC115").add_supporting_data('regkey_value_data_perms', [r, v, repr(r.get_value(v)), a])
                         if wpc.utils.looks_like_path(r.get_value(v)):
                             for a in set_value_aces:
-                                report.get_by_id("WPC116").add_supporting_data('regkey_value_data_perms', [r, v, repr(r.get_value(v)), a])
+                                self.issues.get_by_id("WPC116").add_supporting_data('regkey_value_data_perms', [r, v, repr(r.get_value(v)), a])
                         if wpc.utils.looks_like_registry_path(r.get_value(v)):
                             for a in set_value_aces:
-                                report.get_by_id("WPC117").add_supporting_data('regkey_value_data_perms', [r, v, repr(r.get_value(v)), a])
+                                self.issues.get_by_id("WPC117").add_supporting_data('regkey_value_data_perms', [r, v, repr(r.get_value(v)), a])
                         if wpc.utils.looks_like_ip_address(r.get_value(v)):
                             for a in set_value_aces:
-                                report.get_by_id("WPC118").add_supporting_data('regkey_value_data_perms', [r, v, repr(r.get_value(v)), a])
+                                self.issues.get_by_id("WPC118").add_supporting_data('regkey_value_data_perms', [r, v, repr(r.get_value(v)), a])
                         if wpc.utils.looks_like_user(r.get_value(v)):
                             for a in set_value_aces:
-                                report.get_by_id("WPC119").add_supporting_data('regkey_value_data_perms', [r, v, repr(r.get_value(v)), a])
+                                self.issues.get_by_id("WPC119").add_supporting_data('regkey_value_data_perms', [r, v, repr(r.get_value(v)), a])
     
     
     # Gather info about files and directories
-    def audit_program_files(self, report):
+    def audit_program_files(self):
         # Record info about all directories
         include_dirs = 1
     
@@ -1362,14 +1362,14 @@ class audit(auditbase):
     
                 for ace in aces:
                     if f.is_dir():
-                        report.get_by_id("WPC001").add_supporting_data('writable_dirs', [f, ace])
+                        self.issues.get_by_id("WPC001").add_supporting_data('writable_dirs', [f, ace])
                     elif f.is_file():
-                        report.get_by_id("WPC001").add_supporting_data('writable_progs', [f, ace])    
+                        self.issues.get_by_id("WPC001").add_supporting_data('writable_progs', [f, ace])    
                     else:
                         print "[E] Ignoring thing that isn't file or directory: " + f.get_name()
     
     
-    def audit_all_files(self, options, report):
+    def audit_all_files(self, options):
         # Record info about all directories
         include_dirs = 1
         prog_dirs = []
@@ -1413,11 +1413,11 @@ class audit(auditbase):
                 for check in wpc.conf.interesting_files['filename_exact_match']:
                     for check_file in check['filenames']:
                         if check_file.lower() == f:
-                            report.get_by_id(check['issue']).add_supporting_data('filename_string', [filename])
+                            self.issues.get_by_id(check['issue']).add_supporting_data('filename_string', [filename])
                             
                 for check in wpc.conf.interesting_files['filename_regex_match']:
                     if re.search(check['regex'], f, re.IGNORECASE):
-                        report.get_by_id(check['issue']).add_supporting_data('filename_string', [filename])
+                        self.issues.get_by_id(check['issue']).add_supporting_data('filename_string', [filename])
                             
                 for check in wpc.conf.interesting_files['filename_content_regex_match']:
                     if re.search(check['filename_regex'], f, re.IGNORECASE):
@@ -1426,7 +1426,7 @@ class audit(auditbase):
                             for line in open(filename, 'r'):
                                 #print "[D] line from %s: %s" % (filename, line)
                                 if re.search(check['filename_content_regex'], line, re.IGNORECASE):
-                                    report.get_by_id(check['issue']).add_supporting_data('filename_string', [filename])
+                                    self.issues.get_by_id(check['issue']).add_supporting_data('filename_string', [filename])
                                     break
                         except:
                             pass
@@ -1436,7 +1436,7 @@ class audit(auditbase):
                 #        print ace.as_text()
         # TODO cleverly compile a summary of where weak permissions are
     
-    def audit_paths(self, report):
+    def audit_paths(self):
     # TODO this will be too slow.  Need some clever caching.
     #    print "[-] Checking every user's path"
     #    for user_path in wpc.utils.get_user_paths():
@@ -1449,13 +1449,13 @@ class audit(auditbase):
     #        # tmp_trusted_principles_fq = ()  # TODO
     
         print "[-] Checking system path"
-        self.audit_path_for_issue(report, wpc.utils.get_system_path(), "WPC013")
+        self.audit_path_for_issue(wpc.utils.get_system_path(), "WPC013")
     
         print "[-] Checking current user's path"
-        self.audit_path_for_issue(report, os.environ["PATH"], "WPC014")
+        self.audit_path_for_issue(os.environ["PATH"], "WPC014")
     
     
-    def audit_path_for_issue(self, report, mypath, issueid):
+    def audit_path_for_issue(self, mypath, issueid):
         dirs = set(mypath.split(';'))
         exts = wpc.conf.executable_file_extensions
         for dir in dirs:
@@ -1463,14 +1463,14 @@ class audit(auditbase):
             d = File(dir)
             aces = d.get_dangerous_aces()
             for ace in aces:
-                report.get_by_id(issueid).add_supporting_data('writable_dirs', [d, ace])
+                self.issues.get_by_id(issueid).add_supporting_data('writable_dirs', [d, ace])
     
             for ext in exts:
                 for myfile in glob.glob(dir + '\*.' + ext):
                     f = File(myfile)
                     aces = f.get_dangerous_aces()
                     for ace in aces:
-                        report.get_by_id(issueid).add_supporting_data('writable_progs', [f, ace])
+                        self.issues.get_by_id(issueid).add_supporting_data('writable_progs', [f, ace])
     
             # TODO properly check perms with is_replaceable
     

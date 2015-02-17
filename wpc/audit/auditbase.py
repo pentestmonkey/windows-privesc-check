@@ -8,12 +8,12 @@ class auditbase:
         if condition:
             if name:
                 wpc.utils.section(name)
-            try:
-                sub(*list(args))
-            except:
-                print "[E] Errors occurred but were supressed.  Some checks might have been missed.  Probably a bug."
-            finally:
-                if name:
-                    wpc.utils.print_major("Checks completed", 1)
+           # try:
+            sub(*list(args))
+           # except:
+           #     print "[E] Errors occurred but were supressed.  Some checks might have been missed.  Probably a bug."
+           # finally:
+           #     if name:
+           #         wpc.utils.print_major("Checks completed", 1)
         
 

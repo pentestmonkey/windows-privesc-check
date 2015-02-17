@@ -14,35 +14,39 @@ from wpc.drives import drives
 from wpc.ntobj import ntobj
 from wpc.services import drivers, services
 import pywintypes
+import win32con
+import win32service
+from wpc.sd import sd
+import win32process
+import win32ts
 
 class dump(auditbase):
-    def __init__(self, options, issues):
+    def __init__(self, options):
         self.options = options
-        self.issues = issues
 
     def run(self):    
         # TODO we don't have to pass options or issues to any subs
-        self.run_sub("dump_misc_checks",   1,                                                    self.dump_misc_checks,   self.issues)
-        self.run_sub("dump_paths",         self.options.do_all or self.options.do_paths,         self.dump_paths,         self.issues)
-        self.run_sub("dump_all_files",     self.options.do_allfiles,                             self.dump_all_files,     self.issues)
-        self.run_sub("dump_eventlogs",     self.options.do_all or self.options.do_eventlogs,     self.dump_eventlogs,     self.issues)
-        self.run_sub("dump_shares",        self.options.do_all or self.options.do_shares,        self.dump_shares,        self.issues)
-        self.run_sub("dump_patches",       self.options.do_all or self.options.patchfile,        self.dump_patches,       self.issues)
-        self.run_sub("dump_loggedin",      self.options.do_all or self.options.do_loggedin,      self.dump_loggedin,      self.issues)
-        self.run_sub("dump_services",      self.options.do_all or self.options.do_services,      self.dump_services,      self.issues)
-        self.run_sub("dump_drivers",       self.options.do_all or self.options.do_drivers,       self.dump_drivers,       self.issues)
-        self.run_sub("dump_drives",        self.options.do_all or self.options.do_drives,        self.dump_drives,        self.issues)
-        self.run_sub("dump_processes",     self.options.do_all or self.options.do_processes,     self.dump_processes,     self.issues)
-        self.run_sub("dump_program_files", self.options.do_all or self.options.do_program_files, self.dump_program_files, self.issues)
-        self.run_sub("dump_registry",      self.options.do_all or self.options.do_registry,      self.dump_registry,      self.issues)
-        self.run_sub("dump_reg_keys",      self.options.do_all or self.options.do_reg_keys,      self.dump_reg_keys,      self.issues)
-        self.run_sub("dump_nt_objects",    self.options.do_all or self.options.do_nt_objects,    self.dump_nt_objects,    self.issues)
-        self.run_sub("dump_users",         self.options.do_all or self.options.do_users,         self.dump_users,         self.issues)
-        self.run_sub("dump_groups",        self.options.do_all or self.options.do_groups,        self.dump_groups,        self.issues)
-        self.run_sub("dump_user_modals",   self.options.do_all or self.options.get_modals,       self.dump_user_modals,   self.issues)
+        self.run_sub("dump_misc_checks",   1,                                                    self.dump_misc_checks)
+        self.run_sub("dump_paths",         self.options.do_all or self.options.do_paths,         self.dump_paths      )
+        self.run_sub("dump_all_files",     self.options.do_allfiles,                             self.dump_all_files  )
+        self.run_sub("dump_eventlogs",     self.options.do_all or self.options.do_eventlogs,     self.dump_eventlogs  )
+        self.run_sub("dump_shares",        self.options.do_all or self.options.do_shares,        self.dump_shares     )
+        self.run_sub("dump_patches",       self.options.do_all or self.options.patchfile,        self.dump_patches    )
+        self.run_sub("dump_loggedin",      self.options.do_all or self.options.do_loggedin,      self.dump_loggedin   )
+        self.run_sub("dump_services",      self.options.do_all or self.options.do_services,      self.dump_services   )
+        self.run_sub("dump_drivers",       self.options.do_all or self.options.do_drivers,       self.dump_drivers    )
+        self.run_sub("dump_drives",        self.options.do_all or self.options.do_drives,        self.dump_drives     )
+        self.run_sub("dump_processes",     self.options.do_all or self.options.do_processes,     self.dump_processes  )
+        self.run_sub("dump_program_files", self.options.do_all or self.options.do_program_files, self.dump_program_files)
+        self.run_sub("dump_registry",      self.options.do_all or self.options.do_registry,      self.dump_registry   )
+        self.run_sub("dump_reg_keys",      self.options.do_all or self.options.do_reg_keys,      self.dump_reg_keys   )
+        self.run_sub("dump_nt_objects",    self.options.do_all or self.options.do_nt_objects,    self.dump_nt_objects )
+        self.run_sub("dump_users",         self.options.do_all or self.options.do_users,         self.dump_users      )
+        self.run_sub("dump_groups",        self.options.do_all or self.options.do_groups,        self.dump_groups     )
+        self.run_sub("dump_user_modals",   self.options.do_all or self.options.get_modals,       self.dump_user_modals)
                     
     # ---------------------- Define --dump Subs ---------------------------
-    def dump_paths(self, report):
+    def dump_paths(self):
         systempath = wpc.utils.get_system_path()
         print "System path: %s" % (systempath)
     
@@ -52,7 +56,7 @@ class dump(auditbase):
             print "Path for user %s: %s" % (path[0].get_fq_name(), path[1])
     
     
-    def dump_misc_checks(self, report):
+    def dump_misc_checks(self):
         # Check if host is in a domain
         in_domain = 0
         dc_info = None
@@ -70,17 +74,17 @@ class dump(auditbase):
             print "[+] Host is not in domain"
     
     
-    def dump_eventlogs(self, report):
+    def dump_eventlogs(self):
         # TODO
         print "[E] dump_eventlogs not implemented yet.  Sorry."
     
     
-    def dump_shares(self, report):
+    def dump_shares(self):
         for s in shares().get_all():
             print s.as_text()
     
     
-    def dump_reg_keys(self, report):
+    def dump_reg_keys(self):
         for check, key in wpc.conf.reg_keys.items():
             #print "Checking %s => %s" % (check, key)
             key_a = key.split('\\')
@@ -92,12 +96,12 @@ class dump(auditbase):
                 print "Check: \"%s\", Key: %s, Value: %s, Data: %s" % (check, key_s, value, v)
     
     
-    def dump_patches(self, report):
+    def dump_patches(self):
         # TODO
         print "[E] dump_patches not implemented yet.  Sorry."
     
     
-    def dump_loggedin(self, report):
+    def dump_loggedin(self):
         resume = 0
         print "\n[+] Logged in users:"
         try:
@@ -111,7 +115,7 @@ class dump(auditbase):
             print "[E] Failed"
     
     
-    def dump_program_files(self, report):
+    def dump_program_files(self):
         # Record info about all directories
         include_dirs = 1
     
@@ -227,21 +231,13 @@ class dump(auditbase):
             print r.as_text()
     
     
-    def dump_nt_objects(self, report):
+    def dump_nt_objects(self):
         
         #
         # Windows stations and Desktops - TODO make is more OO: objects for windowstations and desktops.
         #
-        
-        import win32con
-        import win32service
-        import pywintypes
-        import win32security
-        from wpc.sd import sd
-        import win32process
         win32con.WINSTA_ALL_ACCESS = 0x0000037f
     
-        import win32ts
         print
         print "[-] Sessions"
         print
@@ -317,7 +313,7 @@ class dump(auditbase):
     # SymbolicLink - can open, has sd
     
     # TODO is this redundant now we have --dumptab?
-    def dump_all_files(self, report):
+    def dump_all_files(self):
         # Record info about all directories
         include_dirs = 1
     

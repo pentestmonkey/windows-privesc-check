@@ -1,39 +1,11 @@
-from wpc.file import file as File
-from wpc.groups import groups
 from wpc.parseOptions import parseOptions
-from wpc.processes import processes
-from wpc.process import process
-from wpc.regkey import regkey
-from wpc.report.fileAcl import fileAcl
 from wpc.report.report import report
-from wpc.services import drivers, services
-from wpc.users import users
-from wpc.user import user
-from wpc.shares import shares
-from wpc.drives import drives
-from wpc.utils import k32, wow64
-from wpc.patchdata import patchdata
-from wpc.mspatchdb import mspatchdb
-from wpc.exploit import exploit as exploit2
-from wpc.ntobj import ntobj
 from wpc.audit.dump import dump
 from wpc.audit.dumptab import dumptab
 from wpc.audit.audit import audit
-import pywintypes
-import win32net
 import datetime
 import time
-import subprocess
-from lxml import objectify
-import win32netcon
-import urllib2
-import ctypes
-import os
-import wpc.conf
 import wpc.utils
-import glob
-import re
-import win32security
 import sys
 
 # ------------------------ Main Code Starts Here ---------------------
@@ -64,7 +36,7 @@ start_time = time.time()
 
 # Dump raw data if required
 if options.dump_mode:
-    d = dump(options, issues)
+    d = dump(options)
     d.run()
 
 # Dump raw data if required
