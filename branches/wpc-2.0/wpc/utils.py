@@ -742,3 +742,12 @@ def printline(message):
 
 def section(message):
     print "\n[+] Running: %s" % message
+
+# is v1 <= v2?  e.g. is 1.21.3 <= 1.2.3 (no in this case)
+def version_less_than_or_equal_to(v1, v2):
+    versions = [v1, v2]
+    versions.sort(key=lambda s: map(int, s.split('.')))
+    highest = versions[1]
+    if v2 == highest:
+        return 1
+    return 0

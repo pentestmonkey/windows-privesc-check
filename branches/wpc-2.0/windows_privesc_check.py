@@ -26,7 +26,7 @@ if options.pyshell_mode:
     wpc.utils.printline("Python Shell - to exit do CTRL-z or type exit()")
     print
     import code
-    code.interact()
+    code.interact(local=dict(globals(), **locals()))
     sys.exit()
 
 wpc.utils.dump_options(options)
@@ -41,7 +41,7 @@ if options.dump_mode:
 
 # Dump raw data if required
 if options.dumptab_mode:
-    d = dumptab(options)
+    d = dumptab(options, report)
     d.run()
 
 # Identify security issues

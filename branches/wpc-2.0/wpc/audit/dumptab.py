@@ -18,8 +18,9 @@ import wpc.utils
 import win32security
 
 class dumptab(auditbase):
-    def __init__(self, options):
+    def __init__(self, options, report):
         self.options = options
+        self.report = report
 
     def run(self):
         self.run_sub("", 1,                                                         self.dumptab_misc_checks)
@@ -75,7 +76,7 @@ class dumptab(auditbase):
         pass
     
     
-    def dumptab_misc_checks(self, report):
+    def dumptab_misc_checks(self):
         # Check if host is in a domain
         in_domain = 0
         dc_info = None
@@ -95,7 +96,7 @@ class dumptab(auditbase):
     
         # misc information that appears in HTML report
         for i in ['hostname', 'datetime', 'version', 'user', 'domain', 'ipaddress', 'os', 'os_version']:
-            print wpc.utils.tab_line("info", i, report.get_info_item(i))
+            print wpc.utils.tab_line("info", i, self.report.get_info_item(i))
             
             
     def dumptab_shares(self):

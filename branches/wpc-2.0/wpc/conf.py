@@ -200,6 +200,18 @@ software['other_networks'] = {
     ]
 }
 
+vulnerable_software_version_info = []
+vulnerable_software_version_info.append({'installed_package_re': r'Chrome',             'installed_vendor_re': r'Google',                 'installed_version_string_ok': 1, 'newest_vulnerable_version': '40.0.2214.93'})
+vulnerable_software_version_info.append({'installed_package_re': r'^Wireshark',         'installed_vendor_re': r'Wireshark',              'installed_version_string_ok': 1, 'newest_vulnerable_version': '1.12.2'})
+vulnerable_software_version_info.append({'installed_package_re': r'^Firefox',           'installed_vendor_re': r'Mozilla',                'installed_version_string_ok': 1, 'newest_vulnerable_version': '34.0.5'})
+vulnerable_software_version_info.append({'installed_package_re': r'^Adobe Reader',      'installed_vendor_re': r'Adobe Systems',          'installed_version_string_ok': 1, 'newest_vulnerable_version': '11.0.10'})
+vulnerable_software_version_info.append({'installed_package_re': r'^Thunderbird',       'installed_vendor_re': r'Mozilla',                'installed_version_string_ok': 1, 'newest_vulnerable_version': '31.3.0'})
+vulnerable_software_version_info.append({'installed_package_re': r'^LibreOffice',       'installed_vendor_re': r'The Document Foundation','installed_version_string_ok': 1, 'newest_vulnerable_version': '4.3.4'})
+vulnerable_software_version_info.append({'installed_package_re': r'^Quicktime',         'installed_vendor_re': r'Apple',                  'installed_version_string_ok': 1, 'newest_vulnerable_version': '7.71.80.42'})
+vulnerable_software_version_info.append({'installed_package_re': r'^Opera',             'installed_vendor_re': r'Opera Software',         'installed_version_string_ok': 1, 'newest_vulnerable_version': '11.61'})
+vulnerable_software_version_info.append({'installed_package_re': r'^Adobe Flash Player','installed_vendor_re': r'Adobe Systems',          'installed_version_string_ok': 1, 'newest_vulnerable_version': '16.0.0.296'})
+vulnerable_software_version_info.append({'installed_package_re': r'Java 8',             'installed_vendor_re': r'Oracle',                 'installed_version_string_ok': 0, 'version_from_name_re': {'from_re': 'Java 8 Update (\d+).*', 'to_re': r'1.8.0.\1'}, 'newest_vulnerable_version': '1.8.0.25'})
+
 reg_keys = {
     'Devices: Unsigned driver installation behavior': 'HKEY_LOCAL_MACHINE\Software\Microsoft\Driver Signing\Policy',
     'Recovery console: Allow automatic administrative logon ': 'HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Setup\RecoveryConsole\SecurityLevel',
@@ -5502,6 +5514,20 @@ NB: This issue has only been reported for NTFS filesystems.  Other non-NTFS file
           'filename_string': {
              'section': "description",
              'preamble': "The following files were affected:",
+          },
+       }
+    },
+    'WPC195': {
+       'impact': 4,
+       'ease': 3,
+       'confidence': 3,
+       'title': "Vulnerable Software Version Installed",
+       'description': '''The version numbers of some installed software were compared against an internal list of version numbers known to have vulnerabilities.  Some installed version were equal to or older than the vulnerable versions.  This issue is extremely prone to false negatives because not all software is checked and the internal list of vulnerable versions quickly becomes outdated.  The vulnerabilities affecting the software below are not necessarily high risk.  This issue simply reports that at least one security issue exists.''',
+       'recommendation': '''Manually look up the known security issues corresponding to the versions installed.''',
+       'supporting_data': {
+          'software_old': {
+             'section': "description",
+             'preamble': "The following vulnerable versions of software were installed:",
           },
        }
     },
