@@ -658,7 +658,7 @@ def populate_scaninfo(report):
     if prod_type == 2: # domain controller
         search_prod_type = 3
     if major in os_name.keys() and minor in os_name[major].keys() and prod_type in os_name[major][minor].keys():
-        os_str = os_name[major][minor][prod_type]
+        os_str = os_name[major][minor][search_prod_type]
     else:
         os_str = "Unrecognised Windows version: %s.%s.%s (type: %s)" % (major, minor, build, prod_type)
 
