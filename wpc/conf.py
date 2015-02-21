@@ -5537,6 +5537,16 @@ NB: This issue has only been reported for NTFS filesystems.  Other non-NTFS file
           },
        }
     },
+    'WPC196': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Host Is A Domain Controller",
+       'description': '''The host audited is a domain controller.  This is not a secuirty issue, just a note to take in account the status of this system during your audit.''',
+       'recommendation': '''None.''',
+       'supporting_data': {
+       }
+    },
 }
 
 rating_descriptions = {

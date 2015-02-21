@@ -18,6 +18,7 @@ import win32security
 import wpc.conf
 import string
 import sys
+import win32api
 k32 = ctypes.windll.kernel32
 wow64 = ctypes.c_long(0)
  
@@ -657,12 +658,16 @@ def populate_scaninfo(report):
     search_prod_type = prod_type
     if prod_type == 2: # domain controller
         search_prod_type = 3
-    if major in os_name.keys() and minor in os_name[major].keys() and prod_type in os_name[major][minor].keys():
+    if major in os_name.keys() and minor in os_name[major].keys() and search_prod_type in os_name[major][minor].keys():
         os_str = os_name[major][minor][search_prod_type]
     else:
         os_str = "Unrecognised Windows version: %s.%s.%s (type: %s)" % (major, minor, build, prod_type)
 
     report.add_info_item('os', os_str)
+    if prod_type == 2:
+        report.add_info_item('is_domain_controller', "yes")
+    else:
+        report.add_info_item('is_domain_controller', "no")
     report.add_info_item('os_version', str(ver_list[0]) + "." + str(ver_list[1]) + "." + str(ver_list[2]) + " SP" + str(ver_list[5]))
 
 
@@ -754,3 +759,6 @@ def version_less_than_or_equal_to(v1, v2):
     if v2 == highest:
         return 1
     return 0
+
+def host_is_dc():
+    return win32api.GetVersionEx(1)[8] == 2

@@ -66,6 +66,9 @@ class audit(auditbase):
     
         if in_domain:
             self.issues.get_by_id("WPC092").add_supporting_data('dc_info', [dc_info])
+        
+        if wpc.utils.host_is_dc():      
+            self.issues.get_by_id("WPC196").add_supporting_data('dc_info', [dc_info])
     
     
     def audit_installed_software(self):
