@@ -356,9 +356,9 @@ class audit(auditbase):
             'directory': 'WPC134',
             'semaphore': 'WPC135',
         }
-        print issue_for.keys()
+        # print issue_for.keys()
         for child in root.get_all_child_objects():
-            print child.as_text()
+            # print child.as_text()
             if child.get_sd():
                 if child.get_sd().has_no_dacl():
                     self.issues.get_by_id("WPC121").add_supporting_data('object_name_and_type', [child])
