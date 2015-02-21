@@ -1744,6 +1744,12 @@ reg_paths = (
 
 eventlog_key_hklm = 'SYSTEM\CurrentControlSet\Services\Eventlog'
 
+SECURITY_IMPERSONATION_LEVEL = []
+SECURITY_IMPERSONATION_LEVEL.append("SecurityAnonymous")
+SECURITY_IMPERSONATION_LEVEL.append("SecurityIdentification")
+SECURITY_IMPERSONATION_LEVEL.append("SecurityImpersonation")
+SECURITY_IMPERSONATION_LEVEL.append("SecurityDelegation")
+
 # Windows privileges from 
 windows_privileges = (
         "SeAssignPrimaryTokenPrivilege",

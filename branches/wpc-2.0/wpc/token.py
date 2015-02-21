@@ -95,6 +95,10 @@ class token:
         if not self.token_impersonation_level and self.get_th():
             try:
                 self.token_impersonation_level = win32security.GetTokenInformation(self.get_th(), ntsecuritycon.TokenImpersonationLevel)
+                if self.token_impersonation_level is None:
+                    return "[N/A not impersonating]"
+                if self.token_impersonation_level >=0 and self.token_impersonation_level <= 3:
+                    return wpc.conf.SECURITY_IMPERSONATION_LEVEL[self.token_impersonation_level]
             except:
                 pass
         return self.token_impersonation_level
@@ -276,6 +280,7 @@ class token:
         if self.get_token_primary_group():
             t += "Token Group: " + str(self.get_token_primary_group().get_fq_name()) + "\n"
         t += "Token Type: " + str(self.get_token_type()) + "\n"
+        t += "TokenImpersonationLevel: " + str(self.get_token_impersonation_level()) + "\n"
         t += "Token Origin: " + str(self.get_token_origin()) + "\n"
         t += "Token Source: " + str(self.get_token_source()) + "\n"
         t += "TokenHasRestrictions: " + str(self.get_token_restrictions()) + "\n"
@@ -308,6 +313,7 @@ class token:
         if self.get_token_primary_group():
             t += "Token Group: " + str(self.get_token_primary_group().get_fq_name()) + "\n"
         t += "Token Type: " + str(self.get_token_type()) + "\n"
+        t += "TokenImpersonationLevel: " + str(self.get_token_impersonation_level()) + "\n"
         t += "Token Origin: " + str(self.get_token_origin()) + "\n"
         t += "Token Source: " + str(self.get_token_source()) + "\n"
         t += "TokenHasRestrictions: " + str(self.get_token_restrictions()) + "\n"
@@ -340,6 +346,7 @@ class token:
         if self.get_token_primary_group():
             t += "Token Group: " + str(self.get_token_primary_group().get_fq_name()) + "\n"
         t += "Token Type: " + str(self.get_token_type()) + "\n"
+        t += "TokenImpersonationLevel: " + str(self.get_token_impersonation_level()) + "\n"
         t += "Token Origin: " + str(self.get_token_origin()) + "\n"
         t += "Token Source: " + str(self.get_token_source()) + "\n"
         t += "TokenHasRestrictions: " + str(self.get_token_restrictions()) + "\n"
@@ -374,6 +381,7 @@ class token:
         if self.get_token_primary_group():
             t += "Token Group: " + str(self.get_token_primary_group().get_fq_name()) + "\n"
         t += "Token Type: " + str(self.get_token_type()) + "\n"
+        t += "TokenImpersonationLevel: " + str(self.get_token_impersonation_level()) + "\n"
         t += "Token Origin: " + str(self.get_token_origin()) + "\n"
         t += "Token Source: " + str(self.get_token_source()) + "\n"
         t += "TokenHasRestrictions: " + str(self.get_token_restrictions()) + "\n"
@@ -432,6 +440,7 @@ class token:
         else:
             info.append("")
         info.append(self.get_token_type())
+        info.append(self.get_token_impersonation_level())
         info.append(self.get_token_origin())
         info.append(self.get_token_source())
         info.append(self.get_token_restrictions())
@@ -447,10 +456,11 @@ class token:
         info.append(self.get_token_mandatory_policy())
         info.append(self.get_token_restricted())
 
-        t =""
-        if self.get_token_linked_token():
-            t += token(self.get_token_linked_token()).as_text_no_rec()
-        info.append(t)
+# Will cause an infinite loop
+#        t =""
+#        if self.get_token_linked_token():
+#            t += token(self.get_token_linked_token()).as_tab()
+#        info.append(t)
 
         lines.append(wpc.utils.tab_line(*info))
         for sid in self.get_token_restricted_sids():
