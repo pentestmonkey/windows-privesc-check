@@ -719,7 +719,7 @@ def dump_options(options):
             if k == "ignore_principal_list":
                 print " %s: %s" % (k, wpc.conf.trusted_principals_fq)
             elif k == "exploitable_by_list":
-                print " %s: %s" % (k, wpc.conf.exploitable_by)
+                print " %s: %s" % (k, map(lambda g: g.get_fq_name(), wpc.conf.exploitable_by))
             elif k.find("interesting") != -1 and optdict['do_allfiles'] == False:
                 pass
             elif k.find("exploitable_by") != -1 and optdict['privesc_mode'] != 'exploitable_by':
