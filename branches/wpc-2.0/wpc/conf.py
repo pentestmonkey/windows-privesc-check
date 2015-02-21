@@ -5290,7 +5290,7 @@ NB: This issue has only been reported for NTFS filesystems.  Other non-NTFS file
        'ease': 0,
        'confidence': 0,
        'title': "Network security: Restrict NTLM: Outgoing NTLM traffic to remote servers => not Deny All",
-       'description': '''TODO''',
+       'description': '''TODO (This setting applies to XP/2003+)''',
        'recommendation': '''TODO''',
        'supporting_data': {
           'reg_key_value': {
@@ -5318,7 +5318,7 @@ NB: This issue has only been reported for NTFS filesystems.  Other non-NTFS file
        'ease': 0,
        'confidence': 0,
        'title': "Network security: Restrict NTLM: Incoming NTLM traffic => Allow All",
-       'description': '''TODO''',
+       'description': '''TODO (This setting applies to XP/2003+)''',
        'recommendation': '''TODO''',
        'supporting_data': {
           'reg_key_value': {
