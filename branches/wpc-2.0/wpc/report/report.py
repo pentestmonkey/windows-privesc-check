@@ -3,7 +3,7 @@ import xml.etree.cElementTree as etree
 from lxml import etree as letree
 import os.path
 import sys
-
+import wpc.conf
 
 # A list of issues with some information about the scan
 class report():
@@ -263,6 +263,26 @@ class report():
                     
                 </xsl:for-each>
             </xsl:for-each>
+            
+            <h2>Rating Definitions</h2>
+            <xsl:for-each select="ratings/ratingtype">
+                <hr/>
+                <h3><xsl:text disable-output-escaping="yes">&lt;a name=&quot;ratingtype</xsl:text><xsl:value-of select="@name"/><xsl:text disable-output-escaping="yes">&quot;&gt;</xsl:text><xsl:value-of select="@name"/><xsl:text disable-output-escaping="yes">&lt;/a&gt;</xsl:text></h3>
+                    <table id="ratinginfo">
+                        <tr>
+                            <td><b>Level</b></td>
+                            <td><b>Name</b></td>
+                            <td><b>Description</b></td>
+                        </tr>
+                    <xsl:for-each select="ratinglevel">
+                        <tr>
+                            <xsl:text disable-output-escaping="yes">&lt;td class=&quot;rating</xsl:text><xsl:value-of select="normalize-space(@level)"/><xsl:text disable-output-escaping="yes">&quot;&gt;</xsl:text><xsl:value-of select="normalize-space(@level)"/><xsl:text disable-output-escaping="yes">&lt;/td&gt;</xsl:text>
+                            <xsl:text disable-output-escaping="yes">&lt;td class=&quot;rating</xsl:text><xsl:value-of select="normalize-space(@level)"/><xsl:text disable-output-escaping="yes">&quot;&gt;</xsl:text><xsl:value-of select="normalize-space(@name)"/><xsl:text disable-output-escaping="yes">&lt;/td&gt;</xsl:text>
+                            <xsl:text disable-output-escaping="yes">&lt;td class=&quot;rating</xsl:text><xsl:value-of select="normalize-space(@level)"/><xsl:text disable-output-escaping="yes">&quot;&gt;</xsl:text><xsl:value-of select="normalize-space(@description)"/><xsl:text disable-output-escaping="yes">&lt;/td&gt;</xsl:text>
+                        </tr>
+                    </xsl:for-each>
+                    </table>
+            </xsl:for-each>
         </body>
     </html>
 </xsl:template>
@@ -301,7 +321,7 @@ class report():
     def as_xml(self):
         # TODO: Top level version for XML schema
         # TODO: Raw data about object reported (files, service, etc.) 
-        r = etree.Element('report', xmlschemaversion = "1.1")
+        r = etree.Element('report', xmlschemaversion = "1.2")
         # etree.SubElement(r, 'xmlschemaversion').text = "1.0"
         s = etree.Element('scaninfo')
         for k in self.get_info().keys():
@@ -310,6 +330,15 @@ class report():
             s.append(i)
         r.append(s)
         r.append(self.get_issues().as_xml())
+        ratings = etree.Element('ratings')
+        for section_name in wpc.conf.rating_descriptions.keys():
+            ratingtype = etree.Element('ratingtype', name = section_name)
+            for k in wpc.conf.rating_descriptions[section_name]:
+                #i = etree.Element()
+                ratinglevel = etree.Element("ratinglevel", level = str(k), name = wpc.conf.rating_mappings[section_name][k], description = wpc.conf.rating_descriptions[section_name][k])
+                ratingtype.append(ratinglevel)
+            ratings.append(ratingtype)
+        r.append(ratings)
         return r
 
     def as_xml_string(self):
