@@ -133,7 +133,7 @@ class dump(auditbase):
                 print f.as_text()
     
     
-    def dump_services(self, opts):
+    def dump_services(self):
         for s in services().get_services():
             if s:
                 print s.as_text()
@@ -141,17 +141,17 @@ class dump(auditbase):
                 print "[W] Failed to get info about a service.  Skipping."
     
     
-    def dump_drivers(self, opts):
+    def dump_drivers(self):
         for d in drivers().get_services():
             print d.as_text()
     
     
-    def dump_drives(self, opts):
+    def dump_drives(self):
         for d in drives().get_fixed_drives():
             print "%s: (%s)" % (d.get_name(), d.get_fs())
     
     
-    def dump_processes(self, opts):
+    def dump_processes(self):
         for p in processes().get_all():
             print p.as_text()
     
@@ -176,7 +176,7 @@ class dump(auditbase):
                 wpc.utils.disable_wow64()
     
     
-    def dump_users(self, opts, get_privs = 0):
+    def dump_users(self, get_privs = 0):
         print "[+] Dumping user list:"
         userlist = users()
         for u in userlist.get_all():
@@ -193,7 +193,7 @@ class dump(auditbase):
                 print
     
     
-    def dump_user_modals(self, opts):
+    def dump_user_modals(self):
         d1 = d2 = d3 = d4 = {}
         try:
             d1 = win32net.NetUserModalsGet(wpc.conf.remote_server, 0)
@@ -207,7 +207,7 @@ class dump(auditbase):
             for k in d.keys():
                 print "%s: %s" % (k, d[k])
     
-    def dump_groups(self, opts, get_privs = 0):
+    def dump_groups(self, get_privs = 0):
         print "[+] Dumping group list:"
         grouplist = groups()
         for g in grouplist.get_all():
@@ -226,7 +226,7 @@ class dump(auditbase):
             #    print "\t%s" % p
     
     
-    def dump_registry(self, opts):
+    def dump_registry(self):
         for r in regkey('HKLM').get_all_subkeys():
             print r.as_text()
     
