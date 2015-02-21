@@ -230,8 +230,8 @@ class report():
                 <h3><xsl:text disable-output-escaping="yes">&lt;a name=&quot;</xsl:text><xsl:value-of select="normalize-space(title)"/><xsl:text disable-output-escaping="yes">&quot;&gt;</xsl:text><xsl:value-of select="normalize-space(title)"/><xsl:text disable-output-escaping="yes">&lt;/a&gt;</xsl:text></h3>
                 <table id="ratinginfo">
                     <tr>
-                        <td>Impact</td>
-                        <xsl:text disable-output-escaping="yes">&lt;td class=&quot;rating</xsl:text><xsl:value-of select="normalize-space(impact_number)"/><xsl:text disable-output-escaping="yes">&quot;&gt;</xsl:text><xsl:value-of select="normalize-space(impact_text)"/><xsl:text disable-output-escaping="yes">&lt;/td&gt;</xsl:text>
+                        <td style="width:140px">Impact</td>
+                        <xsl:text disable-output-escaping="yes">&lt;td style=&quot;width:90px&quot; class=&quot;rating</xsl:text><xsl:value-of select="normalize-space(impact_number)"/><xsl:text disable-output-escaping="yes">&quot;&gt;</xsl:text><xsl:value-of select="normalize-space(impact_text)"/><xsl:text disable-output-escaping="yes">&lt;/td&gt;</xsl:text>
                     </tr>
                     <tr>
                         <td>Ease of exploitation</td>

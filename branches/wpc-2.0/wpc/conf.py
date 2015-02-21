@@ -5066,7 +5066,7 @@ NB: This issue has only been reported for NTFS filesystems.  Other non-NTFS file
        'ease': 0,
        'confidence': 0,
        'title': "Windows Driver File Missing",
-       'description': '''TODO''',
+       'description': '''TODO (This issue seems to fail to identify some driver paths on 2003 - but not all.  Run "driverquery /v" to get more paths)''',
        'recommendation': '''TODO''',
        'supporting_data': {
           'service_no_exe': {
