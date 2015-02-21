@@ -20,7 +20,6 @@ import string
 import sys
 k32 = ctypes.windll.kernel32
 wow64 = ctypes.c_long(0)
-on64bitwindows = 1
  
 
 # There some strange stuff that we need to do in order
@@ -185,10 +184,12 @@ def load_libs():
 def disable_wow64():
     # Disable WOW64 - we WANT to see 32-bit areas of the filesystem
     #
-    # Need to wrap in a try because the following call will error on 32-bit windows
+    # Need to wrap in a try because the following call may error on 32-bit windows
     try:
-        k32.Wow64DisableWow64FsRedirection(ctypes.byref(wow64))
-        wpc.conf.on64bitwindows = 1
+        if k32.Wow64DisableWow64FsRedirection(ctypes.byref(wow64)):
+            wpc.conf.on64bitwindows = 1
+        else:
+            wpc.conf.on64bitwindows = 0
     except:
         wpc.conf.on64bitwindows = 0
 
