@@ -195,27 +195,32 @@ class report():
                 </tr>
 
                 <tr class="alt">
+                    <td>Is Domain Controller?</td>
+                    <td><xsl:value-of select="scaninfo/is_domain_controller"/></td>
+                </tr>
+
+                <tr>
                     <td>IP Addresses</td>
                     <td>
                             <xsl:value-of select="scaninfo/ipaddress"/>
                     </td>
                 </tr>
 
-                <tr>
+                <tr class="alt">
                     <td>Privesc Mode</td>
                     <td>
                             <xsl:value-of select="scaninfo/privesc_mode"/>
                     </td>
                 </tr>
 
-                <tr class="alt">
+                <tr>
                     <td>Principals considered untrusted (for exploitable_by mode)</td>
                     <td>
                             <xsl:value-of select="scaninfo/exploitable_by"/>
                     </td>
                 </tr>
                 
-                <tr>
+                <tr class="alt">
                     <td>Principals considered trusted (for report_untrusted mode)</td>
                     <td>
                             <xsl:value-of select="scaninfo/ignored_users"/>
