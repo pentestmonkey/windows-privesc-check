@@ -27,6 +27,7 @@ import re
 import win32security
 import sys
 from wpc.report.appendix import appendix
+from wpc.softwarepackages import softwarepackages
 
 class audit(auditbase):
     def __init__(self, options, report):
@@ -77,47 +78,17 @@ class audit(auditbase):
     
     
     def audit_installed_software(self):
-        print '[+] Checking installed software'
-        uninstall = regkey('HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall')
-        self._audit_software_for_regkey(uninstall)
-    
-        if wpc.conf.on64bitwindows:
-            print '[+] Checking installed software (WoW64 enabled)'
-            uninstall = regkey('HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall', view=64)
-            self._audit_software_for_regkey(uninstall)
+        packages = softwarepackages()
+        for package in packages.get_installed_packages():
+            self.issues.get_by_id("WPC191").add_supporting_data('software', [package.get_name(), package.get_publisher(), package.get_version(), package.get_date()])
+            
+            if package.is_vulnerable_version():
+                self.issues.get_by_id('WPC195').add_supporting_data('software_old', [package.get_name(), package.get_publisher(), package.get_version(), package.get_date(), package.get_bad_version()])
+                
+            for sw_category in wpc.conf.software.keys():
+                if package.is_of_type(sw_category):
+                    self.issues.get_by_id(wpc.conf.software[sw_category]['issue']).add_supporting_data('software', [package.get_name(), package.get_publisher(), package.get_version(), package.get_date()])
 
-
-    def _audit_software_for_regkey(self, uninstall):
-        if uninstall.is_present():
-            for subkey in uninstall.get_subkeys():
-                name = wpc.utils.to_printable(subkey.get_value("DisplayName"))
-                publisher = wpc.utils.to_printable(subkey.get_value("Publisher"))
-                version = wpc.utils.to_printable(subkey.get_value("DisplayVersion"))
-                date = wpc.utils.to_printable(subkey.get_value("InstallDate"))
-                if name is not None:
-                    self.issues.get_by_id("WPC191").add_supporting_data('software', [name, publisher, version, date])
-                    for sw_category in wpc.conf.software.keys():
-                        for sw_prefix in wpc.conf.software[sw_category]['names']:
-                            if name.lower().find(sw_prefix.lower()) == 0:
-                                self.issues.get_by_id(wpc.conf.software[sw_category]['issue']).add_supporting_data('software', [name, publisher, version, date])
-                    for vuln_info in wpc.conf.vulnerable_software_version_info:
-                        if 'installed_package_re' in vuln_info:
-                            m = re.search(vuln_info['installed_package_re'], name)
-                            if not m:
-                                continue
-                        
-                        if 'installed_vendor_re' in vuln_info:
-                            m = re.search(vuln_info['installed_vendor_re'], publisher)
-                            if not m:
-                                continue
-                        
-                        if not vuln_info['installed_version_string_ok']:
-                            if 'version_from_name_re' in vuln_info:
-                                version = re.sub(vuln_info['version_from_name_re']['from_re'], vuln_info['version_from_name_re']['to_re'], name)
-                                
-                        if wpc.utils.version_less_than_or_equal_to(version, vuln_info['newest_vulnerable_version']):
-                                self.issues.get_by_id('WPC195').add_supporting_data('software_old', [name, publisher, version, date, vuln_info['newest_vulnerable_version']])
-                             
     
     def audit_eventlogs(self):
         # TODO WPC009 Insecure Permissions On Event Log Registry Key

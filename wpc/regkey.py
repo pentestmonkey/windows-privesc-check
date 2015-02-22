@@ -28,6 +28,9 @@ class regkey:
         self.set_hive(parts[0])
         self.set_path("\\".join(parts[1:]))
 
+    def get_view(self):
+        return self.view
+    
     def get_hive(self):
         return self.hive
 

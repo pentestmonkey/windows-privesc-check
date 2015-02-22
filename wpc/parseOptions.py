@@ -42,6 +42,7 @@ def parseOptions():
     examine.add_option("-T", "--patches",   dest = "patchfile",                                                help = "Patches.  Arg is filename of xlsx patch info.  Download from http://go.microsoft.com/fwlink/?LinkID=245778 or pass 'auto' to fetch automatically")
     examine.add_option("-U", "--users",     dest = "do_users",         default = False, action = "store_true", help = "Users")
     examine.add_option("-v", "--verbose",   dest = "verbose",          default = False, action = "store_true", help = "More verbose output on console")
+    examine.add_option("-W", "--errors",    dest = "do_errors",        default = False, action = "store_true", help = "Die on errors instead of continuing (for debugging)")
     examine.add_option("-z", "--noappendices",dest = "do_appendices",  default = True,  action = "store_false",help = "No report appendices in --audit mode")
 
     host.add_option("-s", "--server", dest = "remote_host",   help = "Remote host or IP")
@@ -55,7 +56,7 @@ def parseOptions():
     # Running out of letters for short options.  Here's a list of ones used
     #    abcdefghijklmnopqrstuvwxyz
     # uc xxxxxx  xxx xxxx xxxxx x 
-    # lc xx xxxxx   x xxx xxxxx x x 
+    # lc xx xxxxx   x xxx xxxxxxx x 
     
     report.add_option("-o", "--report_file_stem",         dest = "report_file_stem",      default = False,                       help = "Filename stem for txt, html report files")
     report.add_option("-x", "--ignoreprincipal",          dest = "ignore_principal_list", default = [],    action = "append",    help = "Don't report privesc issues for these users/groups")
