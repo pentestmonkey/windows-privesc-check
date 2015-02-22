@@ -512,6 +512,7 @@ def expander(mo):
     return os.environ.get(mo.group()[1:-1], 'UNKNOWN')
 
 def to_printable(s):
+    s = str(s)
     if s is None:
         return None
     newstring = ""
@@ -612,7 +613,7 @@ def populate_scaninfo(report):
     report.add_info_item('version', wpc.utils.get_version())
     report.add_info_item('user', os.environ['USERDOMAIN'] + "\\" + os.environ['USERNAME'])
     report.add_info_item('domain', win32api.GetDomainName())
-    ver_list = win32api.GetVersionEx(1)
+    ver_list = win32api.GetVersionEx(1) # bug on windows 8.1  https://msdn.microsoft.com/en-us/library/windows/desktop/ms724451%28v=vs.85%29.aspx
 
     try:
         report.add_info_item('ipaddress', ",".join(socket.gethostbyname_ex(socket.gethostname())[2]))  # have to do this before Wow64DisableWow64FsRedirection
