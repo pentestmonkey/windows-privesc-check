@@ -26,11 +26,15 @@ import glob
 import re
 import win32security
 import sys
+from wpc.report.appendix import appendix
 
 class audit(auditbase):
-    def __init__(self, options, issues):
+    def __init__(self, options, report):
+        self.report = report
+        self.issues = report.get_issues()
+        self.appendices = report.get_appendices()
         self.options = options
-        self.issues = issues
+        
 
     def run(self):
         self.run_sub("audit_misc_checks",        1,                                                         self.audit_misc_checks)
@@ -52,6 +56,7 @@ class audit(auditbase):
         self.run_sub("audit_groups",             self.options.do_all or self.options.do_groups,             self.audit_groups)
         self.run_sub("audit_installed_software", self.options.do_all or self.options.do_installed_software, self.audit_installed_software)
         self.run_sub("audit_all_files (slow!)",  self.options.do_allfiles or self.options.interesting_file_list or self.options.interesting_file_file, self.audit_all_files, self.options)
+        
     
     # ---------------------- Define --audit Subs ---------------------------
     def audit_misc_checks(self):
@@ -462,8 +467,18 @@ class audit(auditbase):
     
     
     def audit_drivers(self):
+        app = appendix("Windows Drivers")
+        app.set_preamble("The following windows drivers were present at the time of the audit.")
+        app.add_table_row(["Shortname", "Longname", "Description", "Path"])
         for s in drivers().get_services():
-    
+            if self.options.do_appendices:
+                fields = []
+                fields.append(s.get_name())
+                fields.append(s.get_description())
+                fields.append(s.get_long_description())
+                fields.append(s.get_exe_path_clean())
+                app.add_table_row(fields)
+                
             if s.get_reg_key() and s.get_reg_key().get_sd():
     
                 # Check DACL set
@@ -643,10 +658,25 @@ class audit(auditbase):
                 # WRITE_OWNER
                 for a in s.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["WRITE_OWNER"]).get_aces():
                     self.issues.get_by_id("WPC170").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
-    
+
+        if self.options.do_appendices:
+            self.appendices.add_appendix(app)
+        
     
     def audit_drives(self):
+        app = appendix("Drives")
+        app.set_preamble("The following drives were present at the time of the audit.")
+        app.add_table_row(["Name", "File System", "Type", "Fixed?"])
+
         for d in drives().get_fixed_drives():
+            if self.options.do_appendices:
+                fields = []
+                fields.append(d.get_name())
+                fields.append(d.get_fs())
+                fields.append(d.get_type())
+                fields.append(d.is_fixed_drive())
+                app.add_table_row(fields)
+
             if d.get_fs() == 'NTFS':
     
                 directory = File(d.get_name())
@@ -659,8 +689,13 @@ class audit(auditbase):
             else:
                 self.issues.get_by_id("WPC011").add_supporting_data('drive_and_fs_list', [d])
     
+        if self.options.do_appendices:
+            self.appendices.add_appendix(app)
     
     def audit_processes(self):
+        a = appendix("Running Processes")
+        a.set_preamble("The following processes were running at the time of the audit.")
+        a.add_table_row(["PID", "Name", "WoW64?", "Exe"])
         for p in processes().get_all():
             # TODO check the dangerous perms aren't held by the process owner
             if p.get_sd():
@@ -699,7 +734,23 @@ class audit(auditbase):
     
             if p.is_wow64():
                 k32.Wow64DisableWow64FsRedirection(ctypes.byref(wow64))
-    
+                
+            if self.options.do_appendices:
+                fields = []
+                fields.append(p.get_pid())
+                fields.append(p.get_short_name())
+                wow64_status = "[unknown]"
+                if p.is_wow64():
+                    wow64_status = p.is_wow64()
+                fields.append(wow64_status)
+                exe_name = "[unknown]"
+                if p.get_exe():
+                    exe_name = p.get_exe().get_name()
+                fields.append(exe_name)
+                a.add_table_row(fields)
+                
+        if self.options.do_appendices:
+            self.appendices.add_appendix(a)
     
     def audit_users(self):
         userlist = users()

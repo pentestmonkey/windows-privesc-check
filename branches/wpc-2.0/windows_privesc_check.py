@@ -46,7 +46,7 @@ if options.dumptab_mode:
 
 # Identify security issues
 if options.audit_mode:
-    a = audit(options, issues)
+    a = audit(options, report)
     a.run()
 
     if options.report_file_stem:
