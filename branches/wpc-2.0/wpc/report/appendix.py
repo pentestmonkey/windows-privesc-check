@@ -10,7 +10,7 @@ class appendix:
         self.table_style = None
 
     def add_table_row(self, cells):
-        self.table.append(map(lambda x: str(x), cells))
+        self.table.append(map(lambda x: wpc.utils.to_printable(x), cells))
 
     def get_title(self):
         return self.title

@@ -78,9 +78,21 @@ class audit(auditbase):
     
     
     def audit_installed_software(self):
+        app = appendix("Installed Software")
+        app.set_preamble("The following software was installed at the time of the audit.")
+        app.add_table_row(["Name", "64 Bit?", "Version", "Date"])
+
         packages = softwarepackages()
         for package in packages.get_installed_packages():
-            self.issues.get_by_id("WPC191").add_supporting_data('software', [package.get_name(), package.get_publisher(), package.get_version(), package.get_date()])
+            if self.options.do_appendices:
+                fields = []
+                fields.append(package.get_name())
+                fields.append(package.get_arch())
+                fields.append(package.get_version())
+                fields.append(package.get_date())
+                app.add_table_row(fields)
+
+            # self.issues.get_by_id("WPC191").add_supporting_data('software', [package.get_name(), package.get_publisher(), package.get_version(), package.get_date()])
             
             if package.is_vulnerable_version():
                 self.issues.get_by_id('WPC195').add_supporting_data('software_old', [package.get_name(), package.get_publisher(), package.get_version(), package.get_date(), package.get_bad_version()])
@@ -89,6 +101,9 @@ class audit(auditbase):
                 if package.is_of_type(sw_category):
                     self.issues.get_by_id(wpc.conf.software[sw_category]['issue']).add_supporting_data('software', [package.get_name(), package.get_publisher(), package.get_version(), package.get_date()])
 
+        if self.options.do_appendices:
+            self.appendices.add_appendix(app)
+    
     
     def audit_eventlogs(self):
         # TODO WPC009 Insecure Permissions On Event Log Registry Key
@@ -120,11 +135,24 @@ class audit(auditbase):
     
     
     def audit_shares(self):
+        app = appendix("Windows Shares")
+        app.set_preamble("The following windows shares were configured at the time of the audit.")
+        app.add_table_row(["Name", "Path", "Description"])
+
         for s in shares().get_all():
+            if self.options.do_appendices:
+                fields = []
+                fields.append(s.get_name())
+                fields.append(s.get_path())
+                fields.append(s.get_description())
+                app.add_table_row(fields)
     
             if s.get_sd():
                 for a in s.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["FILE_READ_DATA"]).get_aces():
                     self.issues.get_by_id("WPC086").add_supporting_data('share_perms', [s, a.get_principal()])
+    
+        if self.options.do_appendices:
+            self.appendices.add_appendix(app)
     
     
     def audit_reg_keys(self):
@@ -318,6 +346,10 @@ class audit(auditbase):
             self.issues.get_by_id("WPC183").add_supporting_data('reg_key_value', [r, "disabledomaincreds", v])
     
     def audit_nt_objects(self):
+        app = appendix("Windows Objects")
+        app.set_preamble("The following windows objects were present at the time of the audit.")
+        app.add_table_row(["Path", "Type"])
+
         root = ntobj("\\")
         issue_for = {
             'symboliclink': 'WPC122',
@@ -337,7 +369,13 @@ class audit(auditbase):
         }
         # print issue_for.keys()
         for child in root.get_all_child_objects():
-            # print child.as_text()
+            if self.options.do_appendices:
+                fields = []
+                fields.append(child.get_path())
+                fields.append(child.get_type())
+                app.add_table_row(fields)
+                # print child.as_text()
+                
             if child.get_sd():
                 if child.get_sd().has_no_dacl():
                     self.issues.get_by_id("WPC121").add_supporting_data('object_name_and_type', [child])
@@ -349,6 +387,9 @@ class audit(auditbase):
                     else:
                         print "[W] No issue exists for object type: %s" % lc_type
     
+        if self.options.do_appendices:
+            self.appendices.add_appendix(app)
+
     
     def audit_patches(self):
         patchfile = self.options.patchfile
@@ -833,7 +874,20 @@ class audit(auditbase):
     
     
     def audit_services(self):
+        app = appendix("Windows Services")
+        app.set_preamble("The following windows services were configured at the time of the audit.")
+        app.add_table_row(["Shortname", "Longname", "Status", "Run As", "Description", "Path"])
+
         for s in services().get_services():
+            if self.options.do_appendices:
+                fields = []
+                fields.append(s.get_name())
+                fields.append(s.get_description())
+                fields.append(s.get_status())
+                fields.append(s.get_run_as())
+                fields.append(s.get_long_description())
+                fields.append(s.get_exe_path_clean())
+                app.add_table_row(fields)
     
             #
             # Check if service runs as a domain/local user
@@ -1074,6 +1128,9 @@ class audit(auditbase):
                 for a in s.get_sd().get_acelist().get_untrusted().get_aces_with_perms(["WRITE_OWNER"]).get_aces():
                     self.issues.get_by_id("WPC024").add_supporting_data('principals_with_service_perm', [s, a.get_principal()])
     
+        if self.options.do_appendices:
+            self.appendices.add_appendix(app)
+
     
     def csv_registry(self):
         print "[D] Walking registry"

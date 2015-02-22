@@ -24,6 +24,11 @@ class softwarepackage():
     def get_version(self):
         return self.version
     
+    def get_arch(self):
+        if self.is32bit:
+            return 32
+        return 64
+    
     def get_date(self):
         return self.date
     
