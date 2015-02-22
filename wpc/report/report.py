@@ -1,4 +1,5 @@
 from wpc.report.issues import issues
+from wpc.report.appendices import appendices
 import xml.etree.cElementTree as etree
 from lxml import etree as letree
 import os.path
@@ -10,6 +11,7 @@ class report():
     def __init__(self):
         self.info = {}
         self.issues = issues()
+        self.appendices = appendices()
         self.xsl_text = '''<?xml version="1.0" encoding="ISO-8859-1"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
@@ -264,6 +266,26 @@ class report():
                 </xsl:for-each>
             </xsl:for-each>
             
+            <h2>Appendices</h2>
+            <xsl:for-each select="appendices/appendix">
+                <hr/>
+                <h3><xsl:text disable-output-escaping="yes">&lt;a name=&quot;appendix:</xsl:text><xsl:value-of select="@title"/><xsl:text disable-output-escaping="yes">&quot;&gt;</xsl:text><xsl:value-of select="@title"/><xsl:text disable-output-escaping="yes">&lt;/a&gt;</xsl:text></h3>
+                    <xsl:for-each select="preamble">
+                                <p><xsl:value-of select="."/></p>
+                    </xsl:for-each>
+                    <xsl:for-each select="table">
+                        <table id="ratinginfo">
+                        <xsl:for-each select="row">
+                            <tr>
+                            <xsl:for-each select="cell">
+                                <td><xsl:value-of select="."/></td>
+                            </xsl:for-each>
+                            </tr>
+                        </xsl:for-each>
+                    </table>
+                    </xsl:for-each>
+            </xsl:for-each>
+
             <h2>Rating Definitions</h2>
             <xsl:for-each select="ratings/ratingtype">
                 <hr/>
@@ -304,6 +326,9 @@ class report():
     def get_issues(self):
         return self.issues
 
+    def get_appendices(self):
+        return self.appendices
+
     def get_info_item(self, k):  # key
         if k in self.info.keys():
             #return (self.info[k]['type'], self.info[k]['value'])
@@ -321,7 +346,7 @@ class report():
     def as_xml(self):
         # TODO: Top level version for XML schema
         # TODO: Raw data about object reported (files, service, etc.) 
-        r = etree.Element('report', xmlschemaversion = "1.2")
+        r = etree.Element('report', xmlschemaversion = "1.3")
         # etree.SubElement(r, 'xmlschemaversion').text = "1.0"
         s = etree.Element('scaninfo')
         for k in self.get_info().keys():
@@ -339,6 +364,7 @@ class report():
                 ratingtype.append(ratinglevel)
             ratings.append(ratingtype)
         r.append(ratings)
+        r.append(self.get_appendices().as_xml())
         return r
 
     def as_xml_string(self):

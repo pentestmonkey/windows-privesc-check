@@ -22,7 +22,7 @@ class drive():
 
     def get_type(self):
         if not self.drivetype:
-            self.drivetype = win32file.GetDriveType(self.driveinfo)
+            self.drivetype = win32file.GetDriveType(self.drivename)
 
         return self.drivetype
 
