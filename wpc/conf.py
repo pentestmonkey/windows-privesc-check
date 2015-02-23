@@ -5547,6 +5547,20 @@ NB: This issue has only been reported for NTFS filesystems.  Other non-NTFS file
        'supporting_data': {
        }
     },
+    'WPC197': {
+       'impact': 0,
+       'ease': 0,
+       'confidence': 0,
+       'title': "Scheduled Task Calls Non-Existent Program",
+       'description': '''A Scheduled Task is configured to run a program that doesn't exist.  This is not necessarily a security problem unless the file can be maliciously created.  This issue gives false-positives for programs which aren't specified using their full path.''',
+       'recommendation': '''Review affected Scheduled Tasks and disabled where approriate.''',
+       'supporting_data': {
+          'taskfile': {
+             'section': "description",
+             'preamble': "The following tasks were affected:",
+          },
+        },
+    },
 }
 
 rating_descriptions = {

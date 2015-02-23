@@ -1,3 +1,4 @@
+from wpc.scheduledtasks import scheduledtasks
 from wpc.audit.auditbase import auditbase
 import wpc.utils
 import win32security
@@ -39,6 +40,7 @@ class dump(auditbase):
         self.run_sub("dump_processes",     self.options.do_all or self.options.do_processes,     self.dump_processes  )
         self.run_sub("dump_program_files", self.options.do_all or self.options.do_program_files, self.dump_program_files)
         self.run_sub("dump_registry",      self.options.do_all or self.options.do_registry,      self.dump_registry   )
+        self.run_sub("dump_scheduled_tasks",self.options.do_all or self.options.do_scheduled_tasks,self.dump_scheduled_tasks)
         self.run_sub("dump_reg_keys",      self.options.do_all or self.options.do_reg_keys,      self.dump_reg_keys   )
         self.run_sub("dump_nt_objects",    self.options.do_all or self.options.do_nt_objects,    self.dump_nt_objects )
         self.run_sub("dump_users",         self.options.do_all or self.options.do_users,         self.dump_users      )
@@ -55,7 +57,11 @@ class dump(auditbase):
         for path in paths:
             print "Path for user %s: %s" % (path[0].get_fq_name(), path[1])
     
-    
+
+    def dump_scheduled_tasks(self):
+        for task in scheduledtasks().get_all_tasks():
+            print task.as_text()
+            
     def dump_misc_checks(self):
         # Check if host is in a domain
         in_domain = 0

@@ -523,6 +523,18 @@ def to_printable(s):
             newstring = newstring + "?"
     return newstring
 
+def dequote(binary_dirty):
+    # remove quotes and leading white space
+    m = re.search('^[\s]*?"([^"]+)"', binary_dirty)
+    if m and os.path.exists(m.group(1)):
+        exe_path_clean = m.group(1)
+        return exe_path_clean
+    else:
+        if m:
+            binary_dirty = m.group(1)
+            
+    return binary_dirty
+    
 # Attempts to clean up strange looking file paths like:
 #   \??\C:\WINDOWS\system32\csrss.exe
 #   \SystemRoot\System32\smss.exe

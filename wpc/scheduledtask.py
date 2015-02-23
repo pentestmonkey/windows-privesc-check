@@ -1,3 +1,4 @@
+import wpc.utils
 
 class scheduledtask():
     def __init__(self, name, root):
@@ -15,6 +16,8 @@ class scheduledtask():
             self.comhandler = None
             self.comhandler_data = None
             self.action_context = None
+            self.command_path = None
+            self.command_set = 0
             self.exec_command = "<none>"
             self.exec_args = "<none>"
             try: 
@@ -60,9 +63,21 @@ class scheduledtask():
         if not self.command:
             try:
                 self.command = self.root.Actions.Exec.Command
+                self.command_set = 1
             except:
                 self.command = "<not set>"
         return self.command
+
+    def get_command_path(self):
+        if not self.command_path:
+            try:
+                self.command_path = wpc.utils.dequote(wpc.utils.env_expand(self.get_command()))
+                #self.command_path = wpc.utils.env_expand(self.get_command())
+            except:
+                self.command_path = "<not set>"
+        if not self.command_set:
+            return None
+        return self.command_path
     
     def get_command_args(self):
         if not self.command_args:
@@ -129,6 +144,24 @@ class scheduledtask():
         return self.uri
     
     
+    def as_tab(self):
+        fields = ["info", "scheduledtask"]
+        fields.append(self.get_name())
+        fields.append(self.get_uri())
+        fields.append(self.get_source())
+        fields.append(self.get_author())
+        fields.append(self.get_description())
+        fields.append(self.get_date())
+        fields.append(self.get_enabled())
+        fields.append(self.get_sd_text())
+        fields.append(self.get_action_context())
+        fields.append(self.get_comhandler())
+        fields.append(self.get_comhandler_data())
+        fields.append(self.get_command())
+        fields.append(self.get_command_path())
+        fields.append(self.get_command_args())
+        return wpc.utils.tab_line(*fields)
+        
     def as_text(self):
         t = ""
         t += "----------------------\n"
@@ -144,6 +177,7 @@ class scheduledtask():
         t += "comhandler: %s\n" % self.get_comhandler()
         t += "comhandler_data: %s\n" % self.get_comhandler_data()
         t += "command: %s\n" % self.get_command()
+        t += "command_path: %s\n" % self.get_command_path()
         t += "command_args: %s\n" % self.get_command_args()
         return t
     

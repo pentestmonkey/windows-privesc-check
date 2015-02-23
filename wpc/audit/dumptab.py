@@ -1,3 +1,4 @@
+from wpc.scheduledtasks import scheduledtasks
 from wpc.audit.auditbase import auditbase
 from wpc.file import file as File
 from wpc.groups import groups
@@ -36,6 +37,7 @@ class dumptab(auditbase):
         self.run_sub("", self.options.do_all or self.options.do_processes,          self.dumptab_processes)
         self.run_sub("", self.options.do_all or self.options.do_program_files,      self.dumptab_program_files)
         self.run_sub("", self.options.do_all or self.options.do_registry,           self.dumptab_registry)
+        self.run_sub("", self.options.do_all or self.options.do_scheduled_tasks,    self.dumptab_scheduled_tasks)
         self.run_sub("", self.options.do_all or self.options.do_reg_keys,           self.dumptab_reg_keys)
         self.run_sub("", self.options.do_all or self.options.do_installed_software, self.dumptab_installed_software)
         self.run_sub("", self.options.do_all or self.options.do_nt_objects,         self.dumptab_nt_objects)
@@ -54,6 +56,11 @@ class dumptab(auditbase):
         print wpc.utils.tab_line("info", "system_path", systempath)
         
         
+    def dumptab_scheduled_tasks(self):
+        for task in scheduledtasks().get_all_tasks():
+            print task.as_tab()
+            
+            
     def dumptab_all_files(self):
         # Record info about all directories
         include_dirs = 1
