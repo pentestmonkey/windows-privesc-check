@@ -379,6 +379,12 @@ class issue:
                     exe = "[unknown]"
                 etree.SubElement(d, 'data').text = " Process ID %s (%s) has weak process-level permissions: %s\n" % (p.get_pid(), exe, perms.as_text())
 
+        elif data_name == 'taskfile':
+            for data in self.get_supporting_data(data_name):
+                t = data[0]
+                f = data[1]
+                etree.SubElement(d, 'data').text = " Task %s runs non-existent file %s\n" % (t.get_name(), f.get_name())
+
         elif data_name == 'thread_perms':
             for data in self.get_supporting_data(data_name):
                 t = data[0]
