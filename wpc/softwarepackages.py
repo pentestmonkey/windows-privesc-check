@@ -25,7 +25,7 @@ class softwarepackages():
         if uninstall.is_present():
             for subkey in uninstall.get_subkeys():
                 name = wpc.utils.to_printable(subkey.get_value("DisplayName"))
-                if name is not None:
+                if not name is None:
                     packages.append(softwarepackage(subkey))
         return packages
     
