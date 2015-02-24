@@ -14,10 +14,15 @@ class scheduledtask():
             self.command = None
             self.command_args = None
             self.comhandler = None
+            self.runas = None
             self.comhandler_data = None
             self.action_context = None
             self.command_path = None
             self.command_set = 0
+            self.principal_groupid = None
+            self.principal_userid = None
+            self.principal_runlevel = None
+            self.principal_id = None
             self.exec_command = "<none>"
             self.exec_args = "<none>"
             try: 
@@ -38,7 +43,7 @@ class scheduledtask():
     def get_action_context(self):
         if not self.action_context:
             try:
-                self.action_context = self.root.Actions.attrib["Author"]
+                self.action_context = self.root.Actions.attrib["Context"]
             except:
                 self.action_context = "<not set>"
         return self.action_context
@@ -94,6 +99,38 @@ class scheduledtask():
             except:
                 self.author = "<not set>"
         return self.author
+
+    def get_principal_groupid(self):
+        if not self.principal_groupid:
+            try:
+                self.principal_groupid = self.root.Principals.Principal.GroupId
+            except:
+                self.principal_groupid = "<not set>"
+        return self.principal_groupid
+    
+    def get_principal_userid(self):
+        if not self.principal_userid:
+            try:
+                self.principal_userid = self.root.Principals.Principal.UserId
+            except:
+                self.principal_userid = "<not set>"
+        return self.principal_userid
+    
+    def get_principal_runlevel(self):
+        if not self.principal_runlevel:
+            try:
+                self.principal_runlevel = self.root.Principals.Principal.RunLevel
+            except:
+                self.principal_runlevel = "<not set>"
+        return self.principal_runlevel
+    
+    def get_principal_id(self):
+        if not self.principal_id:
+            try:
+                self.principal_id = self.root.Principals.Principal.attrib["id"]
+            except:
+                self.principal_id = "<not set>"
+        return self.principal_id
     
     def get_enabled(self):
         if not self.enabled:
@@ -155,6 +192,10 @@ class scheduledtask():
         fields.append(self.get_enabled())
         fields.append(self.get_sd_text())
         fields.append(self.get_action_context())
+        fields.append(self.get_principal_groupid())
+        fields.append(self.get_principal_userid())
+        fields.append(self.get_principal_id())
+        fields.append(self.get_principal_id())
         fields.append(self.get_comhandler())
         fields.append(self.get_comhandler_data())
         fields.append(self.get_command())
@@ -174,12 +215,14 @@ class scheduledtask():
         t += "Enabled: %s\n" % self.get_enabled()
         t += "SD: %s\n" % self.get_sd_text()
         t += "action_context: %s\n" % self.get_action_context()
+        t += "principal_groupid: %s\n" % self.get_principal_groupid()
+        t += "principal_userid: %s\n" % self.get_principal_userid()
+        t += "principal_runlevel: %s\n" % self.get_principal_id()
+        t += "principal_id: %s\n" % self.get_principal_id()
         t += "comhandler: %s\n" % self.get_comhandler()
         t += "comhandler_data: %s\n" % self.get_comhandler_data()
         t += "command: %s\n" % self.get_command()
         t += "command_path: %s\n" % self.get_command_path()
         t += "command_args: %s\n" % self.get_command_args()
         return t
-    
-    
     
