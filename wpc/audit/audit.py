@@ -1146,7 +1146,21 @@ class audit(auditbase):
                             print line
     
     def audit_scheduled_tasks(self):
+        app = appendix("Scheduled Tasks")
+        app.set_preamble("The following Scheduled Tasks were configured at the time of the audit.")
+        app.add_table_row(["Name", "Description", "Enabled", "SD", "Context", "Command"])
+
         for task in scheduledtasks().get_all_tasks():
+            if self.options.do_appendices:
+                fields = []
+                fields.append(task.get_name())
+                fields.append(task.get_description())
+                fields.append(task.get_enabled())
+                fields.append(task.get_sd_text())
+                fields.append(task.get_action_context())
+                fields.append(task.get_command_path())
+                app.add_table_row(fields)
+
             #print task.get_command_path()
             # if task.get_enabled() and task.get_command_path():
             if 1 and task.get_command_path():
@@ -1159,6 +1173,9 @@ class audit(auditbase):
                     for a in f.get_dangerous_aces():
                         self.issues.get_by_id("WPC120").add_supporting_data('scheduled_task_exe_perms', [f.get_name(), f, a])
                 
+        if self.options.do_appendices:
+            self.appendices.add_appendix(app)
+
         
     def audit_registry(self):
     
