@@ -4,4 +4,6 @@ Windows-privesc-check is standalone executable that runs on Windows systems (tes
 
 It is written in python and converted to an executable using pyinstaller so it can be easily uploaded and run (as opposed to unzipping python + other dependencies).  It can run either as a normal user or as Administrator (obviously it does a better job when running as Administrator because it can read more files).
 
+Ignore the main branch.  See https://github.com/pentestmonkey/windows-privesc-check/tree/wpc-2.0
+
 Also see: http://pentestmonkey.net/tools/windows-privesc-check/ (coming soon).
