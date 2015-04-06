@@ -6,6 +6,8 @@ The latest version of the code is in the master branch.
 
 # Use Cases 
 
+Below is a high level description of common use cases.  See also the [Quick Start & Usage](docs/QuickStartUsage.md) page.
+
 ## Find Privesc Vectors (as Administrator) 
 
 When run with admin rights, windows-privesc-check has full read access to all [secureable objects](http://msdn.microsoft.com/en-us/library/aa379557%28VS.85%29.aspx).  This allows it to perform audits for escalation vectors such as:
