@@ -10,7 +10,7 @@ Below is a high level description of common use cases.  See also the [Quick Star
 
 ## Find Privesc Vectors (as Administrator) 
 
-When run with admin rights, windows-privesc-check has full read access to all [secureable objects](http://msdn.microsoft.com/en-us/library/aa379557%28VS.85%29.aspx).  This allows it to perform audits for escalation vectors such as:
+When run with admin rights, windows-privesc-check has full read access to all [secureable objects](https://msdn.microsoft.com/en-us/library/aa379557%28VS.85%29.aspx).  This allows it to perform audits for escalation vectors such as:
   * Reconfiguring Windows Services
   * Replacing Service executables if they have weak file permissions
   * Replacing poorly protected .exe or .dll files in %ProgramFiles%
@@ -19,7 +19,7 @@ When run with admin rights, windows-privesc-check has full read access to all [s
   * Modifying programs on FAT file systems
   * Tampering with running processes
 
-A great many of the privielges escalation vectors checked are simply checks for weak security descriptors on [Windows securable objects](http://msdn.microsoft.com/en-us/library/aa379557%28VS.85%29.aspx).
+A great many of the privielges escalation vectors checked are simply checks for weak security descriptors on [Windows securable objects](https://msdn.microsoft.com/en-us/library/aa379557%28VS.85%29.aspx).
 
 A report is generated in HTML, TXT and XML format.
 
@@ -39,7 +39,7 @@ Both human-readable (text) and machine readable (tab delimited) formats are supp
 
 Examples of data users are able to dump:
   * Detailed Share Information about local or remote systems.  Includes DACL (Share permissions).
-  * Information about users, groups, memeberships and the Windows Privileges (e.g. SeBackupPrivilege).  See http://msdn.microsoft.com/en-us/library/bb530716%28v=VS.85%29.aspx.
+  * Information about users, groups, memeberships and the Windows Privileges (e.g. SeBackupPrivilege).  See https://msdn.microsoft.com/en-us/library/bb530716%28v=VS.85%29.aspx.
 
 ## Provide Information To Help Compromise A Remote System
 
