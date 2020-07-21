@@ -4367,7 +4367,7 @@ NB: This issue has only been reported for NTFS filesystems.  Other non-NTFS file
        'confidence': 5,
        'title': "Some Users Have Passwords That Don't Expire",
        'description': '''TODO UF_DONT_EXPIRE_PASSWD was set for some accounts that were neither locked nor disabled''',
-       'recommendation': '''TODO''',
+       'recommendation': '''Users should not be forced to change passwords as per NIST Special Publication 800-63B: "Do not require that memorized secrets be changed arbitrarily (e.g., periodically) unless there is a user request or evidence of authenticator compromise." (published 2017, last updated in 2020). Various studies show that this reduces password quality, as summarized by Microsoft Research in "Password Guidance" (Robyn Hicock, May 2016). If your organisation has different rules that supercede best current practice, however, non-expiring passwords may be a violation of policy.''',
        'supporting_data': {
           'username': {
              'section': "description",
