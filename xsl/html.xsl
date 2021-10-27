@@ -13,7 +13,7 @@
 			{
 			vertical-align:top;
 			}
-			h1 {font-size: 300%; text-align:center}
+			h1 {font-size: 300%; tex-align:center}
 			h2 {font-size: 200%; margin-top: 25px; margin-bottom: 0px; padding: 5px; background-color: #CCCCCC;}
 			h3 {font-size: 150%; font-weight: normal; padding: 5px; background-color: #EEEEEE; margin-top: 10px;}
 			#frontpage {height: 270px; background-color: #F3F3F3;}
