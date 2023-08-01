@@ -19,7 +19,7 @@ When run with admin rights, windows-privesc-check has full read access to all [s
   * Modifying programs on FAT file systems
   * Tampering with running processes
 
-A great many of the privielges escalation vectors checked are simply checks for weak security descriptors on [Windows securable objects](http://msdn.microsoft.com/en-us/library/aa379557%28VS.85%29.aspx).
+A great many of the privilege escalation vectors checked are simply checks for weak security descriptors on [Windows securable objects](http://msdn.microsoft.com/en-us/library/aa379557%28VS.85%29.aspx).
 
 A report is generated in HTML, TXT and XML format.
 
